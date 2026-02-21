@@ -3,15 +3,19 @@ import { Astal, Gtk } from "ags/gtk4"
 import { execAsync } from "ags/process"
 import { createPoll } from "ags/time"
 
+const fallbackCover = "/usr/share/icons/hicolor/128x128/apps/spotify-client.png"
+const cachedCover = "/tmp/ags-spotify-cover.jpg"
+
 function formatTime(seconds: number) {
-  const safe = Math.max(0, Math.floor(seconds))
+  const safe = Number.isFinite(seconds) ? Math.max(0, Math.floor(seconds)) : 0
   const m = Math.floor(safe / 60)
   const s = safe % 60
   return `${m}:${s.toString().padStart(2, "0")}`
 }
 
-function toLocalArtPath(url: string) {
-  if (!url) return ""
+async function resolveArtPath(url: string) {
+  if (!url) return fallbackCover
+
   if (url.startsWith("file://")) {
     try {
       return decodeURIComponent(url.replace("file://", ""))
@@ -19,11 +23,21 @@ function toLocalArtPath(url: string) {
       return url.replace("file://", "")
     }
   }
-  return ""
+
+  if (url.startsWith("http://") || url.startsWith("https://")) {
+    try {
+      await execAsync(`bash -lc 'curl -L --silent --show-error --max-time 3 --output "${cachedCover}" "${url}"'`)
+      return cachedCover
+    } catch {
+      return fallbackCover
+    }
+  }
+
+  return fallbackCover
 }
 
 export default function SpotifyPopup() {
-  const title = createPoll("No hay reproducción", 1200, async () => {
+  const title = createPoll("No hay reproducción", 1500, async () => {
     try {
       const out = await execAsync(`playerctl -p spotify metadata --format '{{title}}' 2>/dev/null || echo ''`)
       return out.trim() || "No hay reproducción"
@@ -32,7 +46,7 @@ export default function SpotifyPopup() {
     }
   })
 
-  const artist = createPoll("", 1200, async () => {
+  const artist = createPoll("", 1500, async () => {
     try {
       const out = await execAsync(`playerctl -p spotify metadata --format '{{artist}}' 2>/dev/null || echo ''`)
       return out.trim()
@@ -53,9 +67,7 @@ export default function SpotifyPopup() {
     }
   })
 
-
-
-  const progressTime = createPoll("0:00 / 0:00", 400, async () => {
+  const progressTime = createPoll("0:00 / 0:00", 1000, async () => {
     try {
       const len = await execAsync(`playerctl -p spotify metadata --format '{{mpris:length}}' 2>/dev/null || echo '0'`)
       const pos = await execAsync(`playerctl -p spotify position 2>/dev/null || echo '0'`)
@@ -67,14 +79,14 @@ export default function SpotifyPopup() {
     }
   })
 
-  const progressText = createPoll("○──────────", 300, async () => {
+  const progressText = createPoll("◉───────────", 1000, async () => {
     try {
       const len = await execAsync(`playerctl -p spotify metadata --format '{{mpris:length}}' 2>/dev/null || echo '0'`)
       const pos = await execAsync(`playerctl -p spotify position 2>/dev/null || echo '0'`)
       const totalSec = Number(len.trim()) / 1_000_000
       const currentSec = Number(pos.trim())
 
-      if (!Number.isFinite(totalSec) || totalSec <= 0 || !Number.isFinite(currentSec)) return "○──────────"
+      if (!Number.isFinite(totalSec) || totalSec <= 0 || !Number.isFinite(currentSec)) return "◉───────────"
 
       const slots = 12
       const ratio = Math.max(0, Math.min(1, currentSec / totalSec))
@@ -83,16 +95,16 @@ export default function SpotifyPopup() {
       const right = "─".repeat(Math.max(0, slots - head - 1))
       return `${left}◉${right}`
     } catch {
-      return "○──────────"
+      return "◉───────────"
     }
   })
 
-  const artPath = createPoll("", 2000, async () => {
+  const artPath = createPoll(fallbackCover, 3000, async () => {
     try {
       const out = await execAsync(`playerctl -p spotify metadata --format '{{mpris:artUrl}}' 2>/dev/null || echo ''`)
-      return toLocalArtPath(out.trim())
+      return await resolveArtPath(out.trim())
     } catch {
-      return ""
+      return fallbackCover
     }
   })
 
