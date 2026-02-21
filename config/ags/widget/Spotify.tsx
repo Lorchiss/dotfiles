@@ -13,6 +13,27 @@ function formatTime(seconds: number) {
   return `${m}:${s.toString().padStart(2, "0")}`
 }
 
+function parseFloatSafe(raw: string) {
+  const normalized = raw.trim().replace(",", ".")
+  const n = Number(normalized)
+  return Number.isFinite(n) ? n : 0
+}
+
+function shSingleQuote(value: string) {
+  return `'${value.replace(/'/g, `'"'"'`)}'`
+}
+
+type SpotifyState = {
+  title: string
+  artist: string
+  status: string
+  totalSec: number
+  currentSec: number
+  artPath: string
+}
+
+let lastArtUrl = ""
+
 async function resolveArtPath(url: string) {
   if (!url) return fallbackCover
 
@@ -26,7 +47,8 @@ async function resolveArtPath(url: string) {
 
   if (url.startsWith("http://") || url.startsWith("https://")) {
     try {
-      await execAsync(`bash -lc 'curl -L --silent --show-error --max-time 3 --output "${cachedCover}" "${url}"'`)
+      const safeUrl = shSingleQuote(url)
+      await execAsync(`bash -lc "curl -L --silent --show-error --max-time 4 --output ${shSingleQuote(cachedCover)} -- ${safeUrl}"`)
       return cachedCover
     } catch {
       return fallbackCover
@@ -36,77 +58,74 @@ async function resolveArtPath(url: string) {
   return fallbackCover
 }
 
+function statusLabel(status: string) {
+  if (status === "Playing") return "Reproduciendo"
+  if (status === "Paused") return "Pausado"
+  return "Detenido"
+}
+
 export default function SpotifyPopup() {
-  const title = createPoll("No hay reproducción", 1500, async () => {
-    try {
-      const out = await execAsync(`playerctl -p spotify metadata --format '{{title}}' 2>/dev/null || echo ''`)
-      return out.trim() || "No hay reproducción"
-    } catch {
-      return "No hay reproducción"
-    }
+  const state = createPoll<SpotifyState>(
+    {
+      title: "No hay reproducción",
+      artist: "",
+      status: "Detenido",
+      totalSec: 0,
+      currentSec: 0,
+      artPath: fallbackCover,
+    },
+    1000,
+    async () => {
+      try {
+        const out = await execAsync(`bash -lc '
+meta=$(playerctl -p spotify metadata --format "{{title}}|||{{artist}}|||{{mpris:length}}|||{{mpris:artUrl}}" 2>/dev/null || echo "|||0||")
+status=$(playerctl -p spotify status 2>/dev/null || echo "Stopped")
+pos=$(playerctl -p spotify position 2>/dev/null || echo "0")
+printf "%s|||%s|||%s" "$meta" "$status" "$pos"
+'`)
+
+        const parts = out.split("|||")
+        const title = (parts[0] || "").trim() || "No hay reproducción"
+        const artist = (parts[1] || "").trim()
+        const micros = Number((parts[2] || "0").trim())
+        const artUrl = (parts[3] || "").trim()
+        const status = (parts[4] || "Stopped").trim()
+        const currentSec = parseFloatSafe(parts[5] || "0")
+
+        const totalSec = Number.isFinite(micros) && micros > 0 ? micros / 1_000_000 : 0
+
+        let artPath = fallbackCover
+        if (artUrl === lastArtUrl) {
+          artPath = artUrl.startsWith("http") ? cachedCover : await resolveArtPath(artUrl)
+          if (!artPath) artPath = fallbackCover
+        } else {
+          artPath = await resolveArtPath(artUrl)
+          lastArtUrl = artUrl
+        }
+
+        return { title, artist, status, totalSec, currentSec, artPath }
+      } catch {
+        return {
+          title: "No hay reproducción",
+          artist: "",
+          status: "Detenido",
+          totalSec: 0,
+          currentSec: 0,
+          artPath: fallbackCover,
+        }
+      }
+    },
+  )
+
+  const progressText = state((s) => {
+    if (s.totalSec <= 0) return "◉───────────"
+    const slots = 12
+    const ratio = Math.max(0, Math.min(1, s.currentSec / s.totalSec))
+    const head = Math.min(slots - 1, Math.floor(ratio * slots))
+    return `${"━".repeat(head)}◉${"─".repeat(Math.max(0, slots - head - 1))}`
   })
 
-  const artist = createPoll("", 1500, async () => {
-    try {
-      const out = await execAsync(`playerctl -p spotify metadata --format '{{artist}}' 2>/dev/null || echo ''`)
-      return out.trim()
-    } catch {
-      return ""
-    }
-  })
-
-  const status = createPoll("Detenido", 1200, async () => {
-    try {
-      const out = await execAsync(`playerctl -p spotify status 2>/dev/null || echo ''`)
-      const s = out.trim()
-      if (s === "Playing") return "Reproduciendo"
-      if (s === "Paused") return "Pausado"
-      return "Detenido"
-    } catch {
-      return "Detenido"
-    }
-  })
-
-  const progressTime = createPoll("0:00 / 0:00", 1000, async () => {
-    try {
-      const len = await execAsync(`playerctl -p spotify metadata --format '{{mpris:length}}' 2>/dev/null || echo '0'`)
-      const pos = await execAsync(`playerctl -p spotify position 2>/dev/null || echo '0'`)
-      const totalSec = Number(len.trim()) / 1_000_000
-      const currentSec = Number(pos.trim())
-      return `${formatTime(currentSec)} / ${formatTime(totalSec)}`
-    } catch {
-      return "0:00 / 0:00"
-    }
-  })
-
-  const progressText = createPoll("◉───────────", 1000, async () => {
-    try {
-      const len = await execAsync(`playerctl -p spotify metadata --format '{{mpris:length}}' 2>/dev/null || echo '0'`)
-      const pos = await execAsync(`playerctl -p spotify position 2>/dev/null || echo '0'`)
-      const totalSec = Number(len.trim()) / 1_000_000
-      const currentSec = Number(pos.trim())
-
-      if (!Number.isFinite(totalSec) || totalSec <= 0 || !Number.isFinite(currentSec)) return "◉───────────"
-
-      const slots = 12
-      const ratio = Math.max(0, Math.min(1, currentSec / totalSec))
-      const head = Math.min(slots - 1, Math.floor(ratio * slots))
-      const left = "━".repeat(head)
-      const right = "─".repeat(Math.max(0, slots - head - 1))
-      return `${left}◉${right}`
-    } catch {
-      return "◉───────────"
-    }
-  })
-
-  const artPath = createPoll(fallbackCover, 3000, async () => {
-    try {
-      const out = await execAsync(`playerctl -p spotify metadata --format '{{mpris:artUrl}}' 2>/dev/null || echo ''`)
-      return await resolveArtPath(out.trim())
-    } catch {
-      return fallbackCover
-    }
-  })
+  const progressTime = state((s) => `${formatTime(s.currentSec)} / ${formatTime(s.totalSec)}`)
 
   return (
     <window
@@ -124,17 +143,17 @@ export default function SpotifyPopup() {
       <box orientation={Gtk.Orientation.VERTICAL} spacing={12} cssName="spotifyPopupCard">
         <box spacing={10}>
           <box cssName="spotifyCoverWrap" valign={Gtk.Align.START}>
-            <image file={artPath} cssName="spotifyCover" />
+            <image file={state((s) => s.artPath)} cssName="spotifyCover" widthRequest={88} heightRequest={88} />
           </box>
 
           <box orientation={Gtk.Orientation.VERTICAL} spacing={6} hexpand>
             <box spacing={8} halign={Gtk.Align.FILL}>
               <label label=" Spotify" cssName="spotifyPopupHeading" hexpand xalign={0} />
-              <label label={status} cssName="spotifyPopupStatus" />
+              <label label={state((s) => statusLabel(s.status))} cssName="spotifyPopupStatus" />
             </box>
 
-            <label label={title} wrap maxWidthChars={30} cssName="spotifyPopupTrack" xalign={0} />
-            <label label={artist((a) => (a ? `por ${a}` : ""))} cssName="spotifyPopupArtist" xalign={0} />
+            <label label={state((s) => s.title)} wrap maxWidthChars={30} cssName="spotifyPopupTrack" xalign={0} />
+            <label label={state((s) => (s.artist ? `por ${s.artist}` : ""))} cssName="spotifyPopupArtist" xalign={0} />
 
             <box orientation={Gtk.Orientation.VERTICAL} spacing={2}>
               <label label={progressText} cssName="spotifyProgressWave" xalign={0} />
