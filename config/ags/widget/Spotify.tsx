@@ -3,7 +3,6 @@ import { Astal, Gtk } from "ags/gtk4"
 import { execAsync } from "ags/process"
 import { createPoll } from "ags/time"
 
-const fallbackCover = "/usr/share/icons/hicolor/128x128/apps/spotify-client.png"
 const cachedCover = "/tmp/ags-spotify-cover.jpg"
 
 type SpotifyState = {
@@ -16,6 +15,7 @@ type SpotifyState = {
 }
 
 let lastArtUrl = ""
+let lastResolvedArtPath = ""
 
 function formatTime(seconds: number) {
   const safe = Number.isFinite(seconds) ? Math.max(0, Math.floor(seconds)) : 0
@@ -35,15 +35,26 @@ function statusLabel(status: string) {
   return "Detenido"
 }
 
+async function fileExists(path: string) {
+  if (!path) return false
+  try {
+    const out = await execAsync(`bash -lc '[ -f "${path}" ] && echo yes || echo no'`)
+    return out.trim() === "yes"
+  } catch {
+    return false
+  }
+}
+
 async function resolveArtPath(url: string) {
-  if (!url) return fallbackCover
+  if (!url) return lastResolvedArtPath || ""
 
   if (url.startsWith("file://")) {
-    try {
-      return decodeURIComponent(url.replace("file://", ""))
-    } catch {
-      return url.replace("file://", "")
+    const localPath = decodeURIComponent(url.replace("file://", ""))
+    if (await fileExists(localPath)) {
+      lastResolvedArtPath = localPath
+      return localPath
     }
+    return lastResolvedArtPath || ""
   }
 
   if (url.startsWith("http://") || url.startsWith("https://")) {
@@ -51,14 +62,15 @@ async function resolveArtPath(url: string) {
       try {
         await execAsync(`bash -lc 'curl -L --silent --show-error --max-time 4 --output "${cachedCover}" -- "${url}"'`)
         lastArtUrl = url
+        lastResolvedArtPath = cachedCover
       } catch {
-        return fallbackCover
+        return lastResolvedArtPath || ""
       }
     }
-    return cachedCover
+    return lastResolvedArtPath || ""
   }
 
-  return fallbackCover
+  return lastResolvedArtPath || ""
 }
 
 export default function SpotifyPopup() {
@@ -69,7 +81,7 @@ export default function SpotifyPopup() {
       status: "Stopped",
       totalSec: 0,
       currentSec: 0,
-      artPath: fallbackCover,
+      artPath: "",
     },
     1800,
     async () => {
@@ -88,10 +100,10 @@ printf "%s\n%s\n%s\n%s\n%s\n%s" "$title" "$artist" "$length" "$art" "$status" "$
           .split("\n")
           .map((v) => v.trim())
 
-        const title = titleRaw.trim() || "No hay reproducción"
-        const artist = artistRaw.trim()
-        const status = statusRaw.trim() || "Stopped"
-        const micros = Number(lenRaw.trim())
+        const title = titleRaw || "No hay reproducción"
+        const artist = artistRaw
+        const status = statusRaw || "Stopped"
+        const micros = Number(lenRaw)
         const totalSec = Number.isFinite(micros) && micros > 0 ? micros / 1_000_000 : 0
         const currentSec = parseFloatSafe(posRaw)
         const artPath = await resolveArtPath(artUrlRaw)
@@ -104,7 +116,7 @@ printf "%s\n%s\n%s\n%s\n%s\n%s" "$title" "$artist" "$length" "$art" "$status" "$
           status: "Stopped",
           totalSec: 0,
           currentSec: 0,
-          artPath: fallbackCover,
+          artPath: lastResolvedArtPath || "",
         }
       }
     },
@@ -136,7 +148,14 @@ printf "%s\n%s\n%s\n%s\n%s\n%s" "$title" "$artist" "$length" "$art" "$status" "$
       <box orientation={Gtk.Orientation.VERTICAL} spacing={10} cssName="spotifyPopupCard" widthRequest={360}>
         <box spacing={10}>
           <box cssName="spotifyCoverWrap" valign={Gtk.Align.START}>
-            <image file={state((s) => s.artPath)} cssName="spotifyCover" widthRequest={92} heightRequest={92} />
+            <image
+              visible={state((s) => !!s.artPath)}
+              file={state((s) => s.artPath)}
+              cssName="spotifyCover"
+              widthRequest={96}
+              heightRequest={96}
+            />
+            <label visible={state((s) => !s.artPath)} label="" cssName="spotifyCoverFallback" />
           </box>
 
           <box orientation={Gtk.Orientation.VERTICAL} spacing={4}>
