@@ -14,9 +14,19 @@ export default function Bar(gdkmonitor: Gdk.Monitor) {
   const spotifyTitle = createPoll(" ", 2000, async () => {
     try {
       const out = await execAsync(`playerctl -p spotify metadata --format '{{title}}' 2>/dev/null || echo ''`)
-     return ` ${out.trim()}`
+      const title = out.trim()
+      return title ? ` ${title}` : ""
     } catch {
       return ""
+    }
+  })
+
+  const spotifyPlaying = createPoll(false, 2000, async () => {
+    try {
+      const out = await execAsync(`playerctl -p spotify status 2>/dev/null || echo ''`)
+      return out.trim() === "Playing"
+    } catch {
+      return false
     }
   })
 
@@ -97,12 +107,10 @@ export default function Bar(gdkmonitor: Gdk.Monitor) {
 
         {/* RIGHT: spotify + cpu + ram + net + vol + clock */}
         <box $type="end" spacing={12} hexpand halign={Gtk.Align.END}>
-        <button
-          onClicked={toggleSpotifyPopup}
-          class={spotifyState.playing ? "spotify-active" : ""}
-          >
-          <label label={` ${spotifyState.title}`} />
+          <button onClicked={toggleSpotifyPopup} class={spotifyPlaying((playing) => (playing ? "spotify-active" : ""))}>
+            <label label={spotifyTitle} />
           </button>
+          <label label={cpu} />
           <label label={ram} />
           <label label={net} />
           <label label={vol} />
@@ -117,4 +125,3 @@ export default function Bar(gdkmonitor: Gdk.Monitor) {
     </window>
   )
 }
-
