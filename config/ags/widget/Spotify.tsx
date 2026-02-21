@@ -6,23 +6,6 @@ import { createPoll } from "ags/time"
 const fallbackCover = "/usr/share/icons/hicolor/128x128/apps/spotify-client.png"
 const cachedCover = "/tmp/ags-spotify-cover.jpg"
 
-function formatTime(seconds: number) {
-  const safe = Number.isFinite(seconds) ? Math.max(0, Math.floor(seconds)) : 0
-  const m = Math.floor(safe / 60)
-  const s = safe % 60
-  return `${m}:${s.toString().padStart(2, "0")}`
-}
-
-function parseFloatSafe(raw: string) {
-  const normalized = raw.trim().replace(",", ".")
-  const n = Number(normalized)
-  return Number.isFinite(n) ? n : 0
-}
-
-function shSingleQuote(value: string) {
-  return `'${value.replace(/'/g, `'"'"'`)}'`
-}
-
 type SpotifyState = {
   title: string
   artist: string
@@ -33,6 +16,24 @@ type SpotifyState = {
 }
 
 let lastArtUrl = ""
+
+function formatTime(seconds: number) {
+  const safe = Number.isFinite(seconds) ? Math.max(0, Math.floor(seconds)) : 0
+  const m = Math.floor(safe / 60)
+  const s = safe % 60
+  return `${m}:${s.toString().padStart(2, "0")}`
+}
+
+function parseFloatSafe(raw: string) {
+  const n = Number((raw || "").trim().replace(",", "."))
+  return Number.isFinite(n) ? n : 0
+}
+
+function statusLabel(status: string) {
+  if (status === "Playing") return "Reproduciendo"
+  if (status === "Paused") return "Pausado"
+  return "Detenido"
+}
 
 async function resolveArtPath(url: string) {
   if (!url) return fallbackCover
@@ -46,22 +47,18 @@ async function resolveArtPath(url: string) {
   }
 
   if (url.startsWith("http://") || url.startsWith("https://")) {
-    try {
-      const safeUrl = shSingleQuote(url)
-      await execAsync(`bash -lc "curl -L --silent --show-error --max-time 4 --output ${shSingleQuote(cachedCover)} -- ${safeUrl}"`)
-      return cachedCover
-    } catch {
-      return fallbackCover
+    if (url !== lastArtUrl) {
+      try {
+        await execAsync(`bash -lc 'curl -L --silent --show-error --max-time 4 --output "${cachedCover}" -- "${url}"'`)
+        lastArtUrl = url
+      } catch {
+        return fallbackCover
+      }
     }
+    return cachedCover
   }
 
   return fallbackCover
-}
-
-function statusLabel(status: string) {
-  if (status === "Playing") return "Reproduciendo"
-  if (status === "Paused") return "Pausado"
-  return "Detenido"
 }
 
 export default function SpotifyPopup() {
@@ -69,7 +66,7 @@ export default function SpotifyPopup() {
     {
       title: "No hay reproducción",
       artist: "",
-      status: "Detenido",
+      status: "Stopped",
       totalSec: 0,
       currentSec: 0,
       artPath: fallbackCover,
@@ -77,38 +74,29 @@ export default function SpotifyPopup() {
     1000,
     async () => {
       try {
-        const out = await execAsync(`bash -lc '
-meta=$(playerctl -p spotify metadata --format "{{title}}|||{{artist}}|||{{mpris:length}}|||{{mpris:artUrl}}" 2>/dev/null || echo "|||0||")
-status=$(playerctl -p spotify status 2>/dev/null || echo "Stopped")
-pos=$(playerctl -p spotify position 2>/dev/null || echo "0")
-printf "%s|||%s|||%s" "$meta" "$status" "$pos"
-'`)
+        const [titleRaw, artistRaw, lenRaw, artUrlRaw, statusRaw, posRaw] = await Promise.all([
+          execAsync(`playerctl -p spotify metadata --format '{{title}}' 2>/dev/null || echo ''`),
+          execAsync(`playerctl -p spotify metadata --format '{{artist}}' 2>/dev/null || echo ''`),
+          execAsync(`playerctl -p spotify metadata --format '{{mpris:length}}' 2>/dev/null || echo '0'`),
+          execAsync(`playerctl -p spotify metadata --format '{{mpris:artUrl}}' 2>/dev/null || echo ''`),
+          execAsync(`playerctl -p spotify status 2>/dev/null || echo 'Stopped'`),
+          execAsync(`playerctl -p spotify position 2>/dev/null || echo '0'`),
+        ])
 
-        const parts = out.split("|||")
-        const title = (parts[0] || "").trim() || "No hay reproducción"
-        const artist = (parts[1] || "").trim()
-        const micros = Number((parts[2] || "0").trim())
-        const artUrl = (parts[3] || "").trim()
-        const status = (parts[4] || "Stopped").trim()
-        const currentSec = parseFloatSafe(parts[5] || "0")
-
+        const title = titleRaw.trim() || "No hay reproducción"
+        const artist = artistRaw.trim()
+        const status = statusRaw.trim() || "Stopped"
+        const micros = Number(lenRaw.trim())
         const totalSec = Number.isFinite(micros) && micros > 0 ? micros / 1_000_000 : 0
-
-        let artPath = fallbackCover
-        if (artUrl === lastArtUrl) {
-          artPath = artUrl.startsWith("http") ? cachedCover : await resolveArtPath(artUrl)
-          if (!artPath) artPath = fallbackCover
-        } else {
-          artPath = await resolveArtPath(artUrl)
-          lastArtUrl = artUrl
-        }
+        const currentSec = parseFloatSafe(posRaw)
+        const artPath = await resolveArtPath(artUrlRaw.trim())
 
         return { title, artist, status, totalSec, currentSec, artPath }
       } catch {
         return {
           title: "No hay reproducción",
           artist: "",
-          status: "Detenido",
+          status: "Stopped",
           totalSec: 0,
           currentSec: 0,
           artPath: fallbackCover,
@@ -140,15 +128,15 @@ printf "%s|||%s|||%s" "$meta" "$status" "$pos"
       exclusivity={Astal.Exclusivity.IGNORE}
       keymode={Astal.Keymode.ON_DEMAND}
     >
-      <box orientation={Gtk.Orientation.VERTICAL} spacing={10} cssName="spotifyPopupCard" widthRequest={340}>
+      <box orientation={Gtk.Orientation.VERTICAL} spacing={10} cssName="spotifyPopupCard" widthRequest={360}>
         <box spacing={10}>
           <box cssName="spotifyCoverWrap" valign={Gtk.Align.START}>
-            <image file={state((s) => s.artPath)} cssName="spotifyCover" widthRequest={72} heightRequest={72} />
+            <image file={state((s) => s.artPath)} cssName="spotifyCover" widthRequest={92} heightRequest={92} />
           </box>
 
           <box orientation={Gtk.Orientation.VERTICAL} spacing={4}>
             <box spacing={8} halign={Gtk.Align.FILL}>
-              <label label=" Spotify" cssName="spotifyPopupHeading" hexpand xalign={0} />
+              <label label="Spotify" cssName="spotifyPopupHeading" hexpand xalign={0} />
               <label label={state((s) => statusLabel(s.status))} cssName="spotifyPopupStatus" />
             </box>
 

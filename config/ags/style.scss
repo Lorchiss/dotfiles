@@ -57,8 +57,8 @@ window.SpotifyPopup {
   background: transparent;
 
   > spotifyPopupCard {
-    min-width: 340px;
-    padding: 12px;
+    min-width: 360px;
+    padding: 12px 14px;
     border-radius: 16px;
     background: rgba(20, 20, 28, 0.92);
     border: 1px solid rgba(255, 255, 255, 0.12);
@@ -87,14 +87,14 @@ window.SpotifyPopup {
   }
 
   spotifyPopupControls button {
-    border-radius: 12px;
+    border-radius: 14px;
     padding: 6px 10px;
     min-width: 36px;
   }
 
   .spotifyCoverWrap {
-    min-width: 76px;
-    min-height: 76px;
+    min-width: 96px;
+    min-height: 96px;
     border-radius: 12px;
     border: 1px solid rgba(255, 255, 255, 0.1);
     background: rgba(255, 255, 255, 0.04);
@@ -102,9 +102,9 @@ window.SpotifyPopup {
   }
 
   .spotifyCover {
-    min-width: 72px;
-    min-height: 72px;
-    border-radius: 10px;
+    min-width: 92px;
+    min-height: 92px;
+    border-radius: 12px;
   }
 
   spotifyProgressWave {
