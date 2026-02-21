@@ -1,0 +1,47 @@
+// https://gitlab.gnome.org/GNOME/gtk/-/blob/gtk-3-24/gtk/theme/Adwaita/_colors-public.scss
+$fg-color: #{"@theme_fg_color"};
+$bg-color: #{"@theme_bg_color"};
+
+$radius-bar: 20px;
+$bar-height: 44px;
+
+$glass-bg: rgba(20, 20, 28, 0.58);
+$border-light: rgba(255,255,255,0.10);
+$hover-bg: rgba(255, 255, 255, 0.14);
+
+window.Bar {
+  background: transparent;
+
+    > centerbox {
+    background: $glass-bg;
+    border-radius: $radius-bar;
+
+    margin: 14px 36px 0 36px;
+    min-height: $bar-height;
+
+    padding: 0 22px;
+
+    border: 1px solid $border-light;
+
+    button.spotify-active {
+      box-shadow: 0 0 14px rgba(120, 180, 255, 0.30);
+    }
+  }
+
+  label {
+    font-size: 12.5px;
+    letter-spacing: 0.4px;
+  }
+
+  button {
+    border-radius: 14px;
+    padding: 6px 12px;
+    transition: all 120ms ease;
+  }
+  
+  button:hover {
+    background: rgba(255,255,255,0.16);
+    box-shadow: 0 0 10px rgba(255,255,255,0.08);
+  }
+
+}

@@ -1,0 +1,54 @@
+configuration {
+  show-icons: true;
+  icon-theme: "Papirus";
+  font: "JetBrains Mono 12";
+}
+
+* {
+  bg:    #0b0f17ee;
+  bg2:   #111827ee;
+  fg:    #dbeafe;
+  dim:   #94a3b8;
+  accent:#22d3ee; /* cyan neon */
+
+  background-color: transparent;
+  text-color: @fg;
+}
+
+window {
+  width: 34%;
+  padding: 16px;
+  border: 2px;
+  border-color: @accent;
+  border-radius: 14px;
+  background-color: @bg;
+}
+
+inputbar {
+  padding: 10px 12px;
+  border-radius: 12px;
+  background-color: @bg2;
+}
+
+prompt { text-color: @dim; }
+entry  { placeholder: "Buscar…"; placeholder-color: @dim; }
+
+listview {
+  lines: 8;
+  spacing: 6px;
+  padding: 10px 0 0 0;
+}
+
+element {
+  padding: 10px 12px;
+  border-radius: 12px;
+}
+
+element selected {
+  background-color: @accent;
+  text-color: #001018;
+}
+
+element-text { text-color: inherit; }
+element-icon { size: 20px; }
+

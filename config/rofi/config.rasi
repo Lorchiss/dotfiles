@@ -1,0 +1,81 @@
+configuration {
+  modi: "drun";
+  show-icons: true;
+  font: "Inter 12";
+}
+
+* {
+  bg0: #0f0f0f;
+  bg1: #151515;
+  bg2: #1c1c1c;
+  fg0: #e6e6e6;
+  fg1: #9a9a9a;
+  accent: rgba(76, 139, 245, 0.18);
+}
+
+window {
+  location: center;
+  width: 40%;
+  background-color: @bg1;
+  border-radius: 14px;
+}
+
+mainbox {
+  background-color: @bg1;
+  padding: 20px;
+}
+
+inputbar {
+  background-color: @bg2;
+  border-radius: 10px;
+  padding: 10px;
+  children: [ prompt, entry, case-indicator ];
+}
+
+prompt {
+  background-color: transparent;
+  text-color: @fg1;
+  padding: 0 8px 0 0;
+}
+
+entry {
+  background-color: transparent;
+  text-color: @fg0;
+  placeholder: "Buscar…";
+  placeholder-color: @fg1;
+}
+
+case-indicator {
+  background-color: transparent;
+  text-color: @fg1;
+}
+
+listview {
+  background-color: @bg1;
+  margin: 15px 0 0 0;
+  spacing: 8px;
+  scrollbar: false;
+}
+
+element {
+  background-color: @bg2;
+  border-radius: 10px;
+  padding: 10px;
+  text-color: @fg0;
+}
+
+element selected {
+  background-color: @accent;
+  text-color: @fg0;
+}
+
+element-icon {
+  size: 20px;
+  background-color: transparent;
+}
+
+element-text {
+  background-color: transparent;
+  text-color: inherit;
+}
+

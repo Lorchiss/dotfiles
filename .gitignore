@@ -1,0 +1,16 @@
+# AGS / Node
+**/node_modules/
+**/.npm/
+**/.yarn/
+**/dist/
+**/*.log
+
+# Backups / saves
+**/*.bak
+**/*.save
+**/*.save.*
+**/*~ 
+
+# Editor / OS
+.DS_Store
+.vscode/
