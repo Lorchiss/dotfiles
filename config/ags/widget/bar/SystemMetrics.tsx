@@ -25,8 +25,18 @@ read -r _ u1 n1 s1 i1 w1 irq1 sirq1 st1 _ < /proc/stat
 
   const ram = createPoll("RAM --%", 2000, async () => {
     try {
-      const out = await execAsync(`bash -lc "awk '/^MemTotal:/ {t=\$2} /^MemAvailable:/ {a=\$2} END { if (t>0) { printf \"RAM %d\", int(((t-a)*100)/t); printf \"%%\" } else print \"RAM --%\" }' /proc/meminfo"`)
-      return out.trim() || "RAM --%"
+      const out = await execAsync(`bash -lc "grep -E '^(MemTotal|MemAvailable):' /proc/meminfo | awk '{print \\$2}'"`)
+      const [totalRaw, availRaw] = out
+        .trim()
+        .split("\n")
+        .map((v) => Number(v.trim()))
+
+      if (!Number.isFinite(totalRaw) || totalRaw <= 0 || !Number.isFinite(availRaw)) {
+        return "RAM --%"
+      }
+
+      const pct = Math.max(0, Math.min(100, Math.floor(((totalRaw - availRaw) * 100) / totalRaw)))
+      return `RAM ${pct}%`
     } catch {
       return "RAM --%"
     }

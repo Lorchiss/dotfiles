@@ -71,17 +71,22 @@ export default function SpotifyPopup() {
       currentSec: 0,
       artPath: fallbackCover,
     },
-    1000,
+    1800,
     async () => {
       try {
-        const [titleRaw, artistRaw, lenRaw, artUrlRaw, statusRaw, posRaw] = await Promise.all([
-          execAsync(`playerctl -p spotify metadata --format '{{title}}' 2>/dev/null || echo ''`),
-          execAsync(`playerctl -p spotify metadata --format '{{artist}}' 2>/dev/null || echo ''`),
-          execAsync(`playerctl -p spotify metadata --format '{{mpris:length}}' 2>/dev/null || echo '0'`),
-          execAsync(`playerctl -p spotify metadata --format '{{mpris:artUrl}}' 2>/dev/null || echo ''`),
-          execAsync(`playerctl -p spotify status 2>/dev/null || echo 'Stopped'`),
-          execAsync(`playerctl -p spotify position 2>/dev/null || echo '0'`),
-        ])
+        const snapshot = await execAsync(`bash -lc '
+title=$(playerctl -p spotify metadata --format "{{title}}" 2>/dev/null || echo "")
+artist=$(playerctl -p spotify metadata --format "{{artist}}" 2>/dev/null || echo "")
+length=$(playerctl -p spotify metadata --format "{{mpris:length}}" 2>/dev/null || echo "0")
+art=$(playerctl -p spotify metadata --format "{{mpris:artUrl}}" 2>/dev/null || echo "")
+status=$(playerctl -p spotify status 2>/dev/null || echo "Stopped")
+pos=$(playerctl -p spotify position 2>/dev/null || echo "0")
+printf "%s\n%s\n%s\n%s\n%s\n%s" "$title" "$artist" "$length" "$art" "$status" "$pos"
+'`)
+
+        const [titleRaw = "", artistRaw = "", lenRaw = "0", artUrlRaw = "", statusRaw = "Stopped", posRaw = "0"] = snapshot
+          .split("\n")
+          .map((v) => v.trim())
 
         const title = titleRaw.trim() || "No hay reproducción"
         const artist = artistRaw.trim()
@@ -89,7 +94,7 @@ export default function SpotifyPopup() {
         const micros = Number(lenRaw.trim())
         const totalSec = Number.isFinite(micros) && micros > 0 ? micros / 1_000_000 : 0
         const currentSec = parseFloatSafe(posRaw)
-        const artPath = await resolveArtPath(artUrlRaw.trim())
+        const artPath = await resolveArtPath(artUrlRaw)
 
         return { title, artist, status, totalSec, currentSec, artPath }
       } catch {
