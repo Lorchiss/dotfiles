@@ -3,6 +3,25 @@ import { Astal, Gtk } from "ags/gtk4"
 import { execAsync } from "ags/process"
 import { createPoll } from "ags/time"
 
+function formatTime(seconds: number) {
+  const safe = Math.max(0, Math.floor(seconds))
+  const m = Math.floor(safe / 60)
+  const s = safe % 60
+  return `${m}:${s.toString().padStart(2, "0")}`
+}
+
+function toLocalArtPath(url: string) {
+  if (!url) return ""
+  if (url.startsWith("file://")) {
+    try {
+      return decodeURIComponent(url.replace("file://", ""))
+    } catch {
+      return url.replace("file://", "")
+    }
+  }
+  return ""
+}
+
 export default function SpotifyPopup() {
   const title = createPoll("No hay reproducción", 1200, async () => {
     try {
@@ -34,6 +53,49 @@ export default function SpotifyPopup() {
     }
   })
 
+
+
+  const progressTime = createPoll("0:00 / 0:00", 400, async () => {
+    try {
+      const len = await execAsync(`playerctl -p spotify metadata --format '{{mpris:length}}' 2>/dev/null || echo '0'`)
+      const pos = await execAsync(`playerctl -p spotify position 2>/dev/null || echo '0'`)
+      const totalSec = Number(len.trim()) / 1_000_000
+      const currentSec = Number(pos.trim())
+      return `${formatTime(currentSec)} / ${formatTime(totalSec)}`
+    } catch {
+      return "0:00 / 0:00"
+    }
+  })
+
+  const progressText = createPoll("○──────────", 300, async () => {
+    try {
+      const len = await execAsync(`playerctl -p spotify metadata --format '{{mpris:length}}' 2>/dev/null || echo '0'`)
+      const pos = await execAsync(`playerctl -p spotify position 2>/dev/null || echo '0'`)
+      const totalSec = Number(len.trim()) / 1_000_000
+      const currentSec = Number(pos.trim())
+
+      if (!Number.isFinite(totalSec) || totalSec <= 0 || !Number.isFinite(currentSec)) return "○──────────"
+
+      const slots = 12
+      const ratio = Math.max(0, Math.min(1, currentSec / totalSec))
+      const head = Math.min(slots - 1, Math.floor(ratio * slots))
+      const left = "━".repeat(head)
+      const right = "─".repeat(Math.max(0, slots - head - 1))
+      return `${left}◉${right}`
+    } catch {
+      return "○──────────"
+    }
+  })
+
+  const artPath = createPoll("", 2000, async () => {
+    try {
+      const out = await execAsync(`playerctl -p spotify metadata --format '{{mpris:artUrl}}' 2>/dev/null || echo ''`)
+      return toLocalArtPath(out.trim())
+    } catch {
+      return ""
+    }
+  })
+
   return (
     <window
       name="spotify"
@@ -48,14 +110,25 @@ export default function SpotifyPopup() {
       keymode={Astal.Keymode.ON_DEMAND}
     >
       <box orientation={Gtk.Orientation.VERTICAL} spacing={12} cssName="spotifyPopupCard">
-        <box spacing={8} halign={Gtk.Align.FILL}>
-          <label label=" Spotify" cssName="spotifyPopupHeading" hexpand xalign={0} />
-          <label label={status} cssName="spotifyPopupStatus" />
-        </box>
+        <box spacing={10}>
+          <box cssName="spotifyCoverWrap" valign={Gtk.Align.START}>
+            <image file={artPath} cssName="spotifyCover" />
+          </box>
 
-        <box orientation={Gtk.Orientation.VERTICAL} spacing={4}>
-          <label label={title} wrap maxWidthChars={34} cssName="spotifyPopupTrack" xalign={0} />
-          <label label={artist((a) => (a ? `por ${a}` : ""))} cssName="spotifyPopupArtist" xalign={0} />
+          <box orientation={Gtk.Orientation.VERTICAL} spacing={6} hexpand>
+            <box spacing={8} halign={Gtk.Align.FILL}>
+              <label label=" Spotify" cssName="spotifyPopupHeading" hexpand xalign={0} />
+              <label label={status} cssName="spotifyPopupStatus" />
+            </box>
+
+            <label label={title} wrap maxWidthChars={30} cssName="spotifyPopupTrack" xalign={0} />
+            <label label={artist((a) => (a ? `por ${a}` : ""))} cssName="spotifyPopupArtist" xalign={0} />
+
+            <box orientation={Gtk.Orientation.VERTICAL} spacing={2}>
+              <label label={progressText} cssName="spotifyProgressWave" xalign={0} />
+              <label label={progressTime} cssName="spotifyProgressTime" xalign={0} />
+            </box>
+          </box>
         </box>
 
         <box spacing={10} cssName="spotifyPopupControls">
