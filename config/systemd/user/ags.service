@@ -3,7 +3,7 @@ Description=AGS (Aylur's Gtk Shell)
 After=graphical-session.target
 
 [Service]
-ExecStart=/usr/bin/ags run %h/.config/ags/app.ts
+ExecStart=/usr/bin/ags run --gtk 4 --directory %h/.config/ags
 Restart=on-failure
 RestartSec=1
 
