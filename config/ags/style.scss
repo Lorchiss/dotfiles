@@ -44,4 +44,85 @@ window.Bar {
     box-shadow: 0 0 10px rgba(255,255,255,0.08);
   }
 
+  .vol-control {
+    button {
+      min-width: 22px;
+      padding: 4px 8px;
+    }
+  }
+
+}
+
+window.SpotifyPopup {
+  background: transparent;
+
+  > spotifyPopupCard {
+    min-width: 360px;
+    padding: 12px 14px;
+    border-radius: 16px;
+    background: rgba(20, 20, 28, 0.92);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    box-shadow: 0 16px 30px rgba(0, 0, 0, 0.35);
+  }
+
+  spotifyPopupHeading {
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.2px;
+  }
+
+  spotifyPopupStatus {
+    color: rgba(180, 255, 210, 0.9);
+    font-size: 11px;
+  }
+
+  spotifyPopupTrack {
+    font-size: 14px;
+    font-weight: 600;
+  }
+
+  spotifyPopupArtist {
+    color: rgba(220, 220, 230, 0.72);
+    font-size: 12px;
+  }
+
+  spotifyPopupControls button {
+    border-radius: 14px;
+    padding: 6px 10px;
+    min-width: 36px;
+  }
+
+  .spotifyCoverWrap {
+    min-width: 96px;
+    min-height: 96px;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.04);
+    padding: 2px;
+  }
+
+  .spotifyCover {
+    min-width: 96px;
+    min-height: 96px;
+    border-radius: 12px;
+  }
+
+  .spotifyCoverFallback {
+    min-width: 96px;
+    min-height: 96px;
+    font-size: 34px;
+    color: rgba(230, 230, 240, 0.7);
+  }
+
+  spotifyProgressWave {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 12px;
+    color: rgba(156, 214, 180, 0.95);
+    letter-spacing: 0.4px;
+  }
+
+  spotifyProgressTime {
+    color: rgba(220, 220, 230, 0.72);
+    font-size: 11px;
+  }
 }
