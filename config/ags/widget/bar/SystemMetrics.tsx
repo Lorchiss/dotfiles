@@ -1,11 +1,22 @@
 import { Gtk } from "ags/gtk4"
 import { execAsync } from "ags/process"
 import { createPoll } from "ags/time"
+import VolumeControl from "./VolumeControl"
 
 export default function SystemMetrics() {
   const cpu = createPoll("CPU --%", 2000, async () => {
     try {
-      const out = await execAsync(`bash -lc 'awk "/^cpu /{u=$2+$4; t=$2+$4+$5; if (pu>0){printf \\\"CPU %d%%\\\", (u-pu)*100/(t-pt)} pu=u; pt=t}" /proc/stat'`)
+      const out = await execAsync(`bash -lc '
+read -r _ u1 n1 s1 i1 w1 irq1 sirq1 st1 _ < /proc/stat
+t1=$((u1+n1+s1+i1+w1+irq1+sirq1+st1))
+idle1=$((i1+w1))
+sleep 0.2
+read -r _ u2 n2 s2 i2 w2 irq2 sirq2 st2 _ < /proc/stat
+t2=$((u2+n2+s2+i2+w2+irq2+sirq2+st2))
+idle2=$((i2+w2))
+dt=$((t2-t1)); didle=$((idle2-idle1))
+if [ "$dt" -gt 0 ]; then printf "CPU %d%%" $(((100*(dt-didle))/dt)); else printf "CPU --%%"; fi
+'`)
       return out.trim() || "CPU --%"
     } catch {
       return "CPU --%"
@@ -14,7 +25,7 @@ export default function SystemMetrics() {
 
   const ram = createPoll("RAM --%", 2000, async () => {
     try {
-      const out = await execAsync(`bash -lc 'free | awk "/Mem:/ {printf \\\"RAM %d%%\\\", $3*100/$2}"'`)
+      const out = await execAsync(`bash -lc 'free | awk "/Mem:/ {used=$3-$6-$7; if ($2>0) printf \"RAM %d%%\", used*100/$2; else printf \"RAM --%%\"}"'`)
       return out.trim() || "RAM --%"
     } catch {
       return "RAM --%"
@@ -40,21 +51,12 @@ export default function SystemMetrics() {
     }
   })
 
-  const vol = createPoll("VOL --%", 1500, async () => {
-    try {
-      const out = await execAsync(`bash -lc "pactl get-sink-volume @DEFAULT_SINK@ | head -n1 | awk '{print \\$5}'"`)
-      return `VOL ${out.trim()}`
-    } catch {
-      return "VOL --%"
-    }
-  })
-
   return (
     <box spacing={12} halign={Gtk.Align.END}>
       <label label={cpu} />
       <label label={ram} />
       <label label={net} />
-      <label label={vol} />
+      <VolumeControl />
     </box>
   )
 }

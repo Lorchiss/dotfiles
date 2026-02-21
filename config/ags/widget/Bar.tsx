@@ -13,7 +13,8 @@ export default function Bar(gdkmonitor: Gdk.Monitor) {
       name="bar"
       class="Bar"
       gdkmonitor={gdkmonitor}
-      exclusivity={Astal.Exclusivity.NORMAL}
+      layer={Astal.Layer.TOP}
+      exclusivity={Astal.Exclusivity.EXCLUSIVE}
       anchor={TOP | LEFT | RIGHT}
       application={app}
     >
