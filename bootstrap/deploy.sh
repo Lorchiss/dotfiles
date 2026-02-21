@@ -29,6 +29,10 @@ link_dir "$CFG_DIR/hypr"  "$HOME/.config/hypr"
 link_dir "$CFG_DIR/kitty" "$HOME/.config/kitty"
 link_dir "$CFG_DIR/rofi"  "$HOME/.config/rofi"
 link_dir "$CFG_DIR/ags"   "$HOME/.config/ags"
+link_dir "$CFG_DIR/systemd" "$HOME/.config/systemd"
 
 echo "[ags] using system package (no npm install)"
 echo "[done] Backup at: $BACKUP_DIR"
+
+systemctl --user daemon-reload
+systemctl --user enable --now ags.service || true
