@@ -140,19 +140,19 @@ printf "%s|||%s|||%s" "$meta" "$status" "$pos"
       exclusivity={Astal.Exclusivity.IGNORE}
       keymode={Astal.Keymode.ON_DEMAND}
     >
-      <box orientation={Gtk.Orientation.VERTICAL} spacing={12} cssName="spotifyPopupCard">
+      <box orientation={Gtk.Orientation.VERTICAL} spacing={10} cssName="spotifyPopupCard" widthRequest={340}>
         <box spacing={10}>
           <box cssName="spotifyCoverWrap" valign={Gtk.Align.START}>
-            <image file={state((s) => s.artPath)} cssName="spotifyCover" widthRequest={88} heightRequest={88} />
+            <image file={state((s) => s.artPath)} cssName="spotifyCover" widthRequest={72} heightRequest={72} />
           </box>
 
-          <box orientation={Gtk.Orientation.VERTICAL} spacing={6} hexpand>
+          <box orientation={Gtk.Orientation.VERTICAL} spacing={4}>
             <box spacing={8} halign={Gtk.Align.FILL}>
               <label label=" Spotify" cssName="spotifyPopupHeading" hexpand xalign={0} />
               <label label={state((s) => statusLabel(s.status))} cssName="spotifyPopupStatus" />
             </box>
 
-            <label label={state((s) => s.title)} wrap maxWidthChars={30} cssName="spotifyPopupTrack" xalign={0} />
+            <label label={state((s) => s.title)} wrap maxWidthChars={24} cssName="spotifyPopupTrack" xalign={0} />
             <label label={state((s) => (s.artist ? `por ${s.artist}` : ""))} cssName="spotifyPopupArtist" xalign={0} />
 
             <box orientation={Gtk.Orientation.VERTICAL} spacing={2}>
@@ -162,7 +162,7 @@ printf "%s|||%s|||%s" "$meta" "$status" "$pos"
           </box>
         </box>
 
-        <box spacing={10} cssName="spotifyPopupControls">
+        <box spacing={10} cssName="spotifyPopupControls" halign={Gtk.Align.CENTER}>
           <button onClicked={() => execAsync("playerctl -p spotify previous").catch(() => {})}>
             <label label="⏮" />
           </button>
