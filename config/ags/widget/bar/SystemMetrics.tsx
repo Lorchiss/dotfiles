@@ -8,14 +8,14 @@ export default function SystemMetrics() {
     try {
       const out = await execAsync(`bash -lc '
 read -r _ u1 n1 s1 i1 w1 irq1 sirq1 st1 _ < /proc/stat
-t1=$((u1+n1+s1+i1+w1+irq1+sirq1+st1))
-idle1=$((i1+w1))
-sleep 0.2
-read -r _ u2 n2 s2 i2 w2 irq2 sirq2 st2 _ < /proc/stat
-t2=$((u2+n2+s2+i2+w2+irq2+sirq2+st2))
-idle2=$((i2+w2))
-dt=$((t2-t1)); didle=$((idle2-idle1))
-if [ "$dt" -gt 0 ]; then printf "CPU %d%%" $(((100*(dt-didle))/dt)); else printf "CPU --%%"; fi
+ t1=$((u1+n1+s1+i1+w1+irq1+sirq1+st1))
+ idle1=$((i1+w1))
+ sleep 0.2
+ read -r _ u2 n2 s2 i2 w2 irq2 sirq2 st2 _ < /proc/stat
+ t2=$((u2+n2+s2+i2+w2+irq2+sirq2+st2))
+ idle2=$((i2+w2))
+ dt=$((t2-t1)); didle=$((idle2-idle1))
+ if [ "$dt" -gt 0 ]; then printf "CPU %d%%" $(((100*(dt-didle))/dt)); else printf "CPU --%%"; fi
 '`)
       return out.trim() || "CPU --%"
     } catch {
@@ -25,7 +25,21 @@ if [ "$dt" -gt 0 ]; then printf "CPU %d%%" $(((100*(dt-didle))/dt)); else printf
 
   const ram = createPoll("RAM --%", 2000, async () => {
     try {
-      const out = await execAsync(`bash -lc 'free | awk "/Mem:/ {used=$3-$6-$7; if ($2>0) printf \"RAM %d%%\", used*100/$2; else printf \"RAM --%%\"}"'`)
+      const out = await execAsync(`bash -lc '
+awk "
+  /^MemTotal:/ {t=\$2}
+  /^MemAvailable:/ {a=\$2}
+  END {
+    if (t > 0) {
+      used=t-a
+      pct=int((used*100)/t)
+      printf \"RAM %d%%\", pct
+    } else {
+      printf \"RAM --%%\"
+    }
+  }
+" /proc/meminfo
+'`)
       return out.trim() || "RAM --%"
     } catch {
       return "RAM --%"
