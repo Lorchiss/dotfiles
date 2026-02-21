@@ -30,11 +30,5 @@ link_dir "$CFG_DIR/kitty" "$HOME/.config/kitty"
 link_dir "$CFG_DIR/rofi"  "$HOME/.config/rofi"
 link_dir "$CFG_DIR/ags"   "$HOME/.config/ags"
 
-if command -v npm >/dev/null 2>&1; then
-  echo "[ags] installing deps (no node_modules in repo)"
-  (cd "$HOME/.config/ags" && npm ci || npm install)
-else
-  echo "[warn] npm not found; AGS deps not installed"
-fi
-
+echo "[ags] using system package (no npm install)"
 echo "[done] Backup at: $BACKUP_DIR"
