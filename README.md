@@ -23,3 +23,11 @@ Este repositorio configura un entorno de escritorio Linux centrado en **Hyprland
 - Arreglar inconsistencias en `config/ags/widget/Bar.tsx` (por ejemplo, referencias no definidas).
 - Añadir script de lint/typecheck para AGS.
 - Documentar dependencias de runtime: `playerctl`, `pactl`, `iw`, `ip`, `free`.
+
+## Preflight recomendado
+
+Antes de desplegar, valida dependencias:
+
+- `bootstrap/check-deps.sh`
+
+Esto reporta comandos clave para que la barra/popup funcionen correctamente (playerctl, pactl, iw, etc.).
