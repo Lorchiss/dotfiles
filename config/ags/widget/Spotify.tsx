@@ -60,7 +60,7 @@ async function resolveArtPath(url: string) {
   if (url.startsWith("http://") || url.startsWith("https://")) {
     if (url !== lastArtUrl) {
       try {
-        await execAsync(`bash -lc 'curl -L --silent --show-error --max-time 4 --output "${cachedCover}" -- "${url}"'`)
+        await execAsync(`bash -lc 'curl -L --silent --show-error --max-time 5 --output "${cachedCover}" -- "${url}"'`)
         lastArtUrl = url
         lastResolvedArtPath = cachedCover
       } catch {
@@ -83,7 +83,7 @@ export default function SpotifyPopup() {
       currentSec: 0,
       artPath: "",
     },
-    1800,
+    1600,
     async () => {
       try {
         const snapshot = await execAsync(`bash -lc '
@@ -100,15 +100,16 @@ printf "%s\n%s\n%s\n%s\n%s\n%s" "$title" "$artist" "$length" "$art" "$status" "$
           .split("\n")
           .map((v) => v.trim())
 
-        const title = titleRaw || "No hay reproducción"
-        const artist = artistRaw
-        const status = statusRaw || "Stopped"
         const micros = Number(lenRaw)
-        const totalSec = Number.isFinite(micros) && micros > 0 ? micros / 1_000_000 : 0
-        const currentSec = parseFloatSafe(posRaw)
-        const artPath = await resolveArtPath(artUrlRaw)
 
-        return { title, artist, status, totalSec, currentSec, artPath }
+        return {
+          title: titleRaw || "No hay reproducción",
+          artist: artistRaw,
+          status: statusRaw || "Stopped",
+          totalSec: Number.isFinite(micros) && micros > 0 ? micros / 1_000_000 : 0,
+          currentSec: parseFloatSafe(posRaw),
+          artPath: await resolveArtPath(artUrlRaw),
+        }
       } catch {
         return {
           title: "No hay reproducción",
@@ -122,13 +123,7 @@ printf "%s\n%s\n%s\n%s\n%s\n%s" "$title" "$artist" "$length" "$art" "$status" "$
     },
   )
 
-  const progressText = state((s) => {
-    if (s.totalSec <= 0) return "◉───────────"
-    const slots = 12
-    const ratio = Math.max(0, Math.min(1, s.currentSec / s.totalSec))
-    const head = Math.min(slots - 1, Math.floor(ratio * slots))
-    return `${"━".repeat(head)}◉${"─".repeat(Math.max(0, slots - head - 1))}`
-  })
+  const progress = state((s) => (s.totalSec > 0 ? Math.max(0, Math.min(1, s.currentSec / s.totalSec)) : 0))
 
   const progressTime = state((s) => `${formatTime(s.currentSec)} / ${formatTime(s.totalSec)}`)
 
@@ -145,40 +140,42 @@ printf "%s\n%s\n%s\n%s\n%s\n%s" "$title" "$artist" "$length" "$art" "$status" "$
       exclusivity={Astal.Exclusivity.IGNORE}
       keymode={Astal.Keymode.ON_DEMAND}
     >
-      <box orientation={Gtk.Orientation.VERTICAL} spacing={10} cssName="spotifyPopupCard" widthRequest={360}>
-        <box spacing={10}>
+      <box orientation={Gtk.Orientation.VERTICAL} spacing={14} cssName="spotifyPopupCard" widthRequest={560}>
+        <box spacing={16}>
           <box cssName="spotifyCoverWrap" valign={Gtk.Align.START}>
             <image
               visible={state((s) => !!s.artPath)}
               file={state((s) => s.artPath)}
               cssName="spotifyCover"
-              widthRequest={96}
-              heightRequest={96}
+              pixelSize={160}
             />
             <label visible={state((s) => !s.artPath)} label="" cssName="spotifyCoverFallback" />
           </box>
 
-          <box orientation={Gtk.Orientation.VERTICAL} spacing={4}>
-            <box spacing={8} halign={Gtk.Align.FILL}>
-              <label label="Spotify" cssName="spotifyPopupHeading" hexpand xalign={0} />
+          <box orientation={Gtk.Orientation.VERTICAL} spacing={8} hexpand>
+            <box spacing={8}>
+              <label label=" Spotify" cssName="spotifyPopupHeading" hexpand xalign={0} />
               <label label={state((s) => statusLabel(s.status))} cssName="spotifyPopupStatus" />
             </box>
 
-            <label label={state((s) => s.title)} wrap maxWidthChars={24} cssName="spotifyPopupTrack" xalign={0} />
-            <label label={state((s) => (s.artist ? `por ${s.artist}` : ""))} cssName="spotifyPopupArtist" xalign={0} />
+            <label label={state((s) => s.title)} wrap maxWidthChars={28} cssName="spotifyPopupTrack" xalign={0} />
+            <label label={state((s) => (s.artist ? s.artist : ""))} cssName="spotifyPopupArtist" xalign={0} />
 
-            <box orientation={Gtk.Orientation.VERTICAL} spacing={2}>
-              <label label={progressText} cssName="spotifyProgressWave" xalign={0} />
-              <label label={progressTime} cssName="spotifyProgressTime" xalign={0} />
+            <box orientation={Gtk.Orientation.VERTICAL} spacing={4} cssName="spotifyProgressGroup">
+              <Gtk.ProgressBar fraction={progress} hexpand cssName="spotifyProgressBar" />
+              <box>
+                <label label={state((s) => formatTime(s.currentSec))} cssName="spotifyProgressTime" hexpand xalign={0} />
+                <label label={state((s) => formatTime(s.totalSec))} cssName="spotifyProgressTime" xalign={1} />
+              </box>
             </box>
           </box>
         </box>
 
-        <box spacing={10} cssName="spotifyPopupControls" halign={Gtk.Align.CENTER}>
+        <box spacing={12} cssName="spotifyPopupControls" halign={Gtk.Align.CENTER}>
           <button onClicked={() => execAsync("playerctl -p spotify previous").catch(() => {})}>
             <label label="⏮" />
           </button>
-          <button onClicked={() => execAsync("playerctl -p spotify play-pause").catch(() => {})}>
+          <button class="spotifyPlayButton" onClicked={() => execAsync("playerctl -p spotify play-pause").catch(() => {})}>
             <label label="⏯" />
           </button>
           <button onClicked={() => execAsync("playerctl -p spotify next").catch(() => {})}>
