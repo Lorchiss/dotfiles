@@ -3,8 +3,6 @@ import { Astal, Gtk } from "ags/gtk4"
 import { execAsync } from "ags/process"
 import { createPoll } from "ags/time"
 
-const cachedCover = "/tmp/ags-spotify-cover.jpg"
-
 type SpotifyState = {
   title: string
   artist: string
@@ -14,7 +12,6 @@ type SpotifyState = {
   artPath: string
 }
 
-let lastArtUrl = ""
 let lastResolvedArtPath = ""
 
 function formatTime(seconds: number) {
@@ -33,6 +30,12 @@ function statusLabel(status: string) {
   if (status === "Playing") return "Reproduciendo"
   if (status === "Paused") return "Pausado"
   return "Detenido"
+}
+
+function artCachePathFor(url: string) {
+  let hash = 0
+  for (let i = 0; i < url.length; i++) hash = (hash * 31 + url.charCodeAt(i)) >>> 0
+  return `/tmp/ags-spotify-cover-${hash}.jpg`
 }
 
 async function fileExists(path: string) {
@@ -58,16 +61,16 @@ async function resolveArtPath(url: string) {
   }
 
   if (url.startsWith("http://") || url.startsWith("https://")) {
-    if (url !== lastArtUrl) {
+    const target = artCachePathFor(url)
+    if (!(await fileExists(target))) {
       try {
-        await execAsync(`bash -lc 'curl -L --silent --show-error --max-time 5 --output "${cachedCover}" -- "${url}"'`)
-        lastArtUrl = url
-        lastResolvedArtPath = cachedCover
+        await execAsync(`bash -lc 'curl -L --silent --show-error --max-time 5 --output "${target}" -- "${url}"'`)
       } catch {
         return lastResolvedArtPath || ""
       }
     }
-    return lastResolvedArtPath || ""
+    lastResolvedArtPath = target
+    return target
   }
 
   return lastResolvedArtPath || ""
@@ -83,7 +86,7 @@ export default function SpotifyPopup() {
       currentSec: 0,
       artPath: "",
     },
-    1600,
+    1200,
     async () => {
       try {
         const snapshot = await execAsync(`bash -lc '
@@ -101,7 +104,6 @@ printf "%s\n%s\n%s\n%s\n%s\n%s" "$title" "$artist" "$length" "$art" "$status" "$
           .map((v) => v.trim())
 
         const micros = Number(lenRaw)
-
         return {
           title: titleRaw || "No hay reproducción",
           artist: artistRaw,
@@ -124,8 +126,13 @@ printf "%s\n%s\n%s\n%s\n%s\n%s" "$title" "$artist" "$length" "$art" "$status" "$
   )
 
   const progress = state((s) => (s.totalSec > 0 ? Math.max(0, Math.min(1, s.currentSec / s.totalSec)) : 0))
-
-  const progressTime = state((s) => `${formatTime(s.currentSec)} / ${formatTime(s.totalSec)}`)
+  const progressWave = state((s) => {
+    if (s.totalSec <= 0) return "◉──────────────"
+    const slots = 16
+    const ratio = Math.max(0, Math.min(1, s.currentSec / s.totalSec))
+    const head = Math.min(slots - 1, Math.floor(ratio * slots))
+    return `${"━".repeat(head)}◉${"─".repeat(Math.max(0, slots - head - 1))}`
+  })
 
   return (
     <window
@@ -143,12 +150,7 @@ printf "%s\n%s\n%s\n%s\n%s\n%s" "$title" "$artist" "$length" "$art" "$status" "$
       <box orientation={Gtk.Orientation.VERTICAL} spacing={14} cssName="spotifyPopupCard" widthRequest={560}>
         <box spacing={16}>
           <box cssName="spotifyCoverWrap" valign={Gtk.Align.START}>
-            <image
-              visible={state((s) => !!s.artPath)}
-              file={state((s) => s.artPath)}
-              cssName="spotifyCover"
-              pixelSize={160}
-            />
+            <image visible={state((s) => !!s.artPath)} file={state((s) => s.artPath)} cssName="spotifyCover" pixelSize={160} />
             <label visible={state((s) => !s.artPath)} label="" cssName="spotifyCoverFallback" />
           </box>
 
@@ -162,7 +164,8 @@ printf "%s\n%s\n%s\n%s\n%s\n%s" "$title" "$artist" "$length" "$art" "$status" "$
             <label label={state((s) => (s.artist ? s.artist : ""))} cssName="spotifyPopupArtist" xalign={0} />
 
             <box orientation={Gtk.Orientation.VERTICAL} spacing={4} cssName="spotifyProgressGroup">
-              <Gtk.ProgressBar fraction={progress} hexpand cssName="spotifyProgressBar" />
+              <Gtk.ProgressBar fraction={progress} hexpand class="spotifyProgressBar" />
+              <label label={progressWave} cssName="spotifyProgressWave" xalign={0} />
               <box>
                 <label label={state((s) => formatTime(s.currentSec))} cssName="spotifyProgressTime" hexpand xalign={0} />
                 <label label={state((s) => formatTime(s.totalSec))} cssName="spotifyProgressTime" xalign={1} />

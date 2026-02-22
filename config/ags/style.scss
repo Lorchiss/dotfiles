@@ -123,16 +123,23 @@ window.SpotifyPopup {
     margin-top: 4px;
   }
 
-  progressbar.spotifyProgressBar trough {
+  .spotifyProgressBar trough {
     min-height: 8px;
     border-radius: 99px;
     background: rgba(255, 255, 255, 0.22);
   }
 
-  progressbar.spotifyProgressBar progress {
+  .spotifyProgressBar progress {
     min-height: 8px;
     border-radius: 99px;
     background: linear-gradient(90deg, rgba(136, 255, 210, 0.95), rgba(170, 255, 236, 0.95));
+  }
+
+  spotifyProgressWave {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 12px;
+    color: rgba(156, 214, 180, 0.95);
+    letter-spacing: 0.35px;
   }
 
   spotifyProgressTime {
