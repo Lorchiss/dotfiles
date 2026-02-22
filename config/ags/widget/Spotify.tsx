@@ -13,6 +13,10 @@ type SpotifyState = {
 }
 
 let lastResolvedArtPath = ""
+let lastBasePosSec = 0
+let lastTotalSec = 0
+let lastStatus = "Stopped"
+let lastSampleMs = Date.now()
 
 function formatTime(seconds: number) {
   const safe = Number.isFinite(seconds) ? Math.max(0, Math.floor(seconds)) : 0
@@ -81,6 +85,14 @@ async function resolveArtPath(url: string) {
   return lastResolvedArtPath || ""
 }
 
+function currentInterpolatedSec() {
+  if (lastTotalSec <= 0) return 0
+  const elapsedSec = Math.max(0, (Date.now() - lastSampleMs) / 1000)
+  const current =
+    lastStatus === "Playing" ? lastBasePosSec + elapsedSec : lastBasePosSec
+  return Math.max(0, Math.min(lastTotalSec, current))
+}
+
 export default function SpotifyPopup() {
   const state = createPoll<SpotifyState>(
     {
@@ -114,13 +126,22 @@ printf "%s\n%s\n%s\n%s\n%s\n%s" "$title" "$artist" "$length" "$art" "$status" "$
         ] = snapshot.split("\n").map((v) => v.trim())
 
         const micros = Number(lenRaw)
+        const totalSec =
+          Number.isFinite(micros) && micros > 0 ? micros / 1_000_000 : 0
+        const currentSec = parseFloatSafe(posRaw)
+        const status = statusRaw || "Stopped"
+
+        lastBasePosSec = currentSec
+        lastTotalSec = totalSec
+        lastStatus = status
+        lastSampleMs = Date.now()
+
         return {
           title: titleRaw || "No hay reproducción",
           artist: artistRaw,
-          status: statusRaw || "Stopped",
-          totalSec:
-            Number.isFinite(micros) && micros > 0 ? micros / 1_000_000 : 0,
-          currentSec: parseFloatSafe(posRaw),
+          status,
+          totalSec,
+          currentSec,
           artPath: await resolveArtPath(artUrlRaw),
         }
       } catch {
@@ -135,6 +156,12 @@ printf "%s\n%s\n%s\n%s\n%s\n%s" "$title" "$artist" "$length" "$art" "$status" "$
       }
     },
   )
+
+  const progressTicker = createPoll(0, 120, () => currentInterpolatedSec())
+  const progress = progressTicker((currentSec) => {
+    if (lastTotalSec <= 0) return 0
+    return Math.max(0, Math.min(1, currentSec / lastTotalSec))
+  })
 
   const progress = state((s) =>
     s.totalSec > 0 ? Math.max(0, Math.min(1, s.currentSec / s.totalSec)) : 0,
@@ -212,7 +239,7 @@ printf "%s\n%s\n%s\n%s\n%s\n%s" "$title" "$artist" "$length" "$art" "$status" "$
               />
               <box>
                 <label
-                  label={state((s) => formatTime(s.currentSec))}
+                  label={progressTicker((v) => formatTime(v))}
                   cssName="spotifyProgressTime"
                   hexpand
                   xalign={0}
