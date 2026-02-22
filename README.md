@@ -31,3 +31,20 @@ Antes de desplegar, valida dependencias:
 - `bootstrap/check-deps.sh`
 
 Esto reporta comandos clave para que la barra/popup funcionen correctamente (playerctl, pactl, iw, etc.).
+
+## Calidad AGS (typecheck/lint)
+
+En `config/ags` ahora tienes scripts para validación:
+
+- `npm run typecheck`
+- `npm run lint`
+- `npm run format`
+
+Sugerencia rápida:
+
+```bash
+cd config/ags
+npm install
+npm run typecheck
+npm run lint
+```

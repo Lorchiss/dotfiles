@@ -25,17 +25,26 @@ read -r _ u1 n1 s1 i1 w1 irq1 sirq1 st1 _ < /proc/stat
 
   const ram = createPoll("RAM --%", 2000, async () => {
     try {
-      const out = await execAsync(`bash -lc "grep -E '^(MemTotal|MemAvailable):' /proc/meminfo | awk '{print \\$2}'"`)
+      const out = await execAsync(
+        `bash -lc "grep -E '^(MemTotal|MemAvailable):' /proc/meminfo | awk '{print \\$2}'"`,
+      )
       const [totalRaw, availRaw] = out
         .trim()
         .split("\n")
         .map((v) => Number(v.trim()))
 
-      if (!Number.isFinite(totalRaw) || totalRaw <= 0 || !Number.isFinite(availRaw)) {
+      if (
+        !Number.isFinite(totalRaw) ||
+        totalRaw <= 0 ||
+        !Number.isFinite(availRaw)
+      ) {
         return "RAM --%"
       }
 
-      const pct = Math.max(0, Math.min(100, Math.floor(((totalRaw - availRaw) * 100) / totalRaw)))
+      const pct = Math.max(
+        0,
+        Math.min(100, Math.floor(((totalRaw - availRaw) * 100) / totalRaw)),
+      )
       return `RAM ${pct}%`
     } catch {
       return "RAM --%"
@@ -44,17 +53,23 @@ read -r _ u1 n1 s1 i1 w1 irq1 sirq1 st1 _ < /proc/stat
 
   const net = createPoll("", 2000, async () => {
     try {
-      const wifi = await execAsync(`bash -lc 'iw dev 2>/dev/null | awk "/Interface/ {print $2; exit}"'`).catch(() => "")
+      const wifi = await execAsync(
+        `bash -lc 'iw dev 2>/dev/null | awk "/Interface/ {print $2; exit}"'`,
+      ).catch(() => "")
       const iface = wifi.trim()
 
       if (iface) {
-        const sig = await execAsync(`bash -lc 'iw dev ${iface} link 2>/dev/null | awk "/signal/ {print $2}"'`).catch(() => "")
+        const sig = await execAsync(
+          `bash -lc 'iw dev ${iface} link 2>/dev/null | awk "/signal/ {print $2}"'`,
+        ).catch(() => "")
         const signal = sig.trim()
         if (signal) return `NET ${signal}dBm`
         return "NET"
       }
 
-      const eth = await execAsync(`bash -lc 'ip -o link show up | awk -F": " "{print $2}" | grep -E "^(en|eth)" -m1 || true'`).catch(() => "")
+      const eth = await execAsync(
+        `bash -lc 'ip -o link show up | awk -F": " "{print $2}" | grep -E "^(en|eth)" -m1 || true'`,
+      ).catch(() => "")
       return eth.trim() ? "ETH" : ""
     } catch {
       return ""

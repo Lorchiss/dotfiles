@@ -1,17 +1,19 @@
 import app from "ags/gtk4/app"
-import { Astal, Gtk, Gdk } from "ags/gtk4"
+import { Astal, Gtk } from "ags/gtk4"
 import { execAsync } from "ags/process"
 import { createPoll } from "ags/time"
 import SpotifyButton from "./bar/SpotifyButton"
 import SystemMetrics from "./bar/SystemMetrics"
 import ClockMenu from "./bar/ClockMenu"
 
-export default function Bar(gdkmonitor: Gdk.Monitor) {
+export default function Bar(gdkmonitor: any) {
   const { TOP, LEFT, RIGHT } = Astal.WindowAnchor
 
   const workspace = createPoll("WS --", 1200, async () => {
     try {
-      const out = await execAsync(`bash -lc "hyprctl activeworkspace 2>/dev/null | awk '/workspace ID/ {print \$3; exit}'"`)
+      const out = await execAsync(
+        `bash -lc "hyprctl activeworkspace 2>/dev/null | awk '/workspace ID/ {print \$3; exit}'"`,
+      )
       const id = out.trim()
       return id ? `WS ${id}` : "WS --"
     } catch {
@@ -21,7 +23,9 @@ export default function Bar(gdkmonitor: Gdk.Monitor) {
 
   const activeWindowTitle = createPoll("", 1200, async () => {
     try {
-      const out = await execAsync(`bash -lc "hyprctl activewindow 2>/dev/null | sed -n 's/^\s*title:\s*//p' | head -n1"`)
+      const out = await execAsync(
+        `bash -lc "hyprctl activewindow 2>/dev/null | sed -n 's/^\s*title:\s*//p' | head -n1"`,
+      )
       return out.trim()
     } catch {
       return ""
@@ -45,7 +49,11 @@ export default function Bar(gdkmonitor: Gdk.Monitor) {
         </box>
 
         <box $type="center" hexpand halign={Gtk.Align.CENTER}>
-          <label label={activeWindowTitle((title) => (title ? title : " "))} maxWidthChars={46} ellipsize={3} />
+          <label
+            label={activeWindowTitle((title) => (title ? title : " "))}
+            maxWidthChars={46}
+            ellipsize={3}
+          />
         </box>
 
         <box $type="end" spacing={12} hexpand halign={Gtk.Align.END}>
