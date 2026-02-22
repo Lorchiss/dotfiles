@@ -57,39 +57,39 @@ window.SpotifyPopup {
   background: transparent;
 
   > spotifyPopupCard {
-    min-width: 560px;
-    padding: 18px;
-    border-radius: 24px;
+    min-width: 480px;
+    padding: 14px;
+    border-radius: 20px;
     background: rgba(20, 24, 34, 0.78);
     border: 1px solid rgba(255, 255, 255, 0.12);
     box-shadow: 0 22px 40px rgba(0, 0, 0, 0.42);
   }
 
   spotifyPopupHeading {
-    font-size: 17px;
+    font-size: 15px;
     font-weight: 700;
     letter-spacing: 0.2px;
   }
 
   spotifyPopupStatus {
     color: rgba(178, 255, 220, 0.95);
-    font-size: 13px;
+    font-size: 12px;
   }
 
   spotifyPopupTrack {
-    font-size: 34px;
+    font-size: 22px;
     font-weight: 600;
   }
 
   spotifyPopupArtist {
     color: rgba(220, 220, 230, 0.82);
-    font-size: 16px;
+    font-size: 14px;
   }
 
   spotifyPopupControls button {
-    border-radius: 22px;
-    padding: 10px 20px;
-    min-width: 84px;
+    border-radius: 18px;
+    padding: 8px 16px;
+    min-width: 72px;
   }
 
   .spotifyPlayButton {
@@ -98,24 +98,24 @@ window.SpotifyPopup {
   }
 
   .spotifyCoverWrap {
-    min-width: 168px;
-    min-height: 168px;
-    border-radius: 20px;
+    min-width: 136px;
+    min-height: 136px;
+    border-radius: 16px;
     border: 1px solid rgba(255, 255, 255, 0.1);
     background: rgba(255, 255, 255, 0.04);
     padding: 4px;
   }
 
   .spotifyCover {
-    min-width: 160px;
-    min-height: 160px;
-    border-radius: 16px;
+    min-width: 128px;
+    min-height: 128px;
+    border-radius: 14px;
   }
 
   .spotifyCoverFallback {
-    min-width: 160px;
-    min-height: 160px;
-    font-size: 52px;
+    min-width: 128px;
+    min-height: 128px;
+    font-size: 42px;
     color: rgba(230, 230, 240, 0.7);
   }
 
@@ -133,17 +133,11 @@ window.SpotifyPopup {
     min-height: 8px;
     border-radius: 99px;
     background: linear-gradient(90deg, rgba(136, 255, 210, 0.95), rgba(170, 255, 236, 0.95));
-  }
-
-  spotifyProgressWave {
-    font-family: "JetBrains Mono", monospace;
-    font-size: 12px;
-    color: rgba(156, 214, 180, 0.95);
-    letter-spacing: 0.35px;
+    transition: all 220ms ease-out;
   }
 
   spotifyProgressTime {
     color: rgba(220, 220, 230, 0.82);
-    font-size: 13px;
+    font-size: 12px;
   }
 }

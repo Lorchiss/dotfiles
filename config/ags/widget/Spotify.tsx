@@ -126,14 +126,6 @@ printf "%s\n%s\n%s\n%s\n%s\n%s" "$title" "$artist" "$length" "$art" "$status" "$
   )
 
   const progress = state((s) => (s.totalSec > 0 ? Math.max(0, Math.min(1, s.currentSec / s.totalSec)) : 0))
-  const progressWave = state((s) => {
-    if (s.totalSec <= 0) return "◉──────────────"
-    const slots = 16
-    const ratio = Math.max(0, Math.min(1, s.currentSec / s.totalSec))
-    const head = Math.min(slots - 1, Math.floor(ratio * slots))
-    return `${"━".repeat(head)}◉${"─".repeat(Math.max(0, slots - head - 1))}`
-  })
-
   return (
     <window
       name="spotify"
@@ -147,10 +139,10 @@ printf "%s\n%s\n%s\n%s\n%s\n%s" "$title" "$artist" "$length" "$art" "$status" "$
       exclusivity={Astal.Exclusivity.IGNORE}
       keymode={Astal.Keymode.ON_DEMAND}
     >
-      <box orientation={Gtk.Orientation.VERTICAL} spacing={14} cssName="spotifyPopupCard" widthRequest={560}>
+      <box orientation={Gtk.Orientation.VERTICAL} spacing={12} cssName="spotifyPopupCard" widthRequest={480}>
         <box spacing={16}>
           <box cssName="spotifyCoverWrap" valign={Gtk.Align.START}>
-            <image visible={state((s) => !!s.artPath)} file={state((s) => s.artPath)} cssName="spotifyCover" pixelSize={160} />
+            <image visible={state((s) => !!s.artPath)} file={state((s) => s.artPath)} cssName="spotifyCover" pixelSize={128} />
             <label visible={state((s) => !s.artPath)} label="" cssName="spotifyCoverFallback" />
           </box>
 
@@ -160,12 +152,11 @@ printf "%s\n%s\n%s\n%s\n%s\n%s" "$title" "$artist" "$length" "$art" "$status" "$
               <label label={state((s) => statusLabel(s.status))} cssName="spotifyPopupStatus" />
             </box>
 
-            <label label={state((s) => s.title)} wrap maxWidthChars={28} cssName="spotifyPopupTrack" xalign={0} />
+            <label label={state((s) => s.title)} wrap maxWidthChars={24} cssName="spotifyPopupTrack" xalign={0} />
             <label label={state((s) => (s.artist ? s.artist : ""))} cssName="spotifyPopupArtist" xalign={0} />
 
             <box orientation={Gtk.Orientation.VERTICAL} spacing={4} cssName="spotifyProgressGroup">
               <Gtk.ProgressBar fraction={progress} hexpand class="spotifyProgressBar" />
-              <label label={progressWave} cssName="spotifyProgressWave" xalign={0} />
               <box>
                 <label label={state((s) => formatTime(s.currentSec))} cssName="spotifyProgressTime" hexpand xalign={0} />
                 <label label={state((s) => formatTime(s.totalSec))} cssName="spotifyProgressTime" xalign={1} />
