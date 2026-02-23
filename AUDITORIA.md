@@ -1,80 +1,85 @@
-# Auditoría técnica del repositorio dotfiles
+# Auditoria tecnica del repositorio dotfiles
 
 Fecha original: 2026-02-21  
-Actualización: 2026-02-23 (seguimiento operativo)
+Ultima actualizacion: 2026-02-23 (ajuste de proporcion de barra)
 
-## Estado actual (auditoría incremental)
+## Resumen ejecutivo
 
-Se revisó nuevamente el stack Hyprland + AGS tras estabilización de servicio, modularización del bar y ajustes del popup de Spotify.
+- Estado general: estable en estructura y modularizacion de AGS.
+- Problema visual principal: proporcion horizontal de la barra desbalanceada hacia el bloque derecho.
+- Cobertura de validacion: parcial (falta validacion visual en sesion Wayland real).
 
-### ✅ Resuelto desde la auditoría inicial
+## Hallazgos confirmados
+
+### Cerrado
 
 1. Barra modularizada (`SpotifyButton`, `SystemMetrics`, `ClockMenu`, `VolumeControl`).
-2. Error por estado no definido en bar eliminado.
-3. Reserva de espacio de barra corregida (layer/exclusivity).
-4. RAM funcional (`RAM X%`) y sin `%` duplicado.
-5. Placeholders reemplazados por datos reales:
-   - workspace activo
-   - ventana activa
-6. Preflight de dependencias agregado (`bootstrap/check-deps.sh`).
+2. Error de estado no definido en bar eliminado.
+3. Reserva de espacio del bar corregida (`layer` + `exclusivity`).
+4. RAM funcional (`RAM X%`) sin `%` duplicado.
+5. Datos reales en barra (workspace y ventana activa).
+6. Preflight agregado (`bootstrap/check-deps.sh`).
 7. Scripts de calidad AGS agregados (`typecheck`, `lint`, `format`).
-8. `ags.service` endurecido para reducir loops `start-limit-hit`.
+8. `ags.service` endurecido para evitar loops de reinicio.
 
-### ⚠️ Puntos relevantes actuales
+### Abierto / en seguimiento
 
-#### P1 — UX del popup / barra
+1. **P1 - Proporcion visual de barra**
+   - Evidencia: anchos minimos anteriores del bloque derecho eran altos y producian barra visualmente cargada.
+   - Accion aplicada: presets SCSS de densidad (`compact`, `balanced`, `hero`) + ajuste de anchos en modo `balanced`.
+   - Estado: corregido a nivel de codigo; pendiente validacion visual en sesion real.
 
-1. **Fluidez de progreso**
-   - Estado: se mantiene progreso por polling + transición CSS para priorizar estabilidad.
-   - Nota: la interpolación agresiva se descartó por riesgo de inestabilidad en runtime.
+2. **P2 - Dependencias de runtime incompletas**
+   - `bootstrap/check-deps.sh` reporta faltante `iw`.
+   - Impacto: metrica Wi-Fi puede quedar en `NET --`.
 
-2. **Escala visual configurable**
-   - Estado: popup en modo compacto/balanceado.
-   - Siguiente mejora: presets por variables SCSS (`compact`, `balanced`, `hero`).
+3. **P2 - Validacion de calidad incompleta en esta maquina**
+   - `npm run typecheck` no ejecuto por ausencia de `tsc` en entorno local.
+   - Falta ejecutar `npm install` en `config/ags` y repetir typecheck/lint.
 
-3. **Control de volumen de barra**
-   - Estado: migrado a control compacto con popover (menos ruido visual).
-   - Siguiente mejora opcional: slider de volumen nativo si se valida estable en AGS runtime.
+4. **P3 - Documentacion desalineada**
+   - `README.md` aun lista como "proximas mejoras" items ya resueltos.
+   - Conviene sincronizar README con el estado actual de esta auditoria.
 
-#### P2 — Operación
+5. **P3 - Recurso externo fuera de repo**
+   - `~/.config/scripts/wallpaper.sh` sigue no versionado.
 
-4. **Script de wallpaper externo**
-   - `~/.config/scripts/wallpaper.sh` sigue fuera del repositorio.
+## Cambios aplicados en esta actualizacion
 
-5. **Validación runtime real**
-   - Entorno CI/headless no permite verificar AGS/Wayland visualmente.
-   - Requiere smoke-test en sesión real de usuario.
+1. `config/ags/style.scss`
+   - Se agrego sistema de presets de proporcion:
+     - `compact`
+     - `balanced` (default)
+     - `hero`
+   - Se ajustaron anchos minimos de chips y espaciados para mejorar balance visual.
 
-## Plan recomendado (continuar planificado)
+2. `config/ags/widget/bar/SpotifyButton.tsx`
+   - `maxWidthChars` del label de Spotify: `20 -> 16` para reducir peso visual del bloque derecho.
 
-### Siguiente fase corta
+## Lo que falta para cerrar auditoria
 
-1. Añadir presets SCSS del popup (`compact`, `balanced`, `hero`).
-2. Documentar troubleshooting AGS en README (errores frecuentes + comandos).
-3. Decidir si incorporar slider de volumen o mantener popover por simplicidad.
+1. Validar visualmente la barra en Wayland real (desktop normal, no headless).
+2. Si aun se ve desproporcionada, cambiar preset en `config/ags/style.scss` (`$bar-density` a `compact` o `hero`).
+3. Instalar `iw` para telemetria Wi-Fi completa.
+4. Ejecutar en `config/ags`:
+   - `npm install`
+   - `npm run typecheck`
+   - `npm run lint`
+5. Alinear `README.md` con estado actual.
 
-### Fase opcional
+## Comandos usados en esta revision
 
-4. Añadir script de smoke-test post-deploy para sesión de usuario.
-5. Versionar o hacer opcional seguro el `wallpaper.sh`.
+- `nl -ba AUDITORIA.md`
+- `nl -ba config/ags/style.scss`
+- `nl -ba config/ags/widget/Bar.tsx`
+- `nl -ba config/ags/widget/bar/SpotifyButton.tsx`
+- `nl -ba config/ags/widget/bar/SystemMetrics.tsx`
+- `bash bootstrap/check-deps.sh`
+- `cd config/ags && npm run typecheck`
 
-## Comandos usados en esta actualización
+## Criterio minimo de aceptacion
 
-- `sed -n '1,240p' config/ags/widget/bar/VolumeControl.tsx`
-- `sed -n '1,260p' config/ags/style.scss`
-- `sed -n '1,220p' AUDITORIA.md`
-
-## Verificación rápida recomendada
-
-Para validar el estado en una máquina de usuario (Wayland), ejecutar:
-
-1. `systemctl --user status ags.service --no-pager`
-2. `journalctl --user -u ags.service -n 80 --no-pager`
-3. `cd ~/.config/ags && npm run typecheck && npm run lint`
-
-Criterio de aceptación mínimo:
-
-- El servicio permanece activo sin reinicios en bucle.
-- El bar se renderiza con métricas (CPU/RAM), reloj y volumen funcional.
-- El popup de Spotify abre/cierra sin errores visibles ni stack traces.
-
+- `ags.service` activo y sin reinicios en bucle.
+- Barra renderizada con workspace, ventana, Spotify, metricas y reloj sin glitches visibles.
+- Proporcion horizontal percibida como equilibrada en uso diario.
+- Popup de Spotify funcional sin errores en logs.
