@@ -128,27 +128,11 @@ window.Bar {
       background: rgba(255, 255, 255, 0.08);
     }
 
-    .vol-slider trough {
-      min-height: 12px;
-      border-radius: 999px;
-      background: rgba(206, 221, 255, 0.2);
-    }
-
-    .vol-slider highlight {
-      border-radius: 999px;
-      background: linear-gradient(
-        90deg,
-        rgba(120, 222, 255, 0.95),
-        rgba(152, 245, 255, 0.95)
-      );
-    }
-
-    .vol-slider slider {
-      min-width: 22px;
-      min-height: 22px;
-      border-radius: 999px;
-      background: rgba(243, 249, 255, 0.96);
-      border: 1px solid rgba(126, 170, 238, 0.45);
+    .vol-visual-meter {
+      min-width: 180px;
+      font-size: 18px;
+      letter-spacing: 1px;
+      color: rgba(225, 244, 255, 0.92);
     }
   }
 }
