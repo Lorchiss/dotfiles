@@ -5,21 +5,11 @@ import { createPoll } from "ags/time"
 import SpotifyButton from "./bar/SpotifyButton"
 import SystemMetrics from "./bar/SystemMetrics"
 import ClockMenu from "./bar/ClockMenu"
+import WorkspaceLanes from "./bar/WorkspaceLanes"
+import SystemTray from "./bar/SystemTray"
 
 export default function Bar(gdkmonitor: any) {
   const { TOP, LEFT, RIGHT } = Astal.WindowAnchor
-
-  const workspace = createPoll("WS --", 1200, async () => {
-    try {
-      const out = await execAsync(
-        `bash -lc "hyprctl activeworkspace 2>/dev/null | awk '/workspace ID/ {print \$3; exit}'"`,
-      )
-      const id = out.trim()
-      return id ? `WS ${id}` : "WS --"
-    } catch {
-      return "WS --"
-    }
-  })
 
   const activeWindowTitle = createPoll("", 1200, async () => {
     try {
@@ -45,7 +35,7 @@ export default function Bar(gdkmonitor: any) {
     >
       <centerbox cssName="centerbox">
         <box $type="start" spacing={10} hexpand halign={Gtk.Align.START}>
-          <label class="workspace-chip" label={workspace} />
+          <WorkspaceLanes />
         </box>
 
         <box $type="center" hexpand halign={Gtk.Align.CENTER}>
@@ -58,7 +48,18 @@ export default function Bar(gdkmonitor: any) {
         </box>
 
         <box $type="end" spacing={12} hexpand halign={Gtk.Align.END}>
+          <button
+            class="connectivity-chip"
+            onClicked={() => execAsync("ags toggle control-center").catch(() => {})}
+            tooltipText="Abrir Control Center"
+          >
+            <box spacing={6}>
+              <label label="󰖩" />
+              <label label="Centro" />
+            </box>
+          </button>
           <SpotifyButton />
+          <SystemTray />
           <SystemMetrics />
           <ClockMenu />
         </box>
