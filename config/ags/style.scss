@@ -1,9 +1,68 @@
 // https://gitlab.gnome.org/GNOME/gtk/-/blob/gtk-3-24/gtk/theme/Adwaita/_colors-public.scss
+@use "sass:map";
+
 $fg-color: #{"@theme_fg_color"};
 $bg-color: #{"@theme_bg_color"};
 
 $radius-bar: 20px;
-$bar-height: 44px;
+$bar-density: balanced !default; // compact | balanced | hero
+
+$bar-presets: (
+  compact: (
+    bar-height: 40px,
+    bar-side-margin: 28px,
+    bar-padding-x: 18px,
+    workspace-chip-min: 64px,
+    window-title-chip-min: 240px,
+    spotify-chip-min: 146px,
+    metrics-row-min: 238px,
+    cpu-chip-min: 64px,
+    ram-chip-min: 64px,
+    net-chip-min: 84px,
+    clock-chip-min: 136px,
+    vol-button-min: 74px,
+  ),
+  balanced: (
+    bar-height: 44px,
+    bar-side-margin: 36px,
+    bar-padding-x: 22px,
+    workspace-chip-min: 72px,
+    window-title-chip-min: 280px,
+    spotify-chip-min: 164px,
+    metrics-row-min: 252px,
+    cpu-chip-min: 68px,
+    ram-chip-min: 68px,
+    net-chip-min: 88px,
+    clock-chip-min: 148px,
+    vol-button-min: 80px,
+  ),
+  hero: (
+    bar-height: 48px,
+    bar-side-margin: 44px,
+    bar-padding-x: 26px,
+    workspace-chip-min: 80px,
+    window-title-chip-min: 340px,
+    spotify-chip-min: 212px,
+    metrics-row-min: 310px,
+    cpu-chip-min: 78px,
+    ram-chip-min: 78px,
+    net-chip-min: 106px,
+    clock-chip-min: 186px,
+    vol-button-min: 92px,
+  ),
+);
+
+@function bar-size($token) {
+  $preset: map.get($bar-presets, $bar-density);
+  @if $preset == null {
+    @return map.get(map.get($bar-presets, balanced), $token);
+  }
+  @return map.get($preset, $token);
+}
+
+$bar-height: bar-size(bar-height);
+$bar-side-margin: bar-size(bar-side-margin);
+$bar-padding-x: bar-size(bar-padding-x);
 
 $glass-bg: rgba(20, 20, 28, 0.58);
 $border-light: rgba(255, 255, 255, 0.1);
@@ -16,10 +75,10 @@ window.Bar {
     background: $glass-bg;
     border-radius: $radius-bar;
 
-    margin: 14px 36px 0 36px;
+    margin: 14px $bar-side-margin 0 $bar-side-margin;
     min-height: $bar-height;
 
-    padding: 0 22px;
+    padding: 0 $bar-padding-x;
 
     border: 1px solid $border-light;
 
@@ -58,19 +117,31 @@ window.Bar {
   }
 
   .workspace-chip {
-    min-width: 68px;
+    min-width: bar-size(workspace-chip-min);
   }
 
   .window-title-chip {
-    min-width: 320px;
+    min-width: bar-size(window-title-chip-min);
   }
 
   .spotify-chip {
-    min-width: 210px;
+    min-width: bar-size(spotify-chip-min);
+  }
+
+  .spotify-chip-content {
+    min-width: 0;
+  }
+
+  .spotify-chip-icon {
+    color: rgba(220, 220, 230, 0.9);
+  }
+
+  .spotify-chip-title {
+    min-width: 0;
   }
 
   .metrics-row {
-    min-width: 330px;
+    min-width: bar-size(metrics-row-min);
   }
 
   .metric-chip {
@@ -79,22 +150,32 @@ window.Bar {
 
   .cpu-chip,
   .ram-chip {
-    min-width: 78px;
+    min-width: bar-size(cpu-chip-min);
   }
 
   .net-chip {
-    min-width: 104px;
+    min-width: bar-size(net-chip-min);
   }
 
   .clock-chip > button {
-    min-width: 190px;
+    min-width: bar-size(clock-chip-min);
   }
 
   .vol-control {
     > button {
-      min-width: 92px;
+      min-width: bar-size(vol-button-min);
       padding: 6px 12px;
       border-radius: 16px;
+    }
+
+    .vol-trigger-icon {
+      margin-right: 2px;
+    }
+
+    .vol-trigger-label {
+      font-weight: 600;
+      letter-spacing: 0.35px;
+      min-width: 72px;
     }
 
     popover {
@@ -108,31 +189,62 @@ window.Bar {
       padding: 0;
     }
 
-    #volPopover {
-      min-width: 440px;
-      padding: 14px 18px;
-      border-radius: 28px;
-      background: linear-gradient(
-        180deg,
-        rgba(40, 58, 104, 0.86),
-        rgba(30, 44, 82, 0.86)
-      );
-      border: 1px solid rgba(191, 215, 255, 0.34);
-      box-shadow: 0 18px 28px rgba(11, 17, 32, 0.42);
+    volPopover {
+      min-width: 480px;
+      padding: 14px;
+      border-radius: 20px;
+      background: rgba(20, 24, 34, 0.78);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      box-shadow: 0 22px 40px rgba(0, 0, 0, 0.42);
     }
 
     .vol-mute-btn {
-      min-width: 52px;
-      padding: 8px 10px;
-      border-radius: 14px;
-      background: rgba(255, 255, 255, 0.08);
+      min-width: 46px;
+      min-height: 46px;
+      border-radius: 12px;
+      padding: 6px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.1);
     }
 
-    .vol-visual-meter {
-      min-width: 180px;
-      font-size: 18px;
-      letter-spacing: 1px;
-      color: rgba(225, 244, 255, 0.92);
+    .vol-popup-icon {
+      color: rgba(220, 220, 230, 0.82);
+    }
+
+    .vol-popup-heading {
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: 0.2px;
+      color: rgba(226, 233, 244, 0.96);
+    }
+
+    .vol-scale {
+      min-height: 20px;
+    }
+
+    .vol-scale trough {
+      min-height: 8px;
+      border-radius: 99px;
+      background: rgba(255, 255, 255, 0.22);
+    }
+
+    .vol-scale highlight {
+      min-height: 8px;
+      border-radius: 99px;
+      background: linear-gradient(
+        90deg,
+        rgba(136, 255, 210, 0.95),
+        rgba(170, 255, 236, 0.95)
+      );
+      transition: all 220ms ease-out;
+    }
+
+    .vol-percent-label {
+      min-width: 58px;
+      font-size: 22px;
+      font-weight: 600;
+      color: rgba(226, 233, 244, 0.96);
+      font-variant-numeric: tabular-nums;
     }
   }
 }

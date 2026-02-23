@@ -14,6 +14,28 @@ type SpotifyState = {
 
 let lastResolvedArtPath = ""
 
+function marqueeText(text: string, tick: number, width: number) {
+  const clean = text.trim()
+  if (!clean) return ""
+
+  const chars = Array.from(clean)
+  if (chars.length <= width) return clean
+
+  const smoothSpacer = "\u2009"
+  const smoothText = chars.join(smoothSpacer)
+  const gap = smoothSpacer.repeat(width)
+  const loop = Array.from(`${smoothText}${gap}`)
+  const windowSize = width * 2 - 1
+  const start = tick % loop.length
+  let out = ""
+
+  for (let i = 0; i < windowSize; i++) {
+    out += loop[(start + i) % loop.length] ?? " "
+  }
+
+  return out
+}
+
 function formatTime(seconds: number) {
   const safe = Number.isFinite(seconds) ? Math.max(0, Math.floor(seconds)) : 0
   const m = Math.floor(safe / 60)
@@ -148,6 +170,14 @@ printf "%s\n%s\n%s\n%s\n%s\n%s" "$title" "$artist" "$length" "$art" "$status" "$
   const progress = state((s) =>
     s.totalSec > 0 ? Math.max(0, Math.min(1, s.currentSec / s.totalSec)) : 0,
   )
+  const marqueeTick = createPoll(0, 110, (prev) => prev + 1)
+  const marqueeTitle = marqueeTick((tick) =>
+    marqueeText(state().title || "No hay reproducción", tick, 30),
+  )
+  const marqueeArtist = marqueeTick((tick) =>
+    marqueeText(state().artist || "", tick, 34),
+  )
+
   return (
     <window
       name="spotify"
@@ -197,14 +227,20 @@ printf "%s\n%s\n%s\n%s\n%s\n%s" "$title" "$artist" "$length" "$art" "$status" "$
             </box>
 
             <label
-              label={state((s) => s.title)}
-              wrap
-              maxWidthChars={24}
+              label={marqueeTitle}
+              wrap={false}
+              singleLineMode
+              widthChars={30}
+              maxWidthChars={30}
               cssName="spotifyPopupTrack"
               xalign={0}
             />
             <label
-              label={state((s) => (s.artist ? s.artist : ""))}
+              label={marqueeArtist}
+              wrap={false}
+              singleLineMode
+              widthChars={34}
+              maxWidthChars={34}
               cssName="spotifyPopupArtist"
               xalign={0}
             />
