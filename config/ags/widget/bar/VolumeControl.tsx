@@ -81,9 +81,7 @@ export default function VolumeControl() {
             <label
               class="vol-visual-meter"
               xalign={0}
-              label={isMuted((m) =>
-                m ? "—" : volumeValue((v) => visualMeter(v)),
-              )}
+              label={volumeValue((v) => visualMeter(v))}
             />
 
             <box spacing={8} halign={Gtk.Align.END}>
