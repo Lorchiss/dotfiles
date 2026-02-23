@@ -9,13 +9,29 @@ import AudioSection from "./controlcenter/AudioSection"
 import SystemSection from "./controlcenter/SystemSection"
 import SessionSection from "./controlcenter/SessionSection"
 import { createMusicAccentClassState } from "../lib/musicAccent"
+import {
+  readLastControlCenterTab,
+  writeLastControlCenterTab,
+  type PersistedControlCenterTab,
+} from "../lib/controlCenterState"
 
 export default function ControlCenter() {
   let activeTab: ControlCenterTab = "wifi"
   let windowRef: any = null
+  let sectionsScrollRef: any = null
+  let tabsApi: { setActiveTab: (tab: ControlCenterTab) => void } | null = null
+  let pendingStoredTab: ControlCenterTab | null = null
   const accentClass = createMusicAccentClassState()
+  const CONTROL_CENTER_WIDTH = 560
+  const CONTROL_CENTER_CONTENT_HEIGHT = 410
 
   const sectionRefs: Partial<Record<ControlCenterTab, any>> = {}
+
+  const resetSectionsScroll = () => {
+    if (!sectionsScrollRef) return
+    const adjustment = sectionsScrollRef.get_vadjustment?.()
+    adjustment?.set_value?.(0)
+  }
 
   const syncVisibleSection = () => {
     for (const [tab, widget] of Object.entries(sectionRefs)) {
@@ -27,6 +43,8 @@ export default function ControlCenter() {
   const onSelectTab = (tab: ControlCenterTab) => {
     activeTab = tab
     syncVisibleSection()
+    resetSectionsScroll()
+    void writeLastControlCenterTab(tab as PersistedControlCenterTab)
   }
 
   const registerSection = (tab: ControlCenterTab) => (widget: any) => {
@@ -38,6 +56,14 @@ export default function ControlCenter() {
     if (!windowRef) return
     windowRef.visible = false
   }
+
+  void readLastControlCenterTab().then((storedTab) => {
+    if (!storedTab) return
+    activeTab = storedTab
+    syncVisibleSection()
+    pendingStoredTab = storedTab
+    tabsApi?.setActiveTab(storedTab)
+  })
 
   return (
     <window
@@ -71,7 +97,7 @@ export default function ControlCenter() {
         class={accentClass(
           (accent) => `cc-card popup-accent-surface ${accent}`,
         )}
-        widthRequest={560}
+        widthRequest={CONTROL_CENTER_WIDTH}
       >
         <box class="cc-header" spacing={8}>
           <label class="cc-title" label="Control Center" hexpand xalign={0} />
@@ -80,29 +106,73 @@ export default function ControlCenter() {
           </button>
         </box>
 
-        <ControlCenterTabs onSelect={onSelectTab} initialTab="wifi" />
+        <ControlCenterTabs
+          onSelect={onSelectTab}
+          initialTab="wifi"
+          onReady={(controls) => {
+            tabsApi = controls
+            if (pendingStoredTab) {
+              controls.setActiveTab(pendingStoredTab)
+              pendingStoredTab = null
+            }
+          }}
+        />
 
-        <box orientation={Gtk.Orientation.VERTICAL} spacing={0}>
-          <box $={registerSection("wifi")} visible>
-            <WifiSection isActive={() => activeTab === "wifi"} />
-          </box>
+        <Gtk.ScrolledWindow
+          class="cc-sections-scroll"
+          hexpand
+          vexpand
+          $={(scroll: any) => {
+            sectionsScrollRef = scroll
+            scroll.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC)
+            scroll.set_propagate_natural_height(false)
+            scroll.set_min_content_height(CONTROL_CENTER_CONTENT_HEIGHT)
+            scroll.set_max_content_height(CONTROL_CENTER_CONTENT_HEIGHT)
+          }}
+        >
+          <box
+            class="cc-sections-content"
+            orientation={Gtk.Orientation.VERTICAL}
+            spacing={0}
+            hexpand
+          >
+            <box class="cc-tab-pane" $={registerSection("wifi")} visible>
+              <WifiSection isActive={() => activeTab === "wifi"} />
+            </box>
 
-          <box $={registerSection("bluetooth")} visible={false}>
-            <BluetoothSection isActive={() => activeTab === "bluetooth"} />
-          </box>
+            <box
+              class="cc-tab-pane"
+              $={registerSection("bluetooth")}
+              visible={false}
+            >
+              <BluetoothSection isActive={() => activeTab === "bluetooth"} />
+            </box>
 
-          <box $={registerSection("audio")} visible={false}>
-            <AudioSection isActive={() => activeTab === "audio"} />
-          </box>
+            <box
+              class="cc-tab-pane"
+              $={registerSection("audio")}
+              visible={false}
+            >
+              <AudioSection isActive={() => activeTab === "audio"} />
+            </box>
 
-          <box $={registerSection("system")} visible={false}>
-            <SystemSection />
-          </box>
+            <box
+              class="cc-tab-pane"
+              $={registerSection("system")}
+              visible={false}
+            >
+              <SystemSection isActive={() => activeTab === "system"} />
+            </box>
 
-          <box $={registerSection("session")} visible={false}>
-            <SessionSection />
+            <box
+              class="cc-tab-pane"
+              $={registerSection("session")}
+              visible={false}
+            >
+              <SessionSection />
+            </box>
           </box>
-        </box>
+        </Gtk.ScrolledWindow>
       </box>
     </window>
   )

@@ -295,6 +295,16 @@ window.Bar {
     color: $ag-text-1;
   }
 
+  .aur-chip,
+  .news-chip {
+    min-width: 70px;
+  }
+
+  .news-chip-unread {
+    color: $ag-accent-secondary;
+    font-weight: 700;
+  }
+
   .system-tray-chip {
     border-radius: $ag-radius-chip;
     padding: 4px 8px;
@@ -869,6 +879,23 @@ window.ControlCenter {
     padding: 2px 0;
   }
 
+  .cc-sections-scroll {
+    min-width: 0;
+  }
+
+  .cc-sections-scroll viewport {
+    background: transparent;
+  }
+
+  .cc-sections-content,
+  .cc-tab-pane {
+    min-width: 0;
+  }
+
+  .cc-tab-pane {
+    padding-right: 2px;
+  }
+
   .cc-tab-btn {
     min-width: 88px;
     padding: 6px 10px;
@@ -1107,41 +1134,87 @@ window.ControlCenter {
     padding: 8px;
   }
 
-  .cc-session-action {
+  .cc-session-section {
     min-width: 0;
-    min-height: 82px;
-    padding: 8px 6px;
   }
 
-  .cc-session-action-icon {
-    font-size: 17px;
+  .cc-session-actions {
+    min-width: 0;
+  }
+
+  .cc-session-grid-row {
+    min-width: 0;
+  }
+
+  .cc-session-tile {
+    min-width: 0;
+    min-height: 136px;
+    padding: 10px 8px;
+  }
+
+  .cc-session-tile-content {
+    min-width: 0;
+    min-height: 0;
+  }
+
+  .cc-session-tile > box {
+    min-width: 0;
+    min-height: 0;
+  }
+
+  .cc-session-tile-pending {
+    border-color: rgba(146, 214, 255, 0.42);
+    background: rgba(146, 214, 255, 0.12);
+    box-shadow: inset 0 0 0 1px rgba(146, 214, 255, 0.22);
+  }
+
+  .cc-session-tile-danger {
+    border-color: rgba(255, 180, 180, 0.26);
+    background: rgba(255, 120, 120, 0.06);
+  }
+
+  .cc-session-tile-danger:hover {
+    background: rgba(255, 120, 120, 0.12);
+    border-color: rgba(255, 168, 168, 0.45);
+  }
+
+  .cc-session-tile-icon {
+    min-width: 0;
+    font-size: 25px;
     color: $ag-accent-primary;
   }
 
-  .cc-session-action-title {
-    font-size: 12.6px;
+  .cc-session-tile-icon-armed {
+    font-size: 39px;
+  }
+
+  .cc-session-tile-icon-danger {
+    color: rgba(255, 180, 180, 0.95);
+  }
+
+  .cc-session-tile-title {
+    font-size: 13.2px;
     font-weight: 700;
     color: $ag-text-0;
   }
 
-  .cc-session-action-hint {
-    font-size: 10.8px;
+  .cc-session-tile-hint {
+    font-size: 11.4px;
     color: $ag-text-1;
-  }
-
-  .cc-session-action-danger .cc-session-action-icon {
-    color: rgba(255, 180, 180, 0.95);
   }
 
   .cc-session-confirm-box {
     padding: 9px;
+    align-items: center;
   }
 
   .cc-session-confirm-title {
     font-weight: 700;
+    font-size: 11.8px;
   }
 
   .cc-session-confirm-timer {
     font-variant-numeric: tabular-nums;
+    min-width: 72px;
   }
 }

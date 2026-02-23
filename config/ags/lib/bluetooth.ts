@@ -1,4 +1,4 @@
-import { execAsync } from "ags/process"
+import { runCommand } from "./command"
 
 export type BluetoothDevice = {
   mac: string
@@ -95,8 +95,15 @@ async function runBluetoothSession(
 ): Promise<string> {
   const input = shellQuote(buildBluetoothSessionInput(commands))
   const maybeAllowFailure = tolerateFailure ? " || true" : ""
-  const out = await execAsync(
-    `bash -lc "printf %s ${input} | timeout ${timeoutSec}s bluetoothctl 2>&1${maybeAllowFailure}"`,
+  const out = await runCommand(
+    `printf %s ${input} | timeout ${timeoutSec}s bluetoothctl 2>&1${maybeAllowFailure}`,
+    {
+      timeoutMs: (timeoutSec + 2) * 1000,
+      dedupeKey:
+        tolerateFailure && commands.length === BLUETOOTH_READ_COMMANDS.length
+          ? "bluetooth-read-state"
+          : undefined,
+    },
   )
   return cleanBluetoothOutput(out)
 }
@@ -263,5 +270,8 @@ export async function removeBluetoothDevice(mac: string): Promise<void> {
 }
 
 export async function openBluemanFallback(): Promise<void> {
-  await execAsync(`bash -lc "blueman-manager >/dev/null 2>&1 &"`)
+  await runCommand(`blueman-manager >/dev/null 2>&1 &`, {
+    timeoutMs: 1200,
+    allowFailure: true,
+  })
 }

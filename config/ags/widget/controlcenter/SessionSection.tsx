@@ -8,7 +8,6 @@ import {
 
 type SessionUiState = {
   confirmAction: SessionAction | null
-  confirmSecondsLeft: number
   busy: boolean
   message: string
   messageIsError: boolean
@@ -46,6 +45,10 @@ const SESSION_ACTIONS: Array<{
     dangerous: true,
   },
 ]
+const SESSION_ACTION_ROWS = [
+  SESSION_ACTIONS.slice(0, 2),
+  SESSION_ACTIONS.slice(2, 4),
+]
 
 function errorMessage(error: unknown): string {
   if (error instanceof Error && error.message) return error.message
@@ -67,15 +70,12 @@ export default function SessionSection() {
   const state = createPoll<SessionUiState>(
     {
       confirmAction: null,
-      confirmSecondsLeft: 0,
       busy: false,
       message: "",
       messageIsError: false,
     },
     350,
     () => {
-      let confirmSecondsLeft = 0
-
       if (
         confirmAction &&
         confirmStartedAt > 0 &&
@@ -83,15 +83,10 @@ export default function SessionSection() {
       ) {
         confirmAction = null
         confirmStartedAt = 0
-      } else if (confirmAction && confirmStartedAt > 0) {
-        const remainingMs =
-          SESSION_CONFIRM_TIMEOUT_MS - (Date.now() - confirmStartedAt)
-        confirmSecondsLeft = Math.max(0, Math.ceil(remainingMs / 1000))
       }
 
       return {
         confirmAction,
-        confirmSecondsLeft,
         busy,
         message,
         messageIsError,
@@ -103,15 +98,17 @@ export default function SessionSection() {
     if (busy) return
     confirmAction = action
     confirmStartedAt = Date.now()
-    message = `Listo para ${sessionActionLabel(action)}`
+    message = ""
     messageIsError = isDangerousAction(action)
   }
 
-  const cancelConfirmation = () => {
-    confirmAction = null
-    confirmStartedAt = 0
-    message = "Acción cancelada"
-    messageIsError = false
+  const handleActionClick = (action: SessionAction) => {
+    if (busy) return
+    if (confirmAction === action) {
+      void executeConfirmedAction()
+      return
+    }
+    requestConfirmation(action)
   }
 
   const executeConfirmedAction = async () => {
@@ -141,6 +138,7 @@ export default function SessionSection() {
       class="cc-section cc-session-section"
       orientation={Gtk.Orientation.VERTICAL}
       spacing={10}
+      hexpand
     >
       <label class="cc-section-title" label="Sesión" xalign={0} />
       <label
@@ -150,101 +148,77 @@ export default function SessionSection() {
       />
 
       <box
-        class="cc-session-grid"
+        class="cc-session-actions"
         orientation={Gtk.Orientation.VERTICAL}
         spacing={8}
       >
-        <box spacing={8}>
-          {SESSION_ACTIONS.filter((item) => !item.dangerous).map((item) => (
-            <button
-              class="cc-action-btn cc-session-action"
-              sensitive={state((snapshot) => !snapshot.busy)}
-              onClicked={() => requestConfirmation(item.action)}
-            >
-              <box
-                orientation={Gtk.Orientation.VERTICAL}
-                spacing={2}
+        {SESSION_ACTION_ROWS.map((row) => (
+          <box class="cc-session-grid-row" spacing={8} homogeneous>
+            {row.map((item) => (
+              <button
+                class={state((snapshot) =>
+                  [
+                    "cc-action-btn",
+                    "cc-session-tile",
+                    item.dangerous ? "cc-session-tile-danger" : "",
+                    snapshot.confirmAction === item.action
+                      ? "cc-session-tile-pending"
+                      : "",
+                  ]
+                    .filter(Boolean)
+                    .join(" "),
+                )}
+                sensitive={state((snapshot) => !snapshot.busy)}
+                hexpand
                 vexpand
-                valign={Gtk.Align.CENTER}
+                halign={Gtk.Align.FILL}
+                valign={Gtk.Align.FILL}
+                onClicked={() => handleActionClick(item.action)}
               >
-                <label class="cc-session-action-icon" label={item.icon} />
-                <label
-                  class="cc-session-action-title"
-                  label={sessionActionLabel(item.action)}
-                />
-                <label class="cc-session-action-hint" label={item.hint} />
-              </box>
-            </button>
-          ))}
-        </box>
-
-        <box spacing={8}>
-          {SESSION_ACTIONS.filter((item) => item.dangerous).map((item) => (
-            <button
-              class="cc-action-btn cc-danger-btn cc-session-action cc-session-action-danger"
-              sensitive={state((snapshot) => !snapshot.busy)}
-              onClicked={() => requestConfirmation(item.action)}
-            >
-              <box
-                orientation={Gtk.Orientation.VERTICAL}
-                spacing={2}
-                vexpand
-                valign={Gtk.Align.CENTER}
-              >
-                <label class="cc-session-action-icon" label={item.icon} />
-                <label
-                  class="cc-session-action-title"
-                  label={sessionActionLabel(item.action)}
-                />
-                <label class="cc-session-action-hint" label={item.hint} />
-              </box>
-            </button>
-          ))}
-        </box>
-      </box>
-
-      <box
-        class="cc-confirm-box cc-session-confirm-box"
-        orientation={Gtk.Orientation.VERTICAL}
-        spacing={8}
-        visible={state((snapshot) => snapshot.confirmAction !== null)}
-      >
-        <label
-          class="cc-list-subtitle cc-session-confirm-title"
-          xalign={0}
-          label={state((snapshot) => {
-            if (!snapshot.confirmAction) return ""
-            if (isDangerousAction(snapshot.confirmAction)) {
-              return `Confirmación doble requerida: ${sessionActionLabel(snapshot.confirmAction)}`
-            }
-            return `Confirmar ${sessionActionLabel(snapshot.confirmAction)}`
-          })}
-        />
-        <label
-          class="cc-section-subtle cc-session-confirm-timer"
-          xalign={0}
-          label={state((snapshot) =>
-            snapshot.confirmAction
-              ? `Expira en ${snapshot.confirmSecondsLeft}s`
-              : "",
-          )}
-        />
-        <box spacing={8}>
-          <button
-            class="cc-action-btn cc-danger-btn"
-            sensitive={state((snapshot) => !snapshot.busy)}
-            onClicked={() => void executeConfirmedAction()}
-          >
-            <label label="Confirmar" />
-          </button>
-          <button
-            class="cc-action-btn"
-            sensitive={state((snapshot) => !snapshot.busy)}
-            onClicked={cancelConfirmation}
-          >
-            <label label="Cancelar" />
-          </button>
-        </box>
+                <box
+                  class="cc-session-tile-content"
+                  orientation={Gtk.Orientation.VERTICAL}
+                  spacing={4}
+                  valign={Gtk.Align.CENTER}
+                  halign={Gtk.Align.CENTER}
+                  vexpand
+                >
+                  <label
+                    class={state((snapshot) =>
+                      [
+                        "cc-session-tile-icon",
+                        item.dangerous ? "cc-session-tile-icon-danger" : "",
+                        snapshot.confirmAction === item.action
+                          ? "cc-session-tile-icon-armed"
+                          : "",
+                      ]
+                        .filter(Boolean)
+                        .join(" "),
+                    )}
+                    label={item.icon}
+                    xalign={0.5}
+                  />
+                  <label
+                    class="cc-session-tile-title"
+                    label={sessionActionLabel(item.action)}
+                    xalign={0.5}
+                    visible={state(
+                      (snapshot) => snapshot.confirmAction !== item.action,
+                    )}
+                  />
+                  <label
+                    class="cc-session-tile-hint"
+                    label={item.hint}
+                    xalign={0.5}
+                    visible={state(
+                      (snapshot) => snapshot.confirmAction !== item.action,
+                    )}
+                  />
+                </box>
+              </button>
+            ))}
+          </box>
+        ))}
       </box>
 
       <label

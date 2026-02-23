@@ -23,6 +23,7 @@ type AudioUiState = AudioState & {
 
 const AUDIO_POLL_MS = 2000
 const AUDIO_VOLUME_STEP = 5
+const AUDIO_INACTIVE_SKIP_TICKS = 12
 
 function errorMessage(error: unknown): string {
   if (error instanceof Error && error.message) return error.message
@@ -58,6 +59,7 @@ export default function AudioSection({ isActive }: AudioSectionProps) {
   let message = ""
   let messageIsError = false
   let forceRefresh = 2
+  let pollTick = 0
   let syncingScale = false
   let ignoreScaleSyncUntil = 0
 
@@ -74,17 +76,23 @@ export default function AudioSection({ isActive }: AudioSectionProps) {
       messageIsError: false,
     },
     AUDIO_POLL_MS,
-    async () => {
-      const audioState = await readAudioState()
-
-      if (!isActive() && forceRefresh <= 0) {
+    async (prev) => {
+      pollTick += 1
+      const shouldRefresh =
+        forceRefresh > 0 ||
+        isActive() ||
+        prev.sinks.length === 0 ||
+        pollTick % AUDIO_INACTIVE_SKIP_TICKS === 0
+      if (!shouldRefresh) {
         return {
-          ...audioState,
+          ...prev,
           busy: actionInFlight,
           message,
           messageIsError,
         }
       }
+
+      const audioState = await readAudioState()
 
       if (forceRefresh > 0) forceRefresh -= 1
 

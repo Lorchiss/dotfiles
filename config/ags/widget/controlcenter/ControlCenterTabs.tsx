@@ -10,6 +10,9 @@ export type ControlCenterTab =
 type ControlCenterTabsProps = {
   initialTab?: ControlCenterTab
   onSelect: (tab: ControlCenterTab) => void
+  onReady?: (controls: {
+    setActiveTab: (tab: ControlCenterTab) => void
+  }) => void
 }
 
 function tabButtonClasses(isActive: boolean): string[] {
@@ -19,6 +22,7 @@ function tabButtonClasses(isActive: boolean): string[] {
 export default function ControlCenterTabs({
   initialTab = "wifi",
   onSelect,
+  onReady,
 }: ControlCenterTabsProps) {
   let activeTab: ControlCenterTab = initialTab
   const buttonRefs: Partial<Record<ControlCenterTab, any>> = {}
@@ -37,6 +41,14 @@ export default function ControlCenterTabs({
     syncButtonClasses()
     onSelect(tab)
   }
+
+  onReady?.({
+    setActiveTab: (tab) => {
+      activeTab = tab
+      syncButtonClasses()
+      onSelect(tab)
+    },
+  })
 
   const registerButton = (tab: ControlCenterTab) => (button: any) => {
     buttonRefs[tab] = button
