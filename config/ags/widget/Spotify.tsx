@@ -140,7 +140,7 @@ printf "%s\n%s\n%s\n%s\n%s\n%s" "$title" "$artist" "$length" "$art" "$status" "$
     },
   )
 
-  const progress = state((s) => {
+  const progressFraction = state((s) => {
     if (s.totalSec <= 0) return 0
     return Math.max(0, Math.min(1, s.currentSec / s.totalSec))
   })
@@ -215,7 +215,7 @@ printf "%s\n%s\n%s\n%s\n%s\n%s" "$title" "$artist" "$length" "$art" "$status" "$
               cssName="spotifyProgressGroup"
             >
               <Gtk.ProgressBar
-                fraction={progress}
+                fraction={progressFraction}
                 hexpand
                 class="spotifyProgressBar"
               />
