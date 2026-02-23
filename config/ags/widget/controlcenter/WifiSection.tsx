@@ -19,6 +19,7 @@ type WifiUiState = WifiState & {
   busy: boolean
   message: string
   messageIsError: boolean
+  passwordTarget: string
 }
 
 const WIFI_POLL_MS = 1500
@@ -49,6 +50,8 @@ export default function WifiSection({ isActive }: WifiSectionProps) {
   let forceNetworkRefresh = 2
   let pollTick = 0
   let wifiPassword = ""
+  let passwordTarget = ""
+  let lastNetworkRenderKey = ""
 
   const state = createPoll<WifiUiState>(
     {
@@ -60,14 +63,17 @@ export default function WifiSection({ isActive }: WifiSectionProps) {
       busy: false,
       message: "",
       messageIsError: false,
+      passwordTarget: "",
     },
     WIFI_POLL_MS,
     async (prev) => {
       pollTick += 1
+      const editingPassword = Boolean(passwordTarget) && !actionInFlight
       const includeNetworks =
-        forceNetworkRefresh > 0 ||
-        prev.networks.length === 0 ||
-        (isActive() ? pollTick % 4 === 0 : pollTick % 10 === 0)
+        !editingPassword &&
+        (forceNetworkRefresh > 0 ||
+          prev.networks.length === 0 ||
+          (isActive() ? pollTick % 4 === 0 : pollTick % 10 === 0))
 
       if (forceNetworkRefresh > 0) forceNetworkRefresh -= 1
 
@@ -81,6 +87,7 @@ export default function WifiSection({ isActive }: WifiSectionProps) {
         busy: actionInFlight,
         message,
         messageIsError,
+        passwordTarget,
       }
     },
   )
@@ -98,11 +105,15 @@ export default function WifiSection({ isActive }: WifiSectionProps) {
       busy: false,
       message: "",
       messageIsError: false,
+      passwordTarget: "",
     } satisfies WifiUiState
   }
 
-  const runAction = async (label: string, action: () => Promise<void>) => {
-    if (actionInFlight) return
+  const runAction = async (
+    label: string,
+    action: () => Promise<void>,
+  ): Promise<boolean> => {
+    if (actionInFlight) return false
     actionInFlight = true
     message = `${label}...`
     messageIsError = false
@@ -112,9 +123,11 @@ export default function WifiSection({ isActive }: WifiSectionProps) {
       await action()
       message = `${label}: OK`
       messageIsError = false
+      return true
     } catch (error) {
       message = `${label}: ${errorMessage(error)}`
       messageIsError = true
+      return false
     } finally {
       actionInFlight = false
       forceNetworkRefresh = 2
@@ -138,24 +151,39 @@ export default function WifiSection({ isActive }: WifiSectionProps) {
       messageIsError = true
       return
     }
-    if (wifiNeedsPassword(network) && !wifiPassword.trim()) {
-      message = `La red ${network.displayName} requiere contraseña`
-      messageIsError = true
-      return
+    if (wifiNeedsPassword(network)) {
+      if (passwordTarget !== network.ssid) {
+        passwordTarget = network.ssid
+        wifiPassword = ""
+        message = `Ingresa la contraseña para ${network.displayName}`
+        messageIsError = false
+        return
+      }
+
+      if (!wifiPassword.trim()) {
+        message = `Ingresa la contraseña para ${network.displayName}`
+        messageIsError = false
+        return
+      }
     }
 
-    await runAction(`Conectar ${network.displayName}`, () =>
+    const success = await runAction(`Conectar ${network.displayName}`, () =>
       connectWifiNetwork(
         network.ssid,
         current.primaryInterface,
         wifiNeedsPassword(network) ? wifiPassword : undefined,
       ),
     )
+    if (success) {
+      passwordTarget = ""
+      wifiPassword = ""
+    }
   }
 
   const disconnectCurrent = async () => {
     const current = readState()
     if (!current.primaryInterface) return
+    passwordTarget = ""
     await runAction("Desconectar", () =>
       disconnectWifiInterface(current.primaryInterface),
     )
@@ -163,6 +191,7 @@ export default function WifiSection({ isActive }: WifiSectionProps) {
 
   const toggleRadio = async () => {
     const current = readState()
+    passwordTarget = ""
     await runAction(
       current.radioEnabled ? "Apagar Wi-Fi" : "Encender Wi-Fi",
       () => setWifiRadio(!current.radioEnabled),
@@ -170,6 +199,22 @@ export default function WifiSection({ isActive }: WifiSectionProps) {
   }
 
   const renderNetworks = (container: any, snapshot: WifiUiState) => {
+    const networkRenderKey = JSON.stringify({
+      busy: snapshot.busy,
+      primaryInterface: snapshot.primaryInterface,
+      passwordTarget: snapshot.passwordTarget,
+      networks: snapshot.networks.map((network) => ({
+        ssid: network.ssid,
+        displayName: network.displayName,
+        signal: network.signal,
+        security: network.security,
+        bars: network.bars,
+        inUse: network.inUse,
+      })),
+    })
+    if (networkRenderKey === lastNetworkRenderKey) return
+    lastNetworkRenderKey = networkRenderKey
+
     clearChildren(container)
 
     if (!snapshot.networks.length) {
@@ -181,8 +226,13 @@ export default function WifiSection({ isActive }: WifiSectionProps) {
     }
 
     for (const network of snapshot.networks) {
-      const row = new Gtk.Box({ spacing: 8 })
+      const row = new Gtk.Box({
+        orientation: Gtk.Orientation.VERTICAL,
+        spacing: 8,
+      })
       setClasses(row, "cc-list-row")
+
+      const topRow = new Gtk.Box({ spacing: 8 })
 
       const left = new Gtk.Box({
         orientation: Gtk.Orientation.VERTICAL,
@@ -214,8 +264,43 @@ export default function WifiSection({ isActive }: WifiSectionProps) {
         new Gtk.Label({ label: network.inUse ? "Conectada" : "Conectar" }),
       )
 
-      row.append(left)
-      row.append(action)
+      topRow.append(left)
+      topRow.append(action)
+      row.append(topRow)
+
+      if (snapshot.passwordTarget && network.ssid === snapshot.passwordTarget) {
+        const passwordRow = new Gtk.Box({ spacing: 8 })
+        setClasses(passwordRow, "cc-inline-auth-row")
+
+        const passwordEntry = new Gtk.Entry({
+          placeholder_text: `Contraseña para ${network.displayName}`,
+          visibility: false,
+        })
+        passwordEntry.set_text(wifiPassword)
+        passwordEntry.set_hexpand(true)
+        passwordEntry.set_sensitive(!snapshot.busy)
+        passwordEntry.connect("changed", () => {
+          const nextText = passwordEntry.get_text?.() ?? ""
+          wifiPassword = String(nextText)
+        })
+        passwordEntry.connect("notify::has-focus", () => {
+          const hasFocus = passwordEntry.has_focus?.() ?? false
+          if (hasFocus) return
+          if (actionInFlight) return
+          if (wifiPassword.trim()) return
+          passwordTarget = ""
+          message = ""
+          messageIsError = false
+        })
+        passwordEntry.connect("activate", () => {
+          const nextText = passwordEntry.get_text?.() ?? ""
+          wifiPassword = String(nextText)
+          void connectToNetwork(network)
+        })
+
+        passwordRow.append(passwordEntry)
+        row.append(passwordRow)
+      }
       container.append(row)
     }
   }
@@ -274,16 +359,6 @@ export default function WifiSection({ isActive }: WifiSectionProps) {
           <label label="Abrir nmtui" />
         </button>
       </box>
-
-      <entry
-        class="cc-password-entry"
-        placeholderText="Contraseña Wi-Fi (si la red lo requiere)"
-        visibility={false}
-        onChanged={(entry: any) => {
-          const nextText = entry.get_text?.() ?? entry.text ?? ""
-          wifiPassword = String(nextText)
-        }}
-      />
 
       <label
         class={state((snapshot) =>

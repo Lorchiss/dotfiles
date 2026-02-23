@@ -19,11 +19,18 @@ declare module "ags/process" {
 }
 
 declare module "ags/time" {
+  export type PollBinding<T> = {
+    (): T
+    <U>(map: (value: T) => U): U
+    peek?: () => T
+    subscribe?: (listener: () => void) => (() => void) | void
+  }
+
   export function createPoll<T>(
     initial: T,
     intervalMs: number,
-    fn: () => Promise<T> | T,
-  ): T & ((map: (value: T) => any) => any)
+    fn: (prev: T) => Promise<T> | T,
+  ): PollBinding<T>
 }
 
 declare module "ags/gtk4/jsx-runtime" {

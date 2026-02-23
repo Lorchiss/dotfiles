@@ -87,7 +87,12 @@ export default function SystemSection() {
       <label class="cc-section-title" label="Sistema" xalign={0} />
 
       <box class="cc-list-row" spacing={8}>
-        <label class="cc-list-title" label="Actualizaciones pendientes" hexpand xalign={0} />
+        <label
+          class="cc-list-title"
+          label="Actualizaciones pendientes"
+          hexpand
+          xalign={0}
+        />
         <label
           class="cc-list-subtitle"
           label={state((snapshot) =>
@@ -98,7 +103,9 @@ export default function SystemSection() {
           class="cc-action-btn"
           sensitive={state((snapshot) => !snapshot.busy)}
           onClicked={() =>
-            void runAction("Abrir actualización manual", () => openUpdateTerminal())
+            void runAction("Abrir actualización manual", () =>
+              openUpdateTerminal(),
+            )
           }
         >
           <label label="Actualizar" />
@@ -106,7 +113,12 @@ export default function SystemSection() {
       </box>
 
       <box class="cc-list-row" spacing={8}>
-        <label class="cc-list-title" label="Temperatura máxima" hexpand xalign={0} />
+        <label
+          class="cc-list-title"
+          label="Temperatura máxima"
+          hexpand
+          xalign={0}
+        />
         <label
           class="cc-list-subtitle"
           label={state((snapshot) =>
@@ -117,7 +129,11 @@ export default function SystemSection() {
         />
       </box>
 
-      <box class="cc-list-row" orientation={Gtk.Orientation.VERTICAL} spacing={6}>
+      <box
+        class="cc-list-row"
+        orientation={Gtk.Orientation.VERTICAL}
+        spacing={6}
+      >
         <label class="cc-list-title" label="Perfil de energía" xalign={0} />
         <label
           class="cc-list-subtitle"
@@ -136,7 +152,9 @@ export default function SystemSection() {
               (snapshot) => !snapshot.busy && snapshot.powerProfileAvailable,
             )}
             onClicked={() =>
-              void runAction("Perfil ahorro", () => setPowerProfile("power-saver"))
+              void runAction("Perfil ahorro", () =>
+                setPowerProfile("power-saver"),
+              )
             }
           >
             <label label="Ahorro" />
@@ -147,7 +165,9 @@ export default function SystemSection() {
               (snapshot) => !snapshot.busy && snapshot.powerProfileAvailable,
             )}
             onClicked={() =>
-              void runAction("Perfil balanceado", () => setPowerProfile("balanced"))
+              void runAction("Perfil balanceado", () =>
+                setPowerProfile("balanced"),
+              )
             }
           >
             <label label="Balanceado" />

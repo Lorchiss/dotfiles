@@ -52,12 +52,47 @@ Dependencias runtime recomendadas para el Control Center:
 - `nmtui` (fallback Wi‑Fi)
 - `blueman-manager` (fallback Bluetooth)
 - `pavucontrol` (control avanzado de audio)
+- `python3`, `curl`, `xdg-open`, `notify-send` (Spotify popup API + OAuth)
 
 Fallbacks cuando falta una dependencia:
 
 - Sin `nmtui`: usar conexión Wi‑Fi desde apps externas.
 - Sin `blueman-manager`: pairing manual por terminal (`bluetoothctl`).
 - Sin `pavucontrol`: selección básica se mantiene dentro de AGS.
+
+## Spotify Like API (PKCE)
+
+El popup de Spotify ahora incluye:
+
+- Layout `Arctic+Bold` con portada dominante (520px).
+- Controles extra: `Abrir`, `Shuffle`, `Like`.
+- Botón `Conectar` para enlazar Spotify Web API y guardar favoritos reales.
+- Acento dinámico suave calculado desde la portada del álbum.
+
+### Setup (una sola vez)
+
+1. Crea credenciales locales desde el ejemplo:
+
+```bash
+cp ~/.config/ags/private/spotify-auth.example.json ~/.config/ags/private/spotify-auth.json
+chmod 600 ~/.config/ags/private/spotify-auth.json
+```
+
+2. Edita `~/.config/ags/private/spotify-auth.json` y define tu `client_id`.
+
+3. En tu Spotify App Dashboard, agrega este Redirect URI exacto:
+
+- `http://127.0.0.1:8898/callback`
+
+4. Reinicia AGS (`systemctl --user restart ags.service`) o recarga tu sesión.
+
+5. En el popup de Spotify, usa `Conectar` y completa el login en navegador.
+
+### Archivos relevantes
+
+- Helper TS: `config/ags/lib/spotifyApi.ts`
+- Helper Python: `config/ags/scripts/spotify_api.py`
+- Estado local OAuth: `~/.config/ags/private/spotify-auth.json` (ignorado por git)
 
 ## Cómo validar rápido
 

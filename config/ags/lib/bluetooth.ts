@@ -18,19 +18,85 @@ function shellQuote(value: string): string {
   return `'${value.replace(/'/g, `'\\''`)}'`
 }
 
+function normalizeBluetoothCommand(command: string): string {
+  const clean = command.replace(/[\r\n]+/g, " ").trim()
+  if (!clean) throw new Error("Comando bluetooth inválido")
+  return clean
+}
+
+function buildBluetoothSessionInput(commands: string[]): string {
+  const lines = commands.map(normalizeBluetoothCommand)
+  if (!lines.length) throw new Error("Comando bluetooth inválido")
+  return `${lines.join("\n")}\nquit\n`
+}
+
+function normalizeBluetoothMac(mac: string): string {
+  const clean = mac.trim().toUpperCase()
+  if (!/^[0-9A-F]{2}(?::[0-9A-F]{2}){5}$/.test(clean)) {
+    throw new Error("MAC inválida")
+  }
+  return clean
+}
+
+const BLUETOOTH_READ_COMMANDS = [
+  "show",
+  "devices",
+  "devices Paired",
+  "devices Connected",
+] as const
+
+function splitSessionOutputByCommand(
+  raw: string,
+  commands: readonly string[],
+): Map<string, string> {
+  const result = new Map<string, string>()
+  for (const command of commands) result.set(command, "")
+
+  const commandSet = new Set(commands)
+  let currentCommand = ""
+
+  for (const line of raw.split("\n")) {
+    const trimmed = line.trim()
+    if (!trimmed) continue
+
+    if (commandSet.has(trimmed)) {
+      currentCommand = trimmed
+      continue
+    }
+
+    if (trimmed === "quit") {
+      currentCommand = ""
+      continue
+    }
+
+    if (!currentCommand) continue
+    const previous = result.get(currentCommand) ?? ""
+    result.set(currentCommand, previous ? `${previous}\n${trimmed}` : trimmed)
+  }
+
+  return result
+}
+
 function cleanBluetoothOutput(raw: string): string {
   return raw
-    .replace(/\x1B\[[0-9;]*[A-Za-z]/g, "")
+    .replace(/\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])/g, "")
+    .replace(/\u0008/g, "")
     .replace(/\r/g, "\n")
     .split("\n")
-    .map((line) => line.replace(/^\[[^\]]+\]>\s*/, "").trim())
+    .map((line) => line.replace(/^\[[^\]]+\][>#]\s*/, "").trim())
     .filter(Boolean)
     .join("\n")
 }
 
-async function runBluetoothRead(command: string): Promise<string> {
+async function runBluetoothSession(
+  commands: string[],
+  timeoutSec = 8,
+  tolerateFailure = false,
+): Promise<string> {
+  const input = shellQuote(buildBluetoothSessionInput(commands))
+  const maybeAllowFailure = tolerateFailure ? " || true" : ""
   const out = await execAsync(
-    `bash -lc "timeout 5s bluetoothctl ${command} 2>&1 || true"`,
+    `bash -lc "printf %s ${input} | timeout ${timeoutSec}s bluetoothctl 2>&1${maybeAllowFailure}"`,
   )
   return cleanBluetoothOutput(out)
 }
@@ -56,9 +122,7 @@ async function runBluetoothAction(
 ): Promise<void> {
   let out = ""
   try {
-    out = await execAsync(
-      `bash -lc "timeout ${timeoutSec}s bluetoothctl ${command} 2>&1"`,
-    )
+    out = await runBluetoothSession([command], timeoutSec, false)
   } catch (error) {
     const message =
       typeof error === "string"
@@ -76,7 +140,9 @@ async function runBluetoothAction(
     )
   if (!hasKnownError) return
 
-  const isAllowed = allowedErrorPatterns.some((pattern) => pattern.test(cleaned))
+  const isAllowed = allowedErrorPatterns.some((pattern) =>
+    pattern.test(cleaned),
+  )
   if (!isAllowed) {
     throw new Error(pickUsefulError(cleaned))
   }
@@ -98,12 +164,19 @@ function parseDevices(raw: string): Map<string, string> {
 
 export async function readBluetoothState(): Promise<BluetoothState> {
   try {
-    const [showRaw, devicesRaw, pairedRaw, connectedRaw] = await Promise.all([
-      runBluetoothRead("show"),
-      runBluetoothRead("devices"),
-      runBluetoothRead("devices Paired"),
-      runBluetoothRead("devices Connected"),
-    ])
+    const readsRaw = await runBluetoothSession(
+      [...BLUETOOTH_READ_COMMANDS],
+      7,
+      true,
+    )
+    const sections = splitSessionOutputByCommand(
+      readsRaw,
+      BLUETOOTH_READ_COMMANDS,
+    )
+    const showRaw = sections.get("show") ?? ""
+    const devicesRaw = sections.get("devices") ?? ""
+    const pairedRaw = sections.get("devices Paired") ?? ""
+    const connectedRaw = sections.get("devices Connected") ?? ""
 
     const powered = /Powered:\s+yes/i.test(showRaw)
     const discovering = /Discovering:\s+yes/i.test(showRaw)
@@ -125,12 +198,14 @@ export async function readBluetoothState(): Promise<BluetoothState> {
       if (!all.has(mac)) all.set(mac, name)
     }
 
-    const devices: BluetoothDevice[] = [...all.entries()].map(([mac, name]) => ({
-      mac,
-      name,
-      paired: paired.has(mac),
-      connected: connected.has(mac),
-    }))
+    const devices: BluetoothDevice[] = [...all.entries()].map(
+      ([mac, name]) => ({
+        mac,
+        name,
+        paired: paired.has(mac),
+        connected: connected.has(mac),
+      }),
+    )
 
     devices.sort((a, b) => {
       if (a.connected !== b.connected) return a.connected ? -1 : 1
@@ -163,34 +238,28 @@ export async function setBluetoothScan(enabled: boolean): Promise<void> {
 }
 
 export async function pairAndTrustDevice(mac: string): Promise<void> {
-  const cleanMac = mac.trim().toUpperCase()
-  if (!cleanMac) throw new Error("MAC inválida")
+  const cleanMac = normalizeBluetoothMac(mac)
 
-  await runBluetoothAction(`pair ${shellQuote(cleanMac)}`, 20, [
+  await runBluetoothAction(`pair ${cleanMac}`, 20, [
     /AlreadyExists/i,
     /already paired/i,
   ])
-  await runBluetoothAction(`trust ${shellQuote(cleanMac)}`)
+  await runBluetoothAction(`trust ${cleanMac}`)
 }
 
 export async function connectBluetoothDevice(mac: string): Promise<void> {
-  const cleanMac = mac.trim().toUpperCase()
-  if (!cleanMac) throw new Error("MAC inválida")
-  await runBluetoothAction(`connect ${shellQuote(cleanMac)}`, 15, [/already connected/i])
+  const cleanMac = normalizeBluetoothMac(mac)
+  await runBluetoothAction(`connect ${cleanMac}`, 15, [/already connected/i])
 }
 
 export async function disconnectBluetoothDevice(mac: string): Promise<void> {
-  const cleanMac = mac.trim().toUpperCase()
-  if (!cleanMac) throw new Error("MAC inválida")
-  await runBluetoothAction(`disconnect ${shellQuote(cleanMac)}`, 10, [
-    /not connected/i,
-  ])
+  const cleanMac = normalizeBluetoothMac(mac)
+  await runBluetoothAction(`disconnect ${cleanMac}`, 10, [/not connected/i])
 }
 
 export async function removeBluetoothDevice(mac: string): Promise<void> {
-  const cleanMac = mac.trim().toUpperCase()
-  if (!cleanMac) throw new Error("MAC inválida")
-  await runBluetoothAction(`remove ${shellQuote(cleanMac)}`)
+  const cleanMac = normalizeBluetoothMac(mac)
+  await runBluetoothAction(`remove ${cleanMac}`)
 }
 
 export async function openBluemanFallback(): Promise<void> {

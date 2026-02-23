@@ -96,7 +96,10 @@ export async function readHyprWorkspaceState(): Promise<HyprWorkspaceState> {
         const laneWorkspaces = workspaces.filter(
           (workspace) => workspace.monitor === monitorName,
         )
-        const workspaceIds = workspaceIdsForLane(activeWorkspaceId, laneWorkspaces)
+        const workspaceIds = workspaceIdsForLane(
+          activeWorkspaceId,
+          laneWorkspaces,
+        )
 
         return {
           monitorName,
