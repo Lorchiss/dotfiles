@@ -145,6 +145,9 @@ printf "%s\n%s\n%s\n%s\n%s\n%s" "$title" "$artist" "$length" "$art" "$status" "$
     return Math.max(0, Math.min(1, s.currentSec / s.totalSec))
   })
 
+  const progress = state((s) =>
+    s.totalSec > 0 ? Math.max(0, Math.min(1, s.currentSec / s.totalSec)) : 0,
+  )
   return (
     <window
       name="spotify"
