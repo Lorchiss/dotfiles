@@ -1,10 +1,31 @@
 // https://gitlab.gnome.org/GNOME/gtk/-/blob/gtk-3-24/gtk/theme/Adwaita/_colors-public.scss
 @use "sass:map";
 
+// Identity: Arctic Glass
+$ag-surface-0: rgba(11, 16, 24, 0.78);
+$ag-surface-1: rgba(18, 25, 36, 0.82);
+$ag-surface-2: rgba(26, 35, 49, 0.9);
+$ag-text-0: rgba(229, 237, 245, 0.96);
+$ag-text-1: rgba(196, 209, 223, 0.84);
+$ag-accent-primary: rgba(146, 214, 255, 0.96);
+$ag-accent-secondary: rgba(152, 245, 224, 0.95);
+$ag-accent-tertiary: rgba(189, 214, 255, 0.95);
+$ag-border-soft: rgba(255, 255, 255, 0.12);
+$ag-border-strong: rgba(157, 203, 244, 0.34);
+$ag-shadow: rgba(0, 0, 0, 0.42);
+$ag-radius-chip: 14px;
+$ag-radius-control: 16px;
+$ag-radius-card: 20px;
+$ag-radius-pill: 999px;
+$ag-motion-fast: 120ms;
+$ag-motion-base: 180ms;
+$ag-motion-slow: 240ms;
+$ag-curve-standard: cubic-bezier(0.2, 0, 0, 1);
+
 $fg-color: #{"@theme_fg_color"};
 $bg-color: #{"@theme_bg_color"};
 
-$radius-bar: 20px;
+$radius-bar: $ag-radius-card;
 $bar-density: balanced !default; // compact | balanced | hero
 
 $bar-presets: (
@@ -64,68 +85,69 @@ $bar-height: bar-size(bar-height);
 $bar-side-margin: bar-size(bar-side-margin);
 $bar-padding-x: bar-size(bar-padding-x);
 
-$glass-bg: rgba(20, 20, 28, 0.58);
-$border-light: rgba(255, 255, 255, 0.1);
-$hover-bg: rgba(255, 255, 255, 0.14);
-
 window.Bar {
   background: transparent;
 
   > centerbox {
-    background: $glass-bg;
+    background: $ag-surface-0;
     border-radius: $radius-bar;
 
     margin: 14px $bar-side-margin 0 $bar-side-margin;
     min-height: $bar-height;
 
     padding: 0 $bar-padding-x;
-
-    border: 1px solid $border-light;
-
-    button.spotify-active {
-      box-shadow: 0 0 14px rgba(120, 180, 255, 0.3);
-    }
+    border: 1px solid $ag-border-soft;
+    box-shadow: 0 12px 28px -10px $ag-shadow;
   }
 
   label {
     font-size: 12.5px;
     letter-spacing: 0.4px;
+    color: $ag-text-0;
   }
 
   button,
   menubutton > button {
-    border-radius: 14px;
+    border-radius: $ag-radius-chip;
     padding: 6px 12px;
-    transition: all 120ms ease;
-    background: rgba(255, 255, 255, 0.06);
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    transition:
+      background-color $ag-motion-base $ag-curve-standard,
+      border-color $ag-motion-base $ag-curve-standard,
+      box-shadow $ag-motion-base $ag-curve-standard;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid $ag-border-soft;
+    color: $ag-text-0;
   }
 
   button:hover,
   menubutton > button:hover {
-    background: rgba(255, 255, 255, 0.16);
-    box-shadow: 0 0 10px rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.08);
+    border-color: $ag-border-strong;
+    box-shadow: 0 10px 16px -14px $ag-shadow;
   }
 
   button:active,
   button:checked,
   menubutton > button:active,
   menubutton > button:checked {
-    background: rgba(121, 157, 232, 0.34);
-    border-color: rgba(180, 210, 255, 0.4);
-    box-shadow: inset 0 0 0 1px rgba(200, 226, 255, 0.24);
+    background: rgba(255, 255, 255, 0.12);
+    border-color: $ag-border-strong;
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
   }
 
   .workspace-chip {
     min-width: bar-size(workspace-chip-min);
+    color: $ag-accent-tertiary;
   }
 
   .window-title-chip {
     min-width: bar-size(window-title-chip-min);
+    color: $ag-text-1;
   }
 
   .spotify-chip {
     min-width: bar-size(spotify-chip-min);
+    border-color: rgba(152, 245, 224, 0.26);
   }
 
   .spotify-chip-content {
@@ -133,11 +155,21 @@ window.Bar {
   }
 
   .spotify-chip-icon {
-    color: rgba(220, 220, 230, 0.9);
+    color: $ag-accent-secondary;
   }
 
   .spotify-chip-title {
     min-width: 0;
+  }
+
+  .spotify-chip:hover {
+    background: rgba(152, 245, 224, 0.08);
+  }
+
+  .spotify-chip.spotify-active {
+    background: rgba(152, 245, 224, 0.12);
+    border-color: rgba(152, 245, 224, 0.42);
+    box-shadow: 0 0 14px rgba(152, 245, 224, 0.2);
   }
 
   .metrics-row {
@@ -146,6 +178,7 @@ window.Bar {
 
   .metric-chip {
     font-variant-numeric: tabular-nums;
+    color: $ag-text-1;
   }
 
   .cpu-chip,
@@ -159,23 +192,43 @@ window.Bar {
 
   .clock-chip > button {
     min-width: bar-size(clock-chip-min);
+    border-color: rgba(189, 214, 255, 0.24);
+  }
+
+  .clock-chip > button:hover {
+    background: rgba(189, 214, 255, 0.08);
   }
 
   .vol-control {
     > button {
       min-width: bar-size(vol-button-min);
       padding: 6px 12px;
-      border-radius: 16px;
+      border-radius: $ag-radius-control;
+      background: rgba(146, 214, 255, 0.08);
+      border-color: rgba(146, 214, 255, 0.28);
+    }
+
+    > button:hover {
+      background: rgba(146, 214, 255, 0.14);
+      border-color: rgba(146, 214, 255, 0.42);
+    }
+
+    > button:active,
+    > button:checked {
+      background: rgba(146, 214, 255, 0.18);
+      border-color: rgba(146, 214, 255, 0.48);
     }
 
     .vol-trigger-icon {
       margin-right: 2px;
+      color: $ag-accent-primary;
     }
 
     .vol-trigger-label {
       font-weight: 600;
       letter-spacing: 0.35px;
       min-width: 72px;
+      color: $ag-accent-primary;
     }
 
     popover {
