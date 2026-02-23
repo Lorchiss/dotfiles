@@ -12,4 +12,3 @@ app.start({
     SpotifyPopup()
   },
 })
-
