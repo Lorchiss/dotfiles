@@ -84,7 +84,6 @@ export default function VolumeControl() {
               drawValue={false}
               roundDigits={0}
               orientation={Gtk.Orientation.HORIZONTAL}
-              value={volumeValue((v) => v)}
               adjustment={
                 new Gtk.Adjustment({
                   lower: 0,
@@ -94,7 +93,20 @@ export default function VolumeControl() {
                 })
               }
               setup={(self: any) => {
+                let syncing = false
+
+                volumeValue((v) => {
+                  const current = self.get_value()
+                  if (Math.abs(current - v) > 0.5) {
+                    syncing = true
+                    self.set_value(v)
+                    syncing = false
+                  }
+                  return v
+                })
+
                 self.connect("value-changed", () => {
+                  if (syncing) return
                   setVolume(self.get_value())
                 })
               }}
