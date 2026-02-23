@@ -5,14 +5,25 @@ import { createPoll } from "ags/time"
 const volumeStep = 5
 
 export default function VolumeControl() {
-  const volume = createPoll("VOL --%", 1200, async () => {
+  const volumePercent = createPoll("--%", 1200, async () => {
     try {
       const out = await execAsync(
         `bash -lc "pactl get-sink-volume @DEFAULT_SINK@ | head -n1 | awk '{print \\$5}'"`,
       )
-      return `VOL ${out.trim()}`
+      return out.trim() || "--%"
     } catch {
-      return "VOL --%"
+      return "--%"
+    }
+  })
+
+  const isMuted = createPoll(false, 1200, async () => {
+    try {
+      const out = await execAsync(
+        `bash -lc "pactl get-sink-mute @DEFAULT_SINK@ | awk '{print \\$2}'"`,
+      )
+      return out.trim() === "yes"
+    } catch {
+      return false
     }
   })
 
@@ -30,16 +41,30 @@ export default function VolumeControl() {
     )
 
   return (
-    <box spacing={6} class="vol-control" valign={Gtk.Align.CENTER}>
-      <button onClicked={lower} tooltipText="Bajar volumen">
-        <label label="−" />
-      </button>
-      <button onClicked={toggleMute} tooltipText="Mute">
-        <label label={volume} />
-      </button>
-      <button onClicked={raise} tooltipText="Subir volumen">
-        <label label="+" />
-      </button>
-    </box>
+    <menubutton class="vol-control">
+      <label
+        label={isMuted((m) => `${m ? "🔇" : "🔊"} ${volumePercent((v) => v)}`)}
+      />
+      <popover>
+        <box
+          orientation={Gtk.Orientation.VERTICAL}
+          spacing={8}
+          cssName="volPopover"
+        >
+          <label label="Volumen" cssName="volPopoverTitle" xalign={0} />
+          <box spacing={8}>
+            <button onClicked={lower} tooltipText="Bajar volumen">
+              <label label="−" />
+            </button>
+            <button onClicked={toggleMute} tooltipText="Mute">
+              <label label={isMuted((m) => (m ? "Unmute" : "Mute"))} />
+            </button>
+            <button onClicked={raise} tooltipText="Subir volumen">
+              <label label="+" />
+            </button>
+          </box>
+        </box>
+      </popover>
+    </menubutton>
   )
 }

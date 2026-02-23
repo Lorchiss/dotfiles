@@ -1,70 +1,80 @@
 # Auditoría técnica del repositorio dotfiles
 
 Fecha original: 2026-02-21  
-Actualización: 2026-02-22
+Actualización: 2026-02-23 (seguimiento operativo)
 
 ## Estado actual (auditoría incremental)
 
-Se revisó nuevamente el stack Hyprland + AGS tras los cambios recientes del bar/popup.
+Se revisó nuevamente el stack Hyprland + AGS tras estabilización de servicio, modularización del bar y ajustes del popup de Spotify.
 
-### ✅ Resuelto desde la auditoría anterior
+### ✅ Resuelto desde la auditoría inicial
 
-- Barra modularizada en componentes (`SpotifyButton`, `SystemMetrics`, `ClockMenu`, `VolumeControl`).
-- Se eliminó el estado no definido (`spotifyState`) que rompía el render.
-- La barra reserva espacio correcto (exclusividad/layer).
-- Se corrigió la métrica RAM (`RAM X%`) y ya no queda en placeholder por formato de `%`.
-- Se reemplazaron placeholders de barra por datos reales:
-  - workspace activo
-  - ventana activa
+1. Barra modularizada (`SpotifyButton`, `SystemMetrics`, `ClockMenu`, `VolumeControl`).
+2. Error por estado no definido en bar eliminado.
+3. Reserva de espacio de barra corregida (layer/exclusivity).
+4. RAM funcional (`RAM X%`) y sin `%` duplicado.
+5. Placeholders reemplazados por datos reales:
+   - workspace activo
+   - ventana activa
+6. Preflight de dependencias agregado (`bootstrap/check-deps.sh`).
+7. Scripts de calidad AGS agregados (`typecheck`, `lint`, `format`).
+8. `ags.service` endurecido para reducir loops `start-limit-hit`.
 
-### ⚠️ Hallazgos relevantes pendientes / ajuste fino
+### ⚠️ Puntos relevantes actuales
 
-#### P1 — UX/fluidez del popup Spotify
+#### P1 — UX del popup / barra
 
-1. **El progreso puede percibirse con saltos**
-   - Causa: actualización por polling (no señal push de progreso continuo).
-   - Estado actual: suavizado con transición CSS.
-   - Siguiente mejora: interpolación local de progreso entre polls para movimiento continuo.
+1. **Fluidez de progreso**
+   - Estado: se mantiene progreso por polling + transición CSS para priorizar estabilidad.
+   - Nota: la interpolación agresiva se descartó por riesgo de inestabilidad en runtime.
 
-2. **Escala visual del popup sensible al gusto**
-   - Causa: múltiples iteraciones de tamaño (card/caratula/tipografía).
-   - Estado actual: proporciones ajustadas y más compactas.
-   - Siguiente mejora: definir presets (`compact`, `balanced`, `hero`) y conmutar por variable SCSS.
+2. **Escala visual configurable**
+   - Estado: popup en modo compacto/balanceado.
+   - Siguiente mejora: presets por variables SCSS (`compact`, `balanced`, `hero`).
 
-3. **Apertura Spotify por doble click depende del binario/app launcher disponible**
-   - Estado actual: fallback en cadena `spotify` -> `gtk-launch spotify` -> `xdg-open spotify:`.
-   - Siguiente mejora: detectar método válido al iniciar y cachear preferencia.
+3. **Control de volumen de barra**
+   - Estado: migrado a control compacto con popover (menos ruido visual).
+   - Siguiente mejora opcional: slider de volumen nativo si se valida estable en AGS runtime.
 
-#### P2 — Operación/robustez general
+#### P2 — Operación
 
-4. **No existe chequeo de dependencias de sesión**
-   - Falta script de preflight para validar `playerctl`, `pactl`, `iw`, `ip`, `hyprctl`, etc.
-
-5. **No hay typecheck/lint automatizado para AGS**
-   - Riesgo: regresiones de TS/JSX detectadas tarde.
-
-6. **Autostart referencia script externo no versionado**
+4. **Script de wallpaper externo**
    - `~/.config/scripts/wallpaper.sh` sigue fuera del repositorio.
+
+5. **Validación runtime real**
+   - Entorno CI/headless no permite verificar AGS/Wayland visualmente.
+   - Requiere smoke-test en sesión real de usuario.
 
 ## Plan recomendado (continuar planificado)
 
-### Fase siguiente (corta)
+### Siguiente fase corta
 
-1. Añadir `bootstrap/check-deps.sh` con salida clara (OK/WARN/FAIL).
-2. Añadir scripts de `typecheck`/`lint` para `config/ags`.
-3. Normalizar tamaños del popup con tokens SCSS (`$popup-width`, `$cover-size`, etc.).
+1. Añadir presets SCSS del popup (`compact`, `balanced`, `hero`).
+2. Documentar troubleshooting AGS en README (errores frecuentes + comandos).
+3. Decidir si incorporar slider de volumen o mantener popover por simplicidad.
 
-### Fase siguiente+ (opcional)
+### Fase opcional
 
-4. Interpolación de progreso (movimiento más continuo entre polls).
-5. Presets visuales del popup (compact/balanced/hero).
+4. Añadir script de smoke-test post-deploy para sesión de usuario.
+5. Versionar o hacer opcional seguro el `wallpaper.sh`.
 
 ## Comandos usados en esta actualización
 
-- `sed -n '1,260p' AUDITORIA.md`
-- `sed -n '1,260p' config/ags/widget/Bar.tsx`
-- `sed -n '1,320p' config/ags/widget/Spotify.tsx`
-- `sed -n '1,260p' config/ags/widget/bar/SystemMetrics.tsx`
-- `sed -n '1,260p' config/ags/widget/bar/SpotifyButton.tsx`
+- `sed -n '1,240p' config/ags/widget/bar/VolumeControl.tsx`
 - `sed -n '1,260p' config/ags/style.scss`
+- `sed -n '1,220p' AUDITORIA.md`
+
+## Verificación rápida recomendada
+
+Para validar el estado en una máquina de usuario (Wayland), ejecutar:
+
+1. `systemctl --user status ags.service --no-pager`
+2. `journalctl --user -u ags.service -n 80 --no-pager`
+3. `cd ~/.config/ags && npm run typecheck && npm run lint`
+
+Criterio de aceptación mínimo:
+
+- El servicio permanece activo sin reinicios en bucle.
+- El bar se renderiza con métricas (CPU/RAM), reloj y volumen funcional.
+- El popup de Spotify abre/cierra sin errores visibles ni stack traces.
 
