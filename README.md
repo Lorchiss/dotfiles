@@ -31,6 +31,34 @@ Fase 2 (pendiente):
 
 - Tipografías globales para reforzar identidad sin romper legibilidad del sistema.
 
+## Big Upgrade AGS (fase 1)
+
+Implementado:
+
+- Workspaces por monitor en barra (`WorkspaceLanes`), con chips ocupados/activos y click para cambiar de monitor + workspace.
+- Control Center lateral (`SUPER + C` o chip `Centro`) con pestañas:
+  - Wi‑Fi: toggle, lista de redes, connect/disconnect y fallback `nmtui`.
+  - Bluetooth: power/scan, pair+trust/connect/disconnect/remove y fallback `blueman-manager`.
+  - Audio: selección de sink/source por defecto y acceso a `pavucontrol`.
+  - Sesión: acciones de logout/suspend/reboot/shutdown con confirmación.
+- Se mantiene compatibilidad con los módulos ya estables (volumen, Spotify, binds multimedia y screenshots).
+
+Dependencias runtime recomendadas para el Control Center:
+
+- `nmcli`
+- `bluetoothctl`
+- `pactl`
+- `wpctl`
+- `nmtui` (fallback Wi‑Fi)
+- `blueman-manager` (fallback Bluetooth)
+- `pavucontrol` (control avanzado de audio)
+
+Fallbacks cuando falta una dependencia:
+
+- Sin `nmtui`: usar conexión Wi‑Fi desde apps externas.
+- Sin `blueman-manager`: pairing manual por terminal (`bluetoothctl`).
+- Sin `pavucontrol`: selección básica se mantiene dentro de AGS.
+
 ## Cómo validar rápido
 
 1. Ejecutar `bootstrap/deploy.sh`.
