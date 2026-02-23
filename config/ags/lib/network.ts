@@ -29,6 +29,12 @@ type ReadWifiOptions = {
   previousNetworks?: WifiNetwork[]
 }
 
+function errorText(error: unknown): string {
+  if (error instanceof Error && error.message) return error.message
+  if (typeof error === "string") return error
+  return ""
+}
+
 function shellQuote(value: string): string {
   return `'${value.replace(/'/g, `'\\''`)}'`
 }
@@ -40,8 +46,38 @@ function isConnectedState(state: string): boolean {
   )
 }
 
-function parseTableLine(rawLine: string): string[] {
-  return rawLine.split("|").map((chunk) => chunk.trim())
+function parseTableLine(rawLine: string, separator = ":"): string[] {
+  const line = rawLine.trim()
+  if (!line) return []
+
+  const parts: string[] = []
+  let current = ""
+  let escaped = false
+
+  for (const char of line) {
+    if (escaped) {
+      current += char
+      escaped = false
+      continue
+    }
+
+    if (char === "\\") {
+      escaped = true
+      continue
+    }
+
+    if (char === separator) {
+      parts.push(current.trim())
+      current = ""
+      continue
+    }
+
+    current += char
+  }
+
+  if (escaped) current += "\\"
+  parts.push(current.trim())
+  return parts
 }
 
 function parseIntSafe(raw: string): number {
@@ -55,7 +91,7 @@ function parseWifiInterfaces(raw: string): WifiInterface[] {
     .split("\n")
     .map((line) => line.trim())
     .filter(Boolean)
-    .map(parseTableLine)
+    .map((line) => parseTableLine(line))
     .filter((parts) => parts.length >= 4)
     .filter((parts) => parts[1] === "wifi")
     .filter((parts) => !parts[0].startsWith("p2p-"))
@@ -129,7 +165,7 @@ export async function readWifiState(
     const [radioRaw, interfacesRaw] = await Promise.all([
       execAsync(`bash -lc "LC_ALL=C nmcli -t -f WIFI g"`),
       execAsync(
-        `bash -lc "LC_ALL=C nmcli -t --separator '|' -f DEVICE,TYPE,STATE,CONNECTION device status"`,
+        `bash -lc "LC_ALL=C nmcli -t -f DEVICE,TYPE,STATE,CONNECTION device status"`,
       ),
     ])
 
@@ -138,11 +174,11 @@ export async function readWifiState(
     const primary =
       interfaces.find((iface) => isConnectedState(iface.state)) ?? interfaces[0]
 
-    let networks = previousNetworks
+    let networks = radioEnabled ? previousNetworks : []
     if (includeNetworks && radioEnabled && primary?.device) {
       try {
         const listRaw = await execAsync(
-          `bash -lc "LC_ALL=C nmcli -t --separator '|' -f IN-USE,SSID,SIGNAL,SECURITY,BARS dev wifi list ifname ${shellQuote(primary.device)}"`,
+          `bash -lc "LC_ALL=C nmcli -t -f IN-USE,SSID,SIGNAL,SECURITY,BARS dev wifi list ifname ${shellQuote(primary.device)}"`,
         )
         networks = parseWifiNetworks(listRaw)
       } catch {
@@ -211,7 +247,47 @@ export async function connectWifiNetwork(
     parts.push("password", shellQuote(cleanPassword))
   }
 
-  await execAsync(`bash -lc "LC_ALL=C ${parts.join(" ")}"`)
+  const connectCommand = `bash -lc "LC_ALL=C ${parts.join(" ")}"`
+
+  try {
+    await execAsync(connectCommand)
+  } catch (error) {
+    const details = errorText(error).toLowerCase()
+    const shouldRetryWithFreshProfile =
+      Boolean(cleanPassword) &&
+      (details.includes("key-mgmt") ||
+        details.includes("secrets were required") ||
+        details.includes("not provided"))
+
+    if (!shouldRetryWithFreshProfile) throw error
+
+    try {
+      const profilesRaw = await execAsync(
+        `bash -lc "LC_ALL=C nmcli -t -f NAME,TYPE,802-11-wireless.ssid connection show"`,
+      )
+
+      const matchingProfiles = profilesRaw
+        .split("\n")
+        .map((line) => line.trim())
+        .filter(Boolean)
+        .map((line) => parseTableLine(line))
+        .filter((parts) => parts.length >= 3)
+        .filter((parts) => parts[1] === "802-11-wireless")
+        .filter((parts) => parts[2] === cleanSsid)
+        .map((parts) => parts[0])
+        .filter(Boolean)
+
+      for (const profileName of matchingProfiles) {
+        await execAsync(
+          `bash -lc "LC_ALL=C nmcli connection delete id ${shellQuote(profileName)} >/dev/null 2>&1 || true"`,
+        )
+      }
+    } catch {
+      // Ignore cleanup failures and still retry once.
+    }
+
+    await execAsync(connectCommand)
+  }
 }
 
 export async function openNmtuiFallback(): Promise<void> {

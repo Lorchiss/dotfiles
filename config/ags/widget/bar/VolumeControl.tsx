@@ -1,6 +1,7 @@
 import { Gtk } from "ags/gtk4"
 import { execAsync } from "ags/process"
 import { createPoll } from "ags/time"
+import { createMusicAccentClassState } from "../../lib/musicAccent"
 
 const volumeStep = 5
 const keepVolumePopoverOpen = false
@@ -24,6 +25,7 @@ function volumeIconName(value: number, muted: boolean) {
 export default function VolumeControl() {
   let syncingScale = false
   let ignoreStateSyncUntil = 0
+  const accentClass = createMusicAccentClassState()
 
   const state = createPoll<VolumeState>(
     { value: 0, muted: false },
@@ -109,7 +111,13 @@ printf "%s\n%s" "$vol" "$mute"
         autohide={!keepVolumePopoverOpen}
         hasArrow={false}
       >
-        <box spacing={12} cssName="volPopover">
+        <box
+          spacing={12}
+          cssName="volPopover"
+          class={accentClass(
+            (accent) => `volPopover popup-accent-surface ${accent}`,
+          )}
+        >
           <button
             class="vol-mute-btn"
             onClicked={toggleMute}
@@ -143,7 +151,7 @@ printf "%s\n%s" "$vol" "$mute"
                 hexpand
                 drawValue={false}
                 roundDigits={0}
-                $={(self) => {
+                $={(self: any) => {
                   self.set_range(0, 100)
                   self.set_increments(1, volumeStep)
 
@@ -163,7 +171,7 @@ printf "%s\n%s" "$vol" "$mute"
                     self.connect("destroy", () => unsubscribe())
                   }
                 }}
-                onValueChanged={(self) => {
+                onValueChanged={(self: any) => {
                   if (syncingScale) return
                   ignoreStateSyncUntil = Date.now() + 500
                   void setVolume(self.get_value())

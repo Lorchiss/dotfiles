@@ -36,12 +36,18 @@ export default function SystemTray() {
 
   return (
     <box class="system-tray-chip" spacing={8} valign={Gtk.Align.CENTER}>
-      <label class="metric-chip" label={state((snapshot) => updatesLabel(snapshot))} />
+      <label
+        class="metric-chip"
+        label={state((snapshot) => updatesLabel(snapshot))}
+      />
       <label
         class="metric-chip"
         label={state((snapshot) => temperatureLabel(snapshot))}
       />
-      <label class="metric-chip" label={state((snapshot) => profileLabel(snapshot))} />
+      <label
+        class="metric-chip"
+        label={state((snapshot) => profileLabel(snapshot))}
+      />
     </box>
   )
 }

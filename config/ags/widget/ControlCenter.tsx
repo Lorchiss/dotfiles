@@ -8,10 +8,12 @@ import BluetoothSection from "./controlcenter/BluetoothSection"
 import AudioSection from "./controlcenter/AudioSection"
 import SystemSection from "./controlcenter/SystemSection"
 import SessionSection from "./controlcenter/SessionSection"
+import { createMusicAccentClassState } from "../lib/musicAccent"
 
 export default function ControlCenter() {
   let activeTab: ControlCenterTab = "wifi"
   let windowRef: any = null
+  const accentClass = createMusicAccentClassState()
 
   const sectionRefs: Partial<Record<ControlCenterTab, any>> = {}
 
@@ -40,7 +42,7 @@ export default function ControlCenter() {
   return (
     <window
       name="control-center"
-      class="ControlCenter cc-window"
+      class={accentClass((accent) => `ControlCenter cc-window ${accent}`)}
       application={app}
       visible={false}
       layer={Astal.Layer.TOP}
@@ -66,6 +68,9 @@ export default function ControlCenter() {
         orientation={Gtk.Orientation.VERTICAL}
         spacing={10}
         cssName="ccCard"
+        class={accentClass(
+          (accent) => `cc-card popup-accent-surface ${accent}`,
+        )}
         widthRequest={560}
       >
         <box class="cc-header" spacing={8}>

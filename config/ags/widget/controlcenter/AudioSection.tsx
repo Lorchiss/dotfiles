@@ -292,7 +292,7 @@ export default function AudioSection({ isActive }: AudioSectionProps) {
           hexpand
           drawValue={false}
           roundDigits={0}
-          $={(self) => {
+          $={(self: any) => {
             self.set_range(0, 100)
             self.set_increments(1, AUDIO_VOLUME_STEP)
 
@@ -312,7 +312,7 @@ export default function AudioSection({ isActive }: AudioSectionProps) {
               self.connect("destroy", () => unsubscribe())
             }
           }}
-          onValueChanged={(self) => {
+          onValueChanged={(self: any) => {
             if (syncingScale) return
             ignoreScaleSyncUntil = Date.now() + 500
             void setVolume(self.get_value())

@@ -1,18 +1,27 @@
 // https://gitlab.gnome.org/GNOME/gtk/-/blob/gtk-3-24/gtk/theme/Adwaita/_colors-public.scss
 @use "sass:map";
 
-// Identity: Arctic Glass
-$ag-surface-0: rgba(11, 16, 24, 0.78);
-$ag-surface-1: rgba(18, 25, 36, 0.82);
-$ag-surface-2: rgba(26, 35, 49, 0.9);
-$ag-text-0: rgba(229, 237, 245, 0.96);
-$ag-text-1: rgba(196, 209, 223, 0.84);
-$ag-accent-primary: rgba(146, 214, 255, 0.96);
-$ag-accent-secondary: rgba(152, 245, 224, 0.95);
-$ag-accent-tertiary: rgba(189, 214, 255, 0.95);
-$ag-border-soft: rgba(255, 255, 255, 0.12);
-$ag-border-strong: rgba(157, 203, 244, 0.34);
-$ag-shadow: rgba(0, 0, 0, 0.42);
+// Identity: Arctic Solid
+$ag-surface-0: #0f1722;
+$ag-surface-1: #162131;
+$ag-surface-2: #1d2a3c;
+$ag-text-0: #e7edf5;
+$ag-text-1: rgba(205, 217, 232, 0.9);
+$ag-accent-primary: rgba(146, 214, 255, 0.97);
+$ag-accent-secondary: rgba(152, 245, 224, 0.97);
+$ag-accent-tertiary: rgba(189, 214, 255, 0.97);
+$ag-border-soft: rgba(255, 255, 255, 0.15);
+$ag-border-strong: rgba(157, 203, 244, 0.44);
+$ag-shadow: rgba(0, 0, 0, 0.55);
+$ag-popup-base: #0b121d;
+$ag-popup-border: rgba(170, 207, 238, 0.3);
+$ag-popup-shadow: 0 24px 42px -12px rgba(0, 0, 0, 0.68);
+
+$ag-accent-emerald-border: rgba(138, 242, 196, 0.44);
+$ag-accent-cyan-border: rgba(123, 230, 247, 0.44);
+$ag-accent-blue-border: rgba(121, 174, 255, 0.46);
+$ag-accent-amber-border: rgba(248, 197, 108, 0.48);
+$ag-accent-rose-border: rgba(245, 132, 161, 0.46);
 $ag-radius-chip: 14px;
 $ag-radius-control: 16px;
 $ag-radius-card: 20px;
@@ -27,6 +36,13 @@ $bg-color: #{"@theme_bg_color"};
 
 $radius-bar: $ag-radius-card;
 $bar-density: balanced !default; // compact | balanced | hero
+
+@mixin popup-card-shell {
+  border-radius: $ag-radius-card;
+  background: $ag-popup-base;
+  border: 1px solid $ag-popup-border;
+  box-shadow: $ag-popup-shadow;
+}
 
 $bar-presets: (
   compact: (
@@ -84,6 +100,38 @@ $bar-presets: (
 $bar-height: bar-size(bar-height);
 $bar-side-margin: bar-size(bar-side-margin);
 $bar-padding-x: bar-size(bar-padding-x);
+
+.popup-accent-surface {
+  @include popup-card-shell;
+  transition:
+    border-color $ag-motion-base $ag-curve-standard,
+    box-shadow $ag-motion-base $ag-curve-standard;
+}
+
+.popup-accent-surface.spotify-accent-emerald,
+window.SpotifyPopup .spotifyPopupCardShell.spotify-accent-emerald {
+  border-color: $ag-accent-emerald-border;
+}
+
+.popup-accent-surface.spotify-accent-cyan,
+window.SpotifyPopup .spotifyPopupCardShell.spotify-accent-cyan {
+  border-color: $ag-accent-cyan-border;
+}
+
+.popup-accent-surface.spotify-accent-blue,
+window.SpotifyPopup .spotifyPopupCardShell.spotify-accent-blue {
+  border-color: $ag-accent-blue-border;
+}
+
+.popup-accent-surface.spotify-accent-amber,
+window.SpotifyPopup .spotifyPopupCardShell.spotify-accent-amber {
+  border-color: $ag-accent-amber-border;
+}
+
+.popup-accent-surface.spotify-accent-rose,
+window.SpotifyPopup .spotifyPopupCardShell.spotify-accent-rose {
+  border-color: $ag-accent-rose-border;
+}
 
 window.Bar {
   background: transparent;
@@ -272,6 +320,56 @@ window.Bar {
     background: rgba(189, 214, 255, 0.08);
   }
 
+  .clock-popover-shell {
+    padding: 0;
+  }
+
+  .clock-popover-shell contents {
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    padding: 0;
+  }
+
+  .clock-popover-card {
+    min-width: 292px;
+    padding: 12px;
+  }
+
+  .clock-popover-heading {
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.2px;
+    color: $ag-text-0;
+  }
+
+  .clock-popover-calendar {
+    border-radius: 14px;
+    padding: 6px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .clock-popover-card.spotify-accent-emerald .clock-popover-heading {
+    color: rgba(211, 255, 240, 0.98);
+  }
+
+  .clock-popover-card.spotify-accent-cyan .clock-popover-heading {
+    color: rgba(218, 250, 255, 0.98);
+  }
+
+  .clock-popover-card.spotify-accent-blue .clock-popover-heading {
+    color: rgba(224, 236, 255, 0.98);
+  }
+
+  .clock-popover-card.spotify-accent-amber .clock-popover-heading {
+    color: rgba(255, 241, 214, 0.98);
+  }
+
+  .clock-popover-card.spotify-accent-rose .clock-popover-heading {
+    color: rgba(255, 225, 234, 0.98);
+  }
+
   .vol-control {
     > button {
       min-width: bar-size(vol-button-min);
@@ -318,10 +416,6 @@ window.Bar {
     volPopover {
       min-width: 480px;
       padding: 14px;
-      border-radius: $ag-radius-card;
-      background: $ag-surface-0;
-      border: 1px solid $ag-border-soft;
-      box-shadow: 0 22px 40px $ag-shadow;
     }
 
     .vol-mute-btn {
@@ -380,6 +474,46 @@ window.Bar {
       transition: all $ag-motion-slow $ag-curve-standard;
     }
 
+    volPopover.spotify-accent-emerald .vol-scale highlight {
+      background: linear-gradient(
+        90deg,
+        rgba(138, 242, 196, 0.95),
+        rgba(93, 227, 166, 0.95)
+      );
+    }
+
+    volPopover.spotify-accent-cyan .vol-scale highlight {
+      background: linear-gradient(
+        90deg,
+        rgba(123, 230, 247, 0.96),
+        rgba(99, 195, 240, 0.95)
+      );
+    }
+
+    volPopover.spotify-accent-blue .vol-scale highlight {
+      background: linear-gradient(
+        90deg,
+        rgba(121, 174, 255, 0.96),
+        rgba(91, 141, 238, 0.95)
+      );
+    }
+
+    volPopover.spotify-accent-amber .vol-scale highlight {
+      background: linear-gradient(
+        90deg,
+        rgba(248, 197, 108, 0.96),
+        rgba(241, 162, 61, 0.95)
+      );
+    }
+
+    volPopover.spotify-accent-rose .vol-scale highlight {
+      background: linear-gradient(
+        90deg,
+        rgba(245, 132, 161, 0.96),
+        rgba(233, 103, 141, 0.95)
+      );
+    }
+
     .vol-percent-label {
       min-width: 58px;
       font-size: 14px;
@@ -394,8 +528,8 @@ window.SpotifyPopup {
   background: transparent;
 
   button {
-    background: rgba(255, 255, 255, 0.04);
-    border: 1px solid $ag-border-soft;
+    background: rgba(24, 33, 47, 0.96);
+    border: 1px solid rgba(255, 255, 255, 0.18);
     color: $ag-text-0;
     transition:
       background-color $ag-motion-base $ag-curve-standard,
@@ -404,94 +538,153 @@ window.SpotifyPopup {
   }
 
   button:hover {
-    background: rgba(255, 255, 255, 0.08);
+    background: rgba(34, 45, 63, 0.98);
     border-color: $ag-border-strong;
     box-shadow: 0 10px 16px -14px $ag-shadow;
   }
 
   button:active,
   button:checked {
-    background: rgba(255, 255, 255, 0.12);
+    background: rgba(46, 59, 82, 0.99);
     border-color: $ag-border-strong;
-    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.12);
   }
 
-  > spotifyPopupCard {
-    min-width: 480px;
+  .spotifyPopupCardShell {
+    @include popup-card-shell;
     padding: 14px;
-    border-radius: $ag-radius-card;
-    background: $ag-surface-0;
-    border: 1px solid $ag-border-soft;
-    box-shadow: 0 22px 40px $ag-shadow;
   }
 
-  spotifyPopupHeading {
-    font-size: 15px;
+  .spotifyPopupCardShell.spotify-layout-horizontal {
+    min-width: 520px;
+  }
+
+  .spotifyPopupCardShell.spotify-layout-vertical {
+    min-width: 216px;
+  }
+
+  .spotifyPopupCardShell.spotify-api-busy {
+    box-shadow: 0 24px 42px -12px $ag-shadow;
+  }
+
+  .spotifyMainColumn {
+    min-width: 0;
+    min-height: 0;
+  }
+
+  .spotifyPopupCardShell.spotify-layout-horizontal .spotifyMainColumn {
+    min-height: 176px;
+  }
+
+  .spotifyPopupCardShell.spotify-layout-vertical .spotifyMainColumn {
+    min-width: 188px;
+  }
+
+  .spotifyHeaderRow {
+    min-height: 24px;
+  }
+
+  .spotifyPopupCardShell.spotify-layout-vertical .spotifyHeaderRow {
+    min-height: 22px;
+  }
+
+  .spotifyApiChip {
+    min-width: 0;
+    border-radius: $ag-radius-pill;
+    padding: 4px 10px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.18px;
+    color: $ag-text-1;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+  }
+
+  .spotifyPopupHeading {
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.24px;
+    color: $ag-text-0;
+  }
+
+  .spotifyPopupStatus {
+    border-radius: $ag-radius-pill;
+    padding: 2px 9px;
+    color: rgba(170, 249, 234, 0.98);
+    font-size: 11.5px;
     font-weight: 700;
     letter-spacing: 0.2px;
-    color: $ag-text-0;
+    background: rgba(152, 245, 224, 0.16);
+    border: 1px solid rgba(152, 245, 224, 0.4);
   }
 
-  spotifyPopupStatus {
-    color: $ag-accent-secondary;
-    font-size: 12px;
-  }
-
-  spotifyPopupTrack {
-    font-size: 15px;
-    font-weight: 600;
-    color: $ag-text-0;
-    min-width: 0;
-  }
-
-  spotifyPopupArtist {
-    color: $ag-text-1;
+  .spotifyPopupTrack {
     font-size: 14px;
+    font-weight: 700;
+    color: $ag-text-0;
     min-width: 0;
   }
 
-  spotifyPopupControls button {
-    border-radius: 18px;
-    padding: 8px 16px;
-    min-width: 72px;
+  .spotifyPopupArtist {
+    color: $ag-text-1;
+    font-size: 13px;
+    min-width: 0;
+  }
+
+  .spotifyPrimaryControls button {
+    border-radius: 14px;
+    padding: 6px 10px;
+    min-width: 60px;
+  }
+
+  .spotifyPopupCardShell.spotify-layout-vertical
+    .spotifyPrimaryControls
+    button {
+    min-width: 0;
+    padding: 6px 0;
+  }
+
+  .spotify-primary-btn {
+    min-height: 32px;
   }
 
   .spotifyPlayButton {
-    background: rgba(152, 245, 224, 0.2);
-    border-color: rgba(152, 245, 224, 0.42);
-    box-shadow: 0 0 20px rgba(152, 245, 224, 0.18);
+    background: rgba(152, 245, 224, 0.24);
+    border-color: rgba(152, 245, 224, 0.48);
+    box-shadow: 0 0 18px rgba(152, 245, 224, 0.2);
   }
 
   .spotifyCoverWrap {
-    min-width: 136px;
-    min-height: 136px;
+    min-width: 188px;
+    min-height: 188px;
     border-radius: $ag-radius-control;
-    border: 1px solid $ag-border-soft;
-    background: $ag-surface-1;
-    padding: 4px;
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    background: rgba(11, 16, 24, 0.98);
+    padding: 2px;
+    box-shadow: none;
   }
 
   .spotifyCover {
-    min-width: 128px;
-    min-height: 128px;
-    border-radius: 14px;
+    min-width: 184px;
+    min-height: 184px;
+    border-radius: 15px;
   }
 
   .spotifyCoverFallback {
-    min-width: 128px;
-    min-height: 128px;
-    font-size: 42px;
+    min-width: 184px;
+    min-height: 184px;
+    font-size: 52px;
     color: $ag-text-1;
   }
 
   .spotifyProgressGroup {
-    margin-top: 4px;
+    margin-top: 2px;
   }
 
   .spotifyProgressBar trough {
     min-height: 8px;
     border-radius: $ag-radius-pill;
-    background: rgba(255, 255, 255, 0.22);
+    background: rgba(255, 255, 255, 0.2);
   }
 
   .spotifyProgressBar progress {
@@ -505,9 +698,143 @@ window.SpotifyPopup {
     transition: all $ag-motion-slow $ag-curve-standard;
   }
 
-  spotifyProgressTime {
+  .spotifyProgressTime {
     color: $ag-text-1;
-    font-size: 12px;
+    font-size: 11.5px;
+  }
+
+  .spotifyUtilityControls {
+    min-height: 32px;
+  }
+
+  .spotifyPopupCardShell.spotify-layout-vertical .spotifyUtilityControls {
+    min-height: 30px;
+  }
+
+  .spotify-action-btn {
+    border-radius: 14px;
+    min-width: 68px;
+    min-height: 32px;
+    padding: 5px 10px;
+    font-size: 11.5px;
+    font-weight: 700;
+    letter-spacing: 0.22px;
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.16);
+  }
+
+  .spotifyPopupCardShell.spotify-layout-vertical .spotify-action-btn,
+  .spotifyPopupCardShell.spotify-layout-vertical .spotifyConnectButton {
+    min-width: 0;
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  .spotify-action-btn.spotify-action-active {
+    color: rgba(172, 250, 235, 0.98);
+    background: rgba(152, 245, 224, 0.18);
+    border-color: rgba(152, 245, 224, 0.46);
+    box-shadow: 0 0 14px rgba(152, 245, 224, 0.18);
+  }
+
+  .spotify-action-btn.spotify-like-active {
+    color: rgba(255, 231, 237, 0.98);
+    background: rgba(255, 121, 142, 0.2);
+    border-color: rgba(255, 121, 142, 0.46);
+    box-shadow: 0 0 14px rgba(255, 121, 142, 0.18);
+  }
+
+  .spotifyConnectButton {
+    border-radius: 14px;
+    min-width: 84px;
+    min-height: 32px;
+    padding: 5px 10px;
+    font-size: 11.5px;
+    font-weight: 700;
+    letter-spacing: 0.22px;
+    color: rgba(207, 233, 252, 0.96);
+    background: rgba(146, 214, 255, 0.14);
+    border-color: rgba(146, 214, 255, 0.46);
+  }
+
+  .spotifyPopupCardShell.spotify-accent-emerald .spotifyProgressBar progress {
+    background: linear-gradient(
+      90deg,
+      rgba(138, 242, 196, 0.95),
+      rgba(93, 227, 166, 0.95)
+    );
+  }
+
+  .spotifyPopupCardShell.spotify-accent-cyan .spotifyProgressBar progress {
+    background: linear-gradient(
+      90deg,
+      rgba(123, 230, 247, 0.96),
+      rgba(99, 195, 240, 0.95)
+    );
+  }
+
+  .spotifyPopupCardShell.spotify-accent-blue .spotifyProgressBar progress {
+    background: linear-gradient(
+      90deg,
+      rgba(121, 174, 255, 0.96),
+      rgba(91, 141, 238, 0.95)
+    );
+  }
+
+  .spotifyPopupCardShell.spotify-accent-amber .spotifyProgressBar progress {
+    background: linear-gradient(
+      90deg,
+      rgba(248, 197, 108, 0.96),
+      rgba(241, 162, 61, 0.95)
+    );
+  }
+
+  .spotifyPopupCardShell.spotify-accent-rose .spotifyProgressBar progress {
+    background: linear-gradient(
+      90deg,
+      rgba(245, 132, 161, 0.96),
+      rgba(233, 103, 141, 0.95)
+    );
+  }
+
+  .spotifyPopupCardShell.spotify-accent-emerald .spotifyPopupStatus,
+  .spotifyPopupCardShell.spotify-accent-emerald
+    .spotify-action-btn.spotify-action-active {
+    color: rgba(211, 255, 240, 0.98);
+    background: rgba(138, 242, 196, 0.2);
+    border-color: rgba(138, 242, 196, 0.45);
+  }
+
+  .spotifyPopupCardShell.spotify-accent-cyan .spotifyPopupStatus,
+  .spotifyPopupCardShell.spotify-accent-cyan
+    .spotify-action-btn.spotify-action-active {
+    color: rgba(218, 250, 255, 0.98);
+    background: rgba(123, 230, 247, 0.2);
+    border-color: rgba(123, 230, 247, 0.45);
+  }
+
+  .spotifyPopupCardShell.spotify-accent-blue .spotifyPopupStatus,
+  .spotifyPopupCardShell.spotify-accent-blue
+    .spotify-action-btn.spotify-action-active {
+    color: rgba(224, 236, 255, 0.98);
+    background: rgba(121, 174, 255, 0.2);
+    border-color: rgba(121, 174, 255, 0.46);
+  }
+
+  .spotifyPopupCardShell.spotify-accent-amber .spotifyPopupStatus,
+  .spotifyPopupCardShell.spotify-accent-amber
+    .spotify-action-btn.spotify-action-active {
+    color: rgba(255, 241, 214, 0.98);
+    background: rgba(248, 197, 108, 0.22);
+    border-color: rgba(248, 197, 108, 0.5);
+  }
+
+  .spotifyPopupCardShell.spotify-accent-rose .spotifyPopupStatus,
+  .spotifyPopupCardShell.spotify-accent-rose
+    .spotify-action-btn.spotify-action-active {
+    color: rgba(255, 225, 234, 0.98);
+    background: rgba(245, 132, 161, 0.22);
+    border-color: rgba(245, 132, 161, 0.5);
   }
 }
 
@@ -517,10 +844,6 @@ window.ControlCenter {
   > ccCard {
     min-width: 560px;
     padding: 14px;
-    border-radius: $ag-radius-card;
-    background: $ag-surface-0;
-    border: 1px solid $ag-border-soft;
-    box-shadow: 0 24px 48px -12px $ag-shadow;
   }
 
   .cc-header {
@@ -569,6 +892,36 @@ window.ControlCenter {
     border-color: rgba(146, 214, 255, 0.38);
     color: $ag-accent-primary;
     box-shadow: inset 0 0 0 1px rgba(146, 214, 255, 0.18);
+  }
+
+  > ccCard.spotify-accent-emerald .cc-tab-btn-active {
+    background: rgba(138, 242, 196, 0.18);
+    border-color: rgba(138, 242, 196, 0.44);
+    color: rgba(211, 255, 240, 0.98);
+  }
+
+  > ccCard.spotify-accent-cyan .cc-tab-btn-active {
+    background: rgba(123, 230, 247, 0.18);
+    border-color: rgba(123, 230, 247, 0.44);
+    color: rgba(218, 250, 255, 0.98);
+  }
+
+  > ccCard.spotify-accent-blue .cc-tab-btn-active {
+    background: rgba(121, 174, 255, 0.2);
+    border-color: rgba(121, 174, 255, 0.46);
+    color: rgba(224, 236, 255, 0.98);
+  }
+
+  > ccCard.spotify-accent-amber .cc-tab-btn-active {
+    background: rgba(248, 197, 108, 0.2);
+    border-color: rgba(248, 197, 108, 0.48);
+    color: rgba(255, 241, 214, 0.98);
+  }
+
+  > ccCard.spotify-accent-rose .cc-tab-btn-active {
+    background: rgba(245, 132, 161, 0.2);
+    border-color: rgba(245, 132, 161, 0.48);
+    color: rgba(255, 225, 234, 0.98);
   }
 
   .cc-section {
@@ -650,6 +1003,46 @@ window.ControlCenter {
     );
   }
 
+  > ccCard.spotify-accent-emerald .cc-audio-scale highlight {
+    background: linear-gradient(
+      90deg,
+      rgba(138, 242, 196, 0.95),
+      rgba(93, 227, 166, 0.95)
+    );
+  }
+
+  > ccCard.spotify-accent-cyan .cc-audio-scale highlight {
+    background: linear-gradient(
+      90deg,
+      rgba(123, 230, 247, 0.96),
+      rgba(99, 195, 240, 0.95)
+    );
+  }
+
+  > ccCard.spotify-accent-blue .cc-audio-scale highlight {
+    background: linear-gradient(
+      90deg,
+      rgba(121, 174, 255, 0.96),
+      rgba(91, 141, 238, 0.95)
+    );
+  }
+
+  > ccCard.spotify-accent-amber .cc-audio-scale highlight {
+    background: linear-gradient(
+      90deg,
+      rgba(248, 197, 108, 0.96),
+      rgba(241, 162, 61, 0.95)
+    );
+  }
+
+  > ccCard.spotify-accent-rose .cc-audio-scale highlight {
+    background: linear-gradient(
+      90deg,
+      rgba(245, 132, 161, 0.96),
+      rgba(233, 103, 141, 0.95)
+    );
+  }
+
   .cc-audio-volume-label {
     min-width: 48px;
     font-variant-numeric: tabular-nums;
@@ -712,5 +1105,43 @@ window.ControlCenter {
     background: rgba(255, 110, 110, 0.08);
     border-radius: 12px;
     padding: 8px;
+  }
+
+  .cc-session-action {
+    min-width: 0;
+    min-height: 82px;
+    padding: 8px 6px;
+  }
+
+  .cc-session-action-icon {
+    font-size: 17px;
+    color: $ag-accent-primary;
+  }
+
+  .cc-session-action-title {
+    font-size: 12.6px;
+    font-weight: 700;
+    color: $ag-text-0;
+  }
+
+  .cc-session-action-hint {
+    font-size: 10.8px;
+    color: $ag-text-1;
+  }
+
+  .cc-session-action-danger .cc-session-action-icon {
+    color: rgba(255, 180, 180, 0.95);
+  }
+
+  .cc-session-confirm-box {
+    padding: 9px;
+  }
+
+  .cc-session-confirm-title {
+    font-weight: 700;
+  }
+
+  .cc-session-confirm-timer {
+    font-variant-numeric: tabular-nums;
   }
 }

@@ -14,3 +14,12 @@
 # Editor / OS
 .DS_Store
 .vscode/
+
+# AGS private Spotify auth
+config/ags/private/*
+!config/ags/private/spotify-auth.example.json
+!config/ags/private/.gitkeep
+
+# Python cache
+**/__pycache__/
+**/*.pyc

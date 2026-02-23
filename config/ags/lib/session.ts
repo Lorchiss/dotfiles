@@ -20,7 +20,9 @@ export function sessionActionLabel(action: SessionAction): string {
   return SESSION_ACTION_LABELS[action]
 }
 
-export async function executeSessionAction(action: SessionAction): Promise<void> {
+export async function executeSessionAction(
+  action: SessionAction,
+): Promise<void> {
   const command = SESSION_ACTION_COMMANDS[action]
   await execAsync(`bash -lc "${command}"`)
 }
