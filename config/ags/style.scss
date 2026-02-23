@@ -245,30 +245,30 @@ window.Bar {
     volPopover {
       min-width: 480px;
       padding: 14px;
-      border-radius: 20px;
-      background: rgba(20, 24, 34, 0.78);
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      box-shadow: 0 22px 40px rgba(0, 0, 0, 0.42);
+      border-radius: $ag-radius-card;
+      background: $ag-surface-0;
+      border: 1px solid $ag-border-soft;
+      box-shadow: 0 22px 40px $ag-shadow;
     }
 
     .vol-mute-btn {
-      min-width: 46px;
-      min-height: 46px;
+      min-width: 40px;
+      min-height: 40px;
       border-radius: 12px;
-      padding: 6px;
-      background: rgba(255, 255, 255, 0.04);
-      border: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 4px;
+      background: rgba(146, 214, 255, 0.1);
+      border: 1px solid rgba(146, 214, 255, 0.26);
     }
 
     .vol-popup-icon {
-      color: rgba(220, 220, 230, 0.82);
+      color: $ag-accent-primary;
     }
 
     .vol-popup-heading {
       font-size: 15px;
       font-weight: 700;
       letter-spacing: 0.2px;
-      color: rgba(226, 233, 244, 0.96);
+      color: $ag-text-0;
     }
 
     .vol-scale {
@@ -277,26 +277,26 @@ window.Bar {
 
     .vol-scale trough {
       min-height: 8px;
-      border-radius: 99px;
+      border-radius: $ag-radius-pill;
       background: rgba(255, 255, 255, 0.22);
     }
 
     .vol-scale highlight {
       min-height: 8px;
-      border-radius: 99px;
+      border-radius: $ag-radius-pill;
       background: linear-gradient(
         90deg,
-        rgba(136, 255, 210, 0.95),
-        rgba(170, 255, 236, 0.95)
+        rgba(146, 214, 255, 0.95),
+        rgba(189, 214, 255, 0.95)
       );
-      transition: all 220ms ease-out;
+      transition: background-color $ag-motion-base $ag-curve-standard;
     }
 
     .vol-percent-label {
       min-width: 58px;
-      font-size: 22px;
-      font-weight: 600;
-      color: rgba(226, 233, 244, 0.96);
+      font-size: 14px;
+      font-weight: 700;
+      color: $ag-text-1;
       font-variant-numeric: tabular-nums;
     }
   }
@@ -308,31 +308,35 @@ window.SpotifyPopup {
   > spotifyPopupCard {
     min-width: 480px;
     padding: 14px;
-    border-radius: 20px;
-    background: rgba(20, 24, 34, 0.78);
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    box-shadow: 0 22px 40px rgba(0, 0, 0, 0.42);
+    border-radius: $ag-radius-card;
+    background: $ag-surface-0;
+    border: 1px solid $ag-border-soft;
+    box-shadow: 0 22px 40px $ag-shadow;
   }
 
   spotifyPopupHeading {
     font-size: 15px;
     font-weight: 700;
     letter-spacing: 0.2px;
+    color: $ag-text-0;
   }
 
   spotifyPopupStatus {
-    color: rgba(178, 255, 220, 0.95);
+    color: $ag-accent-secondary;
     font-size: 12px;
   }
 
   spotifyPopupTrack {
-    font-size: 22px;
+    font-size: 15px;
     font-weight: 600;
+    color: $ag-text-0;
+    min-width: 0;
   }
 
   spotifyPopupArtist {
-    color: rgba(220, 220, 230, 0.82);
+    color: $ag-text-1;
     font-size: 14px;
+    min-width: 0;
   }
 
   spotifyPopupControls button {
@@ -342,16 +346,17 @@ window.SpotifyPopup {
   }
 
   .spotifyPlayButton {
-    background: rgba(147, 255, 214, 0.2);
-    box-shadow: 0 0 20px rgba(147, 255, 214, 0.18);
+    background: rgba(152, 245, 224, 0.2);
+    border-color: rgba(152, 245, 224, 0.42);
+    box-shadow: 0 0 20px rgba(152, 245, 224, 0.18);
   }
 
   .spotifyCoverWrap {
     min-width: 136px;
     min-height: 136px;
-    border-radius: 16px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    background: rgba(255, 255, 255, 0.04);
+    border-radius: $ag-radius-control;
+    border: 1px solid $ag-border-soft;
+    background: $ag-surface-1;
     padding: 4px;
   }
 
@@ -365,7 +370,7 @@ window.SpotifyPopup {
     min-width: 128px;
     min-height: 128px;
     font-size: 42px;
-    color: rgba(230, 230, 240, 0.7);
+    color: $ag-text-1;
   }
 
   .spotifyProgressGroup {
@@ -374,23 +379,23 @@ window.SpotifyPopup {
 
   .spotifyProgressBar trough {
     min-height: 8px;
-    border-radius: 99px;
+    border-radius: $ag-radius-pill;
     background: rgba(255, 255, 255, 0.22);
   }
 
   .spotifyProgressBar progress {
     min-height: 8px;
-    border-radius: 99px;
+    border-radius: $ag-radius-pill;
     background: linear-gradient(
       90deg,
-      rgba(136, 255, 210, 0.95),
-      rgba(170, 255, 236, 0.95)
+      rgba(152, 245, 224, 0.95),
+      rgba(146, 214, 255, 0.95)
     );
-    transition: all 220ms ease-out;
+    transition: background-color $ag-motion-base $ag-curve-standard;
   }
 
   spotifyProgressTime {
-    color: rgba(220, 220, 230, 0.82);
+    color: $ag-text-1;
     font-size: 12px;
   }
 }
