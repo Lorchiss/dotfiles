@@ -33,28 +33,68 @@ window.Bar {
     letter-spacing: 0.4px;
   }
 
-  button {
+  button,
+  menubutton > button {
     border-radius: 14px;
     padding: 6px 12px;
     transition: all 120ms ease;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.08);
   }
 
-  button:hover {
+  button:hover,
+  menubutton > button:hover {
     background: rgba(255, 255, 255, 0.16);
     box-shadow: 0 0 10px rgba(255, 255, 255, 0.08);
   }
 
+  button:active,
+  button:checked,
+  menubutton > button:active,
+  menubutton > button:checked {
+    background: rgba(121, 157, 232, 0.34);
+    border-color: rgba(180, 210, 255, 0.4);
+    box-shadow: inset 0 0 0 1px rgba(200, 226, 255, 0.24);
+  }
+
+  .workspace-chip {
+    min-width: 68px;
+  }
+
+  .window-title-chip {
+    min-width: 320px;
+  }
+
+  .spotify-chip {
+    min-width: 210px;
+  }
+
+  .metrics-row {
+    min-width: 330px;
+  }
+
+  .metric-chip {
+    font-variant-numeric: tabular-nums;
+  }
+
+  .cpu-chip,
+  .ram-chip {
+    min-width: 78px;
+  }
+
+  .net-chip {
+    min-width: 104px;
+  }
+
+  .clock-chip > button {
+    min-width: 190px;
+  }
+
   .vol-control {
     > button {
-      min-width: 120px;
-      padding: 6px 14px;
+      min-width: 92px;
+      padding: 6px 12px;
       border-radius: 16px;
-      background: rgba(28, 36, 64, 0.4);
-    }
-
-    > button:hover {
-      background: rgba(72, 98, 156, 0.36);
-      box-shadow: 0 0 14px rgba(126, 173, 255, 0.24);
     }
 
     popover {
@@ -69,7 +109,7 @@ window.Bar {
     }
 
     #volPopover {
-      min-width: 520px;
+      min-width: 440px;
       padding: 14px 18px;
       border-radius: 28px;
       background: linear-gradient(
@@ -109,14 +149,6 @@ window.Bar {
       border-radius: 999px;
       background: rgba(243, 249, 255, 0.96);
       border: 1px solid rgba(126, 170, 238, 0.45);
-    }
-
-    .vol-percent {
-      min-width: 58px;
-      font-size: 27px;
-      font-weight: 600;
-      letter-spacing: 0;
-      color: rgba(236, 244, 255, 0.96);
     }
   }
 }

@@ -5,6 +5,16 @@ import { createPoll } from "ags/time"
 const volumeStep = 5
 const maxVolume = 150
 
+function levelGlyph(value: number) {
+  const bars = ["▁", "▂", "▃", "▄", "▅", "▆", "▇", "█"]
+  const normalized = Math.max(0, Math.min(100, value))
+  const idx = Math.min(
+    bars.length - 1,
+    Math.floor((normalized / 100) * bars.length),
+  )
+  return bars[idx]
+}
+
 export default function VolumeControl() {
   const volumeValue = createPoll(0, 800, async () => {
     try {
@@ -54,7 +64,7 @@ export default function VolumeControl() {
     <menubutton class="vol-control" tooltipText="Control de volumen">
       <box spacing={8}>
         <label label={isMuted((m) => (m ? "🔇" : "🔊"))} />
-        <label label={volumeValue((v) => `VOL ${v}%`)} />
+        <label label={volumeValue((v) => levelGlyph(v))} />
       </box>
 
       <popover class="vol-popover-shell">
@@ -62,13 +72,13 @@ export default function VolumeControl() {
           <button
             class="vol-mute-btn"
             onClicked={toggleMute}
-            tooltipText={isMuted((m) => (m ? "Activar sonido" : "Silenciar"))}
+            tooltipText="Silenciar / activar sonido"
           >
             <label label={isMuted((m) => (m ? "🔇" : "🔊"))} />
           </button>
 
-          <box hexpand orientation={Gtk.Orientation.VERTICAL} spacing={6}>
-            <scale
+          <box hexpand orientation={Gtk.Orientation.VERTICAL} spacing={8}>
+            <Gtk.Scale
               class="vol-slider"
               hexpand
               drawValue={false}
@@ -90,7 +100,7 @@ export default function VolumeControl() {
               }}
             />
 
-            <box spacing={8}>
+            <box spacing={8} halign={Gtk.Align.END}>
               <button onClicked={lower} tooltipText="Bajar volumen">
                 <label label="−" />
               </button>
@@ -99,12 +109,6 @@ export default function VolumeControl() {
               </button>
             </box>
           </box>
-
-          <label
-            class="vol-percent"
-            label={volumeValue((v) => `${v}%`)}
-            halign={Gtk.Align.END}
-          />
         </box>
       </popover>
     </menubutton>

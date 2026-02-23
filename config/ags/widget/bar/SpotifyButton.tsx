@@ -48,9 +48,12 @@ export default function SpotifyButton() {
   return (
     <button
       onClicked={onSpotifyButtonClick}
-      class={playing((isPlaying) => (isPlaying ? "spotify-active" : ""))}
+      class={playing((isPlaying) =>
+        isPlaying ? "spotify-chip spotify-active" : "spotify-chip",
+      )}
+      tooltipText="Spotify"
     >
-      <label label={title} />
+      <label label={title} maxWidthChars={20} ellipsize={3} />
     </button>
   )
 }

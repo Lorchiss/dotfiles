@@ -45,11 +45,12 @@ export default function Bar(gdkmonitor: any) {
     >
       <centerbox cssName="centerbox">
         <box $type="start" spacing={10} hexpand halign={Gtk.Align.START}>
-          <label label={workspace} />
+          <label class="workspace-chip" label={workspace} />
         </box>
 
         <box $type="center" hexpand halign={Gtk.Align.CENTER}>
           <label
+            class="window-title-chip"
             label={activeWindowTitle((title) => (title ? title : " "))}
             maxWidthChars={46}
             ellipsize={3}

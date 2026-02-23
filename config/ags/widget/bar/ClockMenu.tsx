@@ -8,7 +8,7 @@ export default function ClockMenu() {
   )
 
   return (
-    <menubutton>
+    <menubutton class="clock-chip" tooltipText="Calendario">
       <label label={clock} />
       <popover>
         <Gtk.Calendar />

@@ -51,7 +51,7 @@ read -r _ u1 n1 s1 i1 w1 irq1 sirq1 st1 _ < /proc/stat
     }
   })
 
-  const net = createPoll("", 2000, async () => {
+  const net = createPoll("NET --", 2000, async () => {
     try {
       const wifi = await execAsync(
         `bash -lc 'iw dev 2>/dev/null | awk "/Interface/ {print $2; exit}"'`,
@@ -64,23 +64,23 @@ read -r _ u1 n1 s1 i1 w1 irq1 sirq1 st1 _ < /proc/stat
         ).catch(() => "")
         const signal = sig.trim()
         if (signal) return `NET ${signal}dBm`
-        return "NET"
+        return "NET --"
       }
 
       const eth = await execAsync(
         `bash -lc 'ip -o link show up | awk -F": " "{print $2}" | grep -E "^(en|eth)" -m1 || true'`,
       ).catch(() => "")
-      return eth.trim() ? "ETH" : ""
+      return eth.trim() ? "ETH link" : "NET --"
     } catch {
-      return ""
+      return "NET --"
     }
   })
 
   return (
-    <box spacing={12} halign={Gtk.Align.END}>
-      <label label={cpu} />
-      <label label={ram} />
-      <label label={net} />
+    <box class="metrics-row" spacing={8} halign={Gtk.Align.END}>
+      <label class="metric-chip cpu-chip" label={cpu} />
+      <label class="metric-chip ram-chip" label={ram} />
+      <label class="metric-chip net-chip" label={net} />
       <VolumeControl />
     </box>
   )
