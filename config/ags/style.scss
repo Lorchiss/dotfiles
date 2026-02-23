@@ -135,14 +135,80 @@ window.Bar {
     box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
   }
 
+  .workspace-lanes {
+    min-width: bar-size(workspace-chip-min);
+  }
+
+  .workspace-monitor-lane {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(189, 214, 255, 0.18);
+    border-radius: $ag-radius-chip;
+    padding: 3px 8px;
+  }
+
+  .workspace-monitor-badge {
+    color: $ag-accent-tertiary;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.35px;
+  }
+
   .workspace-chip {
+    min-width: 30px;
+    padding: 3px 8px;
+    border-radius: 11px;
+    font-size: 11.5px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .workspace-chip-occupied {
+    background: rgba(255, 255, 255, 0.04);
+    border-color: rgba(255, 255, 255, 0.14);
+    color: $ag-text-1;
+  }
+
+  .workspace-chip-active.workspace-chip-focused {
+    background: rgba(189, 214, 255, 0.22);
+    border-color: rgba(189, 214, 255, 0.5);
+    color: $ag-accent-tertiary;
+    box-shadow: 0 0 0 1px rgba(189, 214, 255, 0.2);
+  }
+
+  .workspace-chip-active.workspace-chip-unfocused {
+    background: rgba(189, 214, 255, 0.14);
+    border-color: rgba(189, 214, 255, 0.36);
+    color: rgba(205, 223, 242, 0.92);
+  }
+
+  .workspace-fallback {
     min-width: bar-size(workspace-chip-min);
     color: $ag-accent-tertiary;
+    font-weight: 700;
+    border: 1px solid rgba(189, 214, 255, 0.2);
+    background: rgba(255, 255, 255, 0.04);
   }
 
   .window-title-chip {
     min-width: bar-size(window-title-chip-min);
     color: $ag-text-1;
+  }
+
+  .connectivity-chip {
+    border-color: rgba(146, 214, 255, 0.28);
+    background: rgba(146, 214, 255, 0.06);
+    color: $ag-accent-primary;
+  }
+
+  .connectivity-chip:hover {
+    background: rgba(146, 214, 255, 0.08);
+    border-color: rgba(146, 214, 255, 0.42);
+  }
+
+  .connectivity-chip:active,
+  .connectivity-chip:checked {
+    background: rgba(146, 214, 255, 0.12);
+    border-color: rgba(146, 214, 255, 0.48);
   }
 
   .spotify-chip {
@@ -179,6 +245,13 @@ window.Bar {
   .metric-chip {
     font-variant-numeric: tabular-nums;
     color: $ag-text-1;
+  }
+
+  .system-tray-chip {
+    border-radius: $ag-radius-chip;
+    padding: 4px 8px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.1);
   }
 
   .cpu-chip,
@@ -435,5 +508,184 @@ window.SpotifyPopup {
   spotifyProgressTime {
     color: $ag-text-1;
     font-size: 12px;
+  }
+}
+
+window.ControlCenter {
+  background: transparent;
+
+  > ccCard {
+    min-width: 560px;
+    padding: 14px;
+    border-radius: $ag-radius-card;
+    background: $ag-surface-0;
+    border: 1px solid $ag-border-soft;
+    box-shadow: 0 24px 48px -12px $ag-shadow;
+  }
+
+  .cc-header {
+    min-height: 34px;
+  }
+
+  .cc-title {
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: 0.2px;
+    color: $ag-text-0;
+  }
+
+  .cc-close-btn {
+    min-width: 36px;
+    min-height: 30px;
+    padding: 0;
+    border-radius: 10px;
+    color: $ag-text-1;
+  }
+
+  .cc-tabbar {
+    padding: 2px 0;
+  }
+
+  .cc-tab-btn {
+    min-width: 96px;
+    padding: 6px 10px;
+    border-radius: 11px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: $ag-text-1;
+    transition:
+      background-color $ag-motion-base $ag-curve-standard,
+      border-color $ag-motion-base $ag-curve-standard,
+      box-shadow $ag-motion-base $ag-curve-standard;
+  }
+
+  .cc-tab-btn:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: $ag-border-strong;
+  }
+
+  .cc-tab-btn-active {
+    background: rgba(146, 214, 255, 0.14);
+    border-color: rgba(146, 214, 255, 0.38);
+    color: $ag-accent-primary;
+    box-shadow: inset 0 0 0 1px rgba(146, 214, 255, 0.18);
+  }
+
+  .cc-section {
+    background: $ag-surface-1;
+    border: 1px solid $ag-border-soft;
+    border-radius: 15px;
+    padding: 12px;
+    margin-top: 2px;
+  }
+
+  .cc-section-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: $ag-text-0;
+  }
+
+  .cc-section-subtitle {
+    font-size: 13px;
+    font-weight: 600;
+    color: $ag-text-0;
+  }
+
+  .cc-section-subtle {
+    font-size: 12px;
+    color: $ag-text-1;
+  }
+
+  .cc-inline-message {
+    font-size: 12px;
+    letter-spacing: 0.2px;
+  }
+
+  .cc-inline-message-success {
+    color: $ag-accent-secondary;
+  }
+
+  .cc-inline-message-error {
+    color: rgba(255, 168, 168, 0.95);
+  }
+
+  .cc-password-entry {
+    min-height: 34px;
+    border-radius: 10px;
+    padding: 4px 10px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    color: $ag-text-0;
+  }
+
+  .cc-network-list,
+  .cc-device-list {
+    min-height: 160px;
+  }
+
+  .cc-list-row {
+    border-radius: 11px;
+    padding: 7px 8px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.02);
+  }
+
+  .cc-list-title {
+    color: $ag-text-0;
+    font-size: 12.8px;
+    font-weight: 600;
+  }
+
+  .cc-list-subtitle {
+    color: $ag-text-1;
+    font-size: 11.6px;
+  }
+
+  .cc-empty-state {
+    color: $ag-text-1;
+    font-size: 12px;
+    padding: 8px 0;
+  }
+
+  .cc-action-btn {
+    min-width: 82px;
+    border-radius: 11px;
+    padding: 6px 12px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    color: $ag-text-0;
+    transition:
+      background-color $ag-motion-base $ag-curve-standard,
+      border-color $ag-motion-base $ag-curve-standard,
+      box-shadow $ag-motion-base $ag-curve-standard;
+  }
+
+  .cc-action-btn:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: $ag-border-strong;
+    box-shadow: 0 10px 16px -14px $ag-shadow;
+  }
+
+  .cc-action-btn:active,
+  .cc-action-btn:checked {
+    background: rgba(255, 255, 255, 0.12);
+    border-color: $ag-border-strong;
+  }
+
+  .cc-danger-btn {
+    border-color: rgba(255, 180, 180, 0.32);
+    color: rgba(255, 200, 200, 0.95);
+  }
+
+  .cc-danger-btn:hover {
+    background: rgba(255, 120, 120, 0.12);
+    border-color: rgba(255, 168, 168, 0.45);
+  }
+
+  .cc-confirm-box {
+    border: 1px solid rgba(255, 180, 180, 0.24);
+    background: rgba(255, 110, 110, 0.08);
+    border-radius: 12px;
+    padding: 8px;
   }
 }
