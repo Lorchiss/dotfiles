@@ -24,6 +24,7 @@ type BluetoothUiState = BluetoothState & {
 }
 
 const BLUETOOTH_POLL_MS = 2000
+const BLUETOOTH_INACTIVE_SKIP_TICKS = 15
 
 function errorMessage(error: unknown): string {
   if (error instanceof Error && error.message) return error.message
@@ -49,6 +50,7 @@ export default function BluetoothSection({ isActive }: BluetoothSectionProps) {
   let message = ""
   let messageIsError = false
   let forceRefresh = 2
+  let pollTick = 0
 
   const state = createPoll<BluetoothUiState>(
     {
@@ -61,17 +63,23 @@ export default function BluetoothSection({ isActive }: BluetoothSectionProps) {
       messageIsError: false,
     },
     BLUETOOTH_POLL_MS,
-    async () => {
-      const bluetoothState = await readBluetoothState()
-
-      if (!isActive() && forceRefresh <= 0) {
+    async (prev) => {
+      pollTick += 1
+      const shouldRefresh =
+        forceRefresh > 0 ||
+        isActive() ||
+        prev.devices.length === 0 ||
+        pollTick % BLUETOOTH_INACTIVE_SKIP_TICKS === 0
+      if (!shouldRefresh) {
         return {
-          ...bluetoothState,
+          ...prev,
           busy: actionInFlight,
           message,
           messageIsError,
         }
       }
+
+      const bluetoothState = await readBluetoothState()
 
       if (forceRefresh > 0) forceRefresh -= 1
 

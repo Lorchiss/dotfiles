@@ -1,5 +1,5 @@
-import { execAsync } from "ags/process"
 import { openInTerminal } from "./terminal"
+import { runCommand } from "./command"
 
 export type WifiInterface = {
   device: string
@@ -163,9 +163,12 @@ export async function readWifiState(
 
   try {
     const [radioRaw, interfacesRaw] = await Promise.all([
-      execAsync(`bash -lc "LC_ALL=C nmcli -t -f WIFI g"`),
-      execAsync(
-        `bash -lc "LC_ALL=C nmcli -t -f DEVICE,TYPE,STATE,CONNECTION device status"`,
+      runCommand(`LC_ALL=C nmcli -t -f WIFI g`, { timeoutMs: 6000 }),
+      runCommand(
+        `LC_ALL=C nmcli -t -f DEVICE,TYPE,STATE,CONNECTION device status`,
+        {
+          timeoutMs: 6000,
+        },
       ),
     ])
 
@@ -177,8 +180,9 @@ export async function readWifiState(
     let networks = radioEnabled ? previousNetworks : []
     if (includeNetworks && radioEnabled && primary?.device) {
       try {
-        const listRaw = await execAsync(
-          `bash -lc "LC_ALL=C nmcli -t -f IN-USE,SSID,SIGNAL,SECURITY,BARS dev wifi list ifname ${shellQuote(primary.device)}"`,
+        const listRaw = await runCommand(
+          `LC_ALL=C nmcli -t -f IN-USE,SSID,SIGNAL,SECURITY,BARS dev wifi list ifname ${shellQuote(primary.device)}`,
+          { timeoutMs: 9000 },
         )
         networks = parseWifiNetworks(listRaw)
       } catch {
@@ -209,16 +213,16 @@ export async function readWifiState(
 
 export async function setWifiRadio(enabled: boolean): Promise<void> {
   const mode = enabled ? "on" : "off"
-  await execAsync(`bash -lc "nmcli radio wifi ${mode}"`)
+  await runCommand(`nmcli radio wifi ${mode}`, { timeoutMs: 6000 })
 }
 
 export async function disconnectWifiInterface(
   interfaceName: string,
 ): Promise<void> {
   if (!interfaceName) return
-  await execAsync(
-    `bash -lc "nmcli device disconnect ${shellQuote(interfaceName)}"`,
-  )
+  await runCommand(`nmcli device disconnect ${shellQuote(interfaceName)}`, {
+    timeoutMs: 8000,
+  })
 }
 
 export async function connectWifiNetwork(
@@ -247,10 +251,10 @@ export async function connectWifiNetwork(
     parts.push("password", shellQuote(cleanPassword))
   }
 
-  const connectCommand = `bash -lc "LC_ALL=C ${parts.join(" ")}"`
+  const connectCommand = `LC_ALL=C ${parts.join(" ")}`
 
   try {
-    await execAsync(connectCommand)
+    await runCommand(connectCommand, { timeoutMs: 18_000 })
   } catch (error) {
     const details = errorText(error).toLowerCase()
     const shouldRetryWithFreshProfile =
@@ -262,8 +266,9 @@ export async function connectWifiNetwork(
     if (!shouldRetryWithFreshProfile) throw error
 
     try {
-      const profilesRaw = await execAsync(
-        `bash -lc "LC_ALL=C nmcli -t -f NAME,TYPE,802-11-wireless.ssid connection show"`,
+      const profilesRaw = await runCommand(
+        `LC_ALL=C nmcli -t -f NAME,TYPE,802-11-wireless.ssid connection show`,
+        { timeoutMs: 8000 },
       )
 
       const matchingProfiles = profilesRaw
@@ -278,15 +283,16 @@ export async function connectWifiNetwork(
         .filter(Boolean)
 
       for (const profileName of matchingProfiles) {
-        await execAsync(
-          `bash -lc "LC_ALL=C nmcli connection delete id ${shellQuote(profileName)} >/dev/null 2>&1 || true"`,
+        await runCommand(
+          `LC_ALL=C nmcli connection delete id ${shellQuote(profileName)} >/dev/null 2>&1 || true`,
+          { timeoutMs: 7000, allowFailure: true },
         )
       }
     } catch {
       // Ignore cleanup failures and still retry once.
     }
 
-    await execAsync(connectCommand)
+    await runCommand(connectCommand, { timeoutMs: 18_000 })
   }
 }
 

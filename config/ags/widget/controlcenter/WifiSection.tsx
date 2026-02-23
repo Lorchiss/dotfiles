@@ -23,6 +23,7 @@ type WifiUiState = WifiState & {
 }
 
 const WIFI_POLL_MS = 1500
+const WIFI_INACTIVE_SKIP_TICKS = 16
 
 function errorMessage(error: unknown): string {
   if (error instanceof Error && error.message) return error.message
@@ -68,6 +69,21 @@ export default function WifiSection({ isActive }: WifiSectionProps) {
     WIFI_POLL_MS,
     async (prev) => {
       pollTick += 1
+      const shouldRefresh =
+        forceNetworkRefresh > 0 ||
+        isActive() ||
+        prev.networks.length === 0 ||
+        pollTick % WIFI_INACTIVE_SKIP_TICKS === 0
+      if (!shouldRefresh) {
+        return {
+          ...prev,
+          busy: actionInFlight,
+          message,
+          messageIsError,
+          passwordTarget,
+        }
+      }
+
       const editingPassword = Boolean(passwordTarget) && !actionInFlight
       const includeNetworks =
         !editingPassword &&
@@ -284,7 +300,11 @@ export default function WifiSection({ isActive }: WifiSectionProps) {
           wifiPassword = String(nextText)
         })
         passwordEntry.connect("notify::has-focus", () => {
-          const hasFocus = passwordEntry.has_focus?.() ?? false
+          const focusAccessor = (passwordEntry as any).has_focus
+          const hasFocus =
+            typeof focusAccessor === "function"
+              ? Boolean(focusAccessor.call(passwordEntry))
+              : Boolean(focusAccessor)
           if (hasFocus) return
           if (actionInFlight) return
           if (wifiPassword.trim()) return

@@ -43,22 +43,63 @@ Implementado:
   - Sesión: acciones de logout/suspend/reboot/shutdown con confirmación.
 - Se mantiene compatibilidad con los módulos ya estables (volumen, Spotify, binds multimedia y screenshots).
 
-Dependencias runtime recomendadas para el Control Center:
+## Mantenimiento Arch en pestaña `Sistema`
 
-- `nmcli`
-- `bluetoothctl`
-- `pactl`
-- `wpctl`
-- `nmtui` (fallback Wi‑Fi)
-- `blueman-manager` (fallback Bluetooth)
-- `pavucontrol` (control avanzado de audio)
-- `python3`, `curl`, `xdg-open`, `notify-send` (Spotify popup API + OAuth)
+Implementado:
 
-Fallbacks cuando falta una dependencia:
+- Actualizaciones con breakdown `Oficial + AUR + Total`.
+- Botón `Noticias` para abrir Arch News oficial y marcar leído.
+- Indicadores rápidos en barra (`SystemTray`) para `AUR` y `NEWS`.
+- Detección de `snapper` (config `root`) y acceso a rollback interactivo.
+- Estado de batería/energía con fallback limpio en desktops sin batería.
+- Flujo de actualización interactivo con snapshots pre/post (`pacman` + `paru` cuando existe).
 
-- Sin `nmtui`: usar conexión Wi‑Fi desde apps externas.
-- Sin `blueman-manager`: pairing manual por terminal (`bluetoothctl`).
-- Sin `pavucontrol`: selección básica se mantiene dentro de AGS.
+Scripts nuevos:
+
+- `config/ags/scripts/system_update.sh`
+- `config/ags/scripts/snapper_rollback.sh`
+
+Uso rápido:
+
+```bash
+bash config/ags/scripts/system_update.sh --dry-run
+bash config/ags/scripts/snapper_rollback.sh --help
+```
+
+Notas de operación:
+
+- Snapshots solo se ejecutan si `snapper` está instalado y existe config `root`.
+- Si `paru` no existe, el update corre solo paquetes oficiales (`pacman`).
+- En equipos sin batería, `Sistema` muestra estado `No disponible (desktop)` sin error.
+
+## Contrato de dependencias (preflight)
+
+`bootstrap/check-deps.sh` separa dependencias en dos grupos:
+
+Required (bloquean operación estable si faltan):
+
+- `hyprctl`, `ags`, `systemctl`
+- `playerctl`, `pactl`, `ip`, `awk`
+- `curl`, `python3`, `xdg-open`, `notify-send`
+- `nmcli`, `bluetoothctl`
+
+Optional (no bloquean arranque, pero degradan funciones):
+
+- `iw`
+- `nm-applet`, `blueman-applet`
+- `wpctl`, `pavucontrol`
+- `nmtui`, `blueman-manager`
+- `grim`, `slurp`
+- `powerprofilesctl`
+- `checkupdates`
+- `snapper`, `btrfs`
+- `paru`
+
+Modo estricto:
+
+- `bash bootstrap/check-deps.sh --strict`
+
+En modo estricto, el script retorna `1` si falta cualquier dependencia `required`.
 
 ## Spotify Like API (PKCE)
 
@@ -96,25 +137,33 @@ chmod 600 ~/.config/ags/private/spotify-auth.json
 
 ## Cómo validar rápido
 
-1. Ejecutar `bootstrap/deploy.sh`.
-2. Confirmar servicio AGS:
+1. Validar required antes de desplegar:
+   - `bash bootstrap/check-deps.sh --strict`
+2. Ejecutar `bootstrap/deploy.sh`.
+3. Confirmar servicio AGS:
    - `systemctl --user status ags.service`
-3. Revisar logs:
+4. Revisar logs:
    - `journalctl --user -u ags.service -f`
 
-## Próximas mejoras sugeridas
+## Estado de auditoría actual
 
-- Arreglar inconsistencias en `config/ags/widget/Bar.tsx` (por ejemplo, referencias no definidas).
-- Añadir script de lint/typecheck para AGS.
-- Documentar dependencias de runtime: `playerctl`, `pactl`, `iw`, `ip`, `free`.
+Estado: `cerrada` (auditoría de estabilidad cerrada el 2026-02-23).
+
+Resultado:
+
+- Dependencias `required` en verde y `optional` con faltantes esperados de mantenimiento (`snapper`, `btrfs`, `paru`) según host.
+- `ags.service` activo y estable tras reinicio.
+- Validación visual en Wayland real completada (barra, Control Center y Spotify popup).
+- `typecheck` y `lint` de AGS en verde.
 
 ## Preflight recomendado
 
 Antes de desplegar, valida dependencias:
 
-- `bootstrap/check-deps.sh`
+- `bash bootstrap/check-deps.sh --strict` (bloquea faltantes `required`)
+- `bash bootstrap/check-deps.sh` (reporte completo `required + optional`)
 
-Esto reporta comandos clave para que la barra/popup funcionen correctamente (playerctl, pactl, iw, etc.).
+Esto reporta comandos clave para que barra/control center funcionen sin degradación.
 
 ## Calidad AGS (typecheck/lint)
 
@@ -132,6 +181,24 @@ npm install
 npm run typecheck
 npm run lint
 ```
+
+## Smoke test operativo AGS
+
+Para validar runtime después de cambios:
+
+```bash
+bash bootstrap/ags-smoke.sh
+```
+
+El smoke test:
+
+- reinicia `ags.service`
+- fuerza `Control Center` en tab `Sistema` y abre/cierra panel
+- ejecuta validaciones seguras de scripts:
+  - `system_update.sh --dry-run`
+  - `snapper_rollback.sh --help`
+- abre/cierra popup de Spotify
+- falla (`exit 1`) si detecta `JS ERROR`, `TypeError`, `Traceback`, `CRITICAL` o `ERROR` en logs recientes
 
 ## Recuperación rápida de `ags.service`
 
