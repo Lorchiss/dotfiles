@@ -1,6 +1,11 @@
 import { execAsync } from "ags/process"
+import { openInTerminal } from "./terminal"
 
-export type PowerProfile = "power-saver" | "balanced" | "performance" | "unknown"
+export type PowerProfile =
+  | "power-saver"
+  | "balanced"
+  | "performance"
+  | "unknown"
 
 export type SystemState = {
   updatesCount: number | null
@@ -72,7 +77,7 @@ export async function setPowerProfile(profile: PowerProfile): Promise<void> {
 }
 
 export async function openUpdateTerminal(): Promise<void> {
-  await execAsync(
-    `bash -lc "kitty -e bash -lc 'echo \"Actualización manual\"; sudo pacman -Syu; echo; read -r -p \"Enter para cerrar\" _' >/dev/null 2>&1 &"`,
+  await openInTerminal(
+    `echo "Actualización manual"; sudo pacman -Syu; echo; read -r -p "Enter para cerrar" _`,
   )
 }

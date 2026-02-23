@@ -6,6 +6,7 @@ import ControlCenterTabs, {
 import WifiSection from "./controlcenter/WifiSection"
 import BluetoothSection from "./controlcenter/BluetoothSection"
 import AudioSection from "./controlcenter/AudioSection"
+import SystemSection from "./controlcenter/SystemSection"
 import SessionSection from "./controlcenter/SessionSection"
 
 export default function ControlCenter() {
@@ -87,6 +88,10 @@ export default function ControlCenter() {
 
           <box $={registerSection("audio")} visible={false}>
             <AudioSection isActive={() => activeTab === "audio"} />
+          </box>
+
+          <box $={registerSection("system")} visible={false}>
+            <SystemSection />
           </box>
 
           <box $={registerSection("session")} visible={false}>

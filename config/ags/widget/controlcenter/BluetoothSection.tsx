@@ -31,6 +31,19 @@ function errorMessage(error: unknown): string {
   return "No se pudo completar la operación Bluetooth"
 }
 
+function clearChildren(container: any) {
+  let child = container.get_first_child?.()
+  while (child) {
+    const next = child.get_next_sibling?.()
+    container.remove(child)
+    child = next
+  }
+}
+
+function setClasses(widget: any, classes: string) {
+  widget.set_css_classes?.(classes.split(" ").filter(Boolean))
+}
+
 export default function BluetoothSection({ isActive }: BluetoothSectionProps) {
   let actionInFlight = false
   let message = ""
@@ -73,7 +86,8 @@ export default function BluetoothSection({ isActive }: BluetoothSectionProps) {
 
   const readState = () => {
     const source = state as any
-    if (typeof source.peek === "function") return source.peek() as BluetoothUiState
+    if (typeof source.peek === "function")
+      return source.peek() as BluetoothUiState
     if (typeof source === "function") return source() as BluetoothUiState
     return {
       controllerName: "",
@@ -126,7 +140,9 @@ export default function BluetoothSection({ isActive }: BluetoothSectionProps) {
     runAction(`Emparejar ${device.name}`, () => pairAndTrustDevice(device.mac))
 
   const connectDevice = async (device: BluetoothDevice) =>
-    runAction(`Conectar ${device.name}`, () => connectBluetoothDevice(device.mac))
+    runAction(`Conectar ${device.name}`, () =>
+      connectBluetoothDevice(device.mac),
+    )
 
   const disconnectDevice = async (device: BluetoothDevice) =>
     runAction(`Desconectar ${device.name}`, () =>
@@ -134,7 +150,98 @@ export default function BluetoothSection({ isActive }: BluetoothSectionProps) {
     )
 
   const removeDevice = async (device: BluetoothDevice) =>
-    runAction(`Eliminar ${device.name}`, () => removeBluetoothDevice(device.mac))
+    runAction(`Eliminar ${device.name}`, () =>
+      removeBluetoothDevice(device.mac),
+    )
+
+  const renderDevices = (container: any, snapshot: BluetoothUiState) => {
+    clearChildren(container)
+
+    if (!snapshot.devices.length) {
+      const empty = new Gtk.Label({
+        label: "No hay dispositivos Bluetooth detectados",
+      })
+      setClasses(empty, "cc-empty-state")
+      empty.set_xalign(0)
+      container.append(empty)
+      return
+    }
+
+    for (const device of snapshot.devices) {
+      const row = new Gtk.Box({ spacing: 8 })
+      setClasses(row, "cc-list-row")
+
+      const left = new Gtk.Box({
+        orientation: Gtk.Orientation.VERTICAL,
+      })
+      left.set_hexpand(true)
+
+      const title = new Gtk.Label({ label: device.name })
+      setClasses(title, "cc-list-title")
+      title.set_xalign(0)
+
+      const subtitle = new Gtk.Label({
+        label: `${device.mac} · ${device.connected ? "Conectado" : device.paired ? "Emparejado" : "Disponible"}`,
+      })
+      setClasses(subtitle, "cc-list-subtitle")
+      subtitle.set_xalign(0)
+
+      left.append(title)
+      left.append(subtitle)
+
+      const actions = new Gtk.Box({ spacing: 6 })
+
+      const pairButton = new Gtk.Button()
+      setClasses(pairButton, "cc-action-btn")
+      pairButton.set_sensitive(
+        !snapshot.busy && snapshot.powered && !device.paired,
+      )
+      pairButton.connect("clicked", () => {
+        void pairDevice(device)
+      })
+      pairButton.set_child(new Gtk.Label({ label: "Pair+Trust" }))
+
+      const connectButton = new Gtk.Button()
+      setClasses(connectButton, "cc-action-btn")
+      connectButton.set_sensitive(
+        !snapshot.busy &&
+          snapshot.powered &&
+          device.paired &&
+          !device.connected,
+      )
+      connectButton.connect("clicked", () => {
+        void connectDevice(device)
+      })
+      connectButton.set_child(new Gtk.Label({ label: "Conectar" }))
+
+      const disconnectButton = new Gtk.Button()
+      setClasses(disconnectButton, "cc-action-btn")
+      disconnectButton.set_sensitive(
+        !snapshot.busy && snapshot.powered && device.connected,
+      )
+      disconnectButton.connect("clicked", () => {
+        void disconnectDevice(device)
+      })
+      disconnectButton.set_child(new Gtk.Label({ label: "Desconectar" }))
+
+      const removeButton = new Gtk.Button()
+      setClasses(removeButton, "cc-action-btn cc-danger-btn")
+      removeButton.set_sensitive(!snapshot.busy && device.paired)
+      removeButton.connect("clicked", () => {
+        void removeDevice(device)
+      })
+      removeButton.set_child(new Gtk.Label({ label: "Eliminar" }))
+
+      actions.append(pairButton)
+      actions.append(connectButton)
+      actions.append(disconnectButton)
+      actions.append(removeButton)
+
+      row.append(left)
+      row.append(actions)
+      container.append(row)
+    }
+  }
 
   return (
     <box
@@ -209,72 +316,20 @@ export default function BluetoothSection({ isActive }: BluetoothSectionProps) {
         class="cc-device-list"
         orientation={Gtk.Orientation.VERTICAL}
         spacing={6}
-      >
-        {state((snapshot) => {
-          if (!snapshot.devices.length) {
-            return (
-              <label
-                class="cc-empty-state"
-                label="No hay dispositivos Bluetooth detectados"
-                xalign={0}
-              />
-            )
+        $={(self: any) => {
+          const source = state as any
+
+          const render = () => {
+            renderDevices(self, readState())
           }
 
-          return snapshot.devices.map((device) => (
-            <box class="cc-list-row" spacing={8}>
-              <box orientation={Gtk.Orientation.VERTICAL} hexpand>
-                <label class="cc-list-title" label={device.name} xalign={0} />
-                <label
-                  class="cc-list-subtitle"
-                  label={`${device.mac} · ${device.connected ? "Conectado" : device.paired ? "Emparejado" : "Disponible"}`}
-                  xalign={0}
-                />
-              </box>
-
-              <box spacing={6}>
-                <button
-                  class="cc-action-btn"
-                  sensitive={state(
-                    (ui) => !ui.busy && ui.powered && !device.paired,
-                  )}
-                  onClicked={() => void pairDevice(device)}
-                >
-                  <label label="Pair+Trust" />
-                </button>
-
-                <button
-                  class="cc-action-btn"
-                  sensitive={state(
-                    (ui) => !ui.busy && ui.powered && device.paired && !device.connected,
-                  )}
-                  onClicked={() => void connectDevice(device)}
-                >
-                  <label label="Conectar" />
-                </button>
-
-                <button
-                  class="cc-action-btn"
-                  sensitive={state(
-                    (ui) => !ui.busy && ui.powered && device.connected,
-                  )}
-                  onClicked={() => void disconnectDevice(device)}
-                >
-                  <label label="Desconectar" />
-                </button>
-
-                <button
-                  class="cc-action-btn cc-danger-btn"
-                  sensitive={state((ui) => !ui.busy && device.paired)}
-                  onClicked={() => void removeDevice(device)}
-                >
-                  <label label="Eliminar" />
-                </button>
-              </box>
-            </box>
-          ))
-        })}
-      </box>
+          render()
+          const unsubscribe = source.subscribe?.(render)
+          if (typeof unsubscribe === "function") {
+            self.connect("destroy", () => unsubscribe())
+          }
+        }}
+      />
     </box>
   )
 }

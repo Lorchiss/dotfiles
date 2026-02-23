@@ -1,4 +1,5 @@
 import { execAsync } from "ags/process"
+import { openInTerminal } from "./terminal"
 
 export type WifiInterface = {
   device: string
@@ -34,7 +35,9 @@ function shellQuote(value: string): string {
 
 function isConnectedState(state: string): boolean {
   const normalized = state.toLowerCase()
-  return normalized.includes("connected") && !normalized.includes("disconnected")
+  return (
+    normalized.includes("connected") && !normalized.includes("disconnected")
+  )
 }
 
 function parseTableLine(rawLine: string): string[] {
@@ -173,7 +176,9 @@ export async function setWifiRadio(enabled: boolean): Promise<void> {
   await execAsync(`bash -lc "nmcli radio wifi ${mode}"`)
 }
 
-export async function disconnectWifiInterface(interfaceName: string): Promise<void> {
+export async function disconnectWifiInterface(
+  interfaceName: string,
+): Promise<void> {
   if (!interfaceName) return
   await execAsync(
     `bash -lc "nmcli device disconnect ${shellQuote(interfaceName)}"`,
@@ -210,5 +215,5 @@ export async function connectWifiNetwork(
 }
 
 export async function openNmtuiFallback(): Promise<void> {
-  await execAsync(`bash -lc "kitty -e nmtui >/dev/null 2>&1 &"`)
+  await openInTerminal("nmtui")
 }

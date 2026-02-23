@@ -29,6 +29,19 @@ function errorMessage(error: unknown): string {
   return "No se pudo completar la operación Wi-Fi"
 }
 
+function clearChildren(container: any) {
+  let child = container.get_first_child?.()
+  while (child) {
+    const next = child.get_next_sibling?.()
+    container.remove(child)
+    child = next
+  }
+}
+
+function setClasses(widget: any, classes: string) {
+  widget.set_css_classes?.(classes.split(" ").filter(Boolean))
+}
+
 export default function WifiSection({ isActive }: WifiSectionProps) {
   let actionInFlight = false
   let message = ""
@@ -150,9 +163,61 @@ export default function WifiSection({ isActive }: WifiSectionProps) {
 
   const toggleRadio = async () => {
     const current = readState()
-    await runAction(current.radioEnabled ? "Apagar Wi-Fi" : "Encender Wi-Fi", () =>
-      setWifiRadio(!current.radioEnabled),
+    await runAction(
+      current.radioEnabled ? "Apagar Wi-Fi" : "Encender Wi-Fi",
+      () => setWifiRadio(!current.radioEnabled),
     )
+  }
+
+  const renderNetworks = (container: any, snapshot: WifiUiState) => {
+    clearChildren(container)
+
+    if (!snapshot.networks.length) {
+      const empty = new Gtk.Label({ label: "No hay redes Wi-Fi detectadas" })
+      setClasses(empty, "cc-empty-state")
+      empty.set_xalign(0)
+      container.append(empty)
+      return
+    }
+
+    for (const network of snapshot.networks) {
+      const row = new Gtk.Box({ spacing: 8 })
+      setClasses(row, "cc-list-row")
+
+      const left = new Gtk.Box({
+        orientation: Gtk.Orientation.VERTICAL,
+      })
+      left.set_hexpand(true)
+
+      const title = new Gtk.Label({ label: network.displayName })
+      setClasses(title, "cc-list-title")
+      title.set_xalign(0)
+
+      const subtitle = new Gtk.Label({
+        label: `${network.signal}% · ${network.security || "Abierta"} ${network.bars ? `· ${network.bars}` : ""}`,
+      })
+      setClasses(subtitle, "cc-list-subtitle")
+      subtitle.set_xalign(0)
+
+      left.append(title)
+      left.append(subtitle)
+
+      const action = new Gtk.Button()
+      setClasses(action, "cc-action-btn")
+      action.set_sensitive(
+        !snapshot.busy && !network.inUse && !!snapshot.primaryInterface,
+      )
+      action.connect("clicked", () => {
+        void connectToNetwork(network)
+      })
+      action.set_child(
+        new Gtk.Label({ label: network.inUse ? "Conectada" : "Conectar" }),
+      )
+
+      row.append(left)
+      row.append(action)
+      container.append(row)
+    }
   }
 
   return (
@@ -237,42 +302,20 @@ export default function WifiSection({ isActive }: WifiSectionProps) {
         class="cc-network-list"
         orientation={Gtk.Orientation.VERTICAL}
         spacing={6}
-      >
-        {state((snapshot) => {
-          if (!snapshot.networks.length) {
-            return (
-              <label
-                class="cc-empty-state"
-                label="No hay redes Wi-Fi detectadas"
-                xalign={0}
-              />
-            )
+        $={(self: any) => {
+          const source = state as any
+
+          const render = () => {
+            renderNetworks(self, readState())
           }
 
-          return snapshot.networks.map((network) => (
-            <box class="cc-list-row" spacing={8}>
-              <box orientation={Gtk.Orientation.VERTICAL} hexpand>
-                <label class="cc-list-title" label={network.displayName} xalign={0} />
-                <label
-                  class="cc-list-subtitle"
-                  label={`${network.signal}% · ${network.security || "Abierta"} ${network.bars ? `· ${network.bars}` : ""}`}
-                  xalign={0}
-                />
-              </box>
-
-              <button
-                class="cc-action-btn"
-                sensitive={state(
-                  (ui) => !ui.busy && !network.inUse && !!ui.primaryInterface,
-                )}
-                onClicked={() => void connectToNetwork(network)}
-              >
-                <label label={network.inUse ? "Conectada" : "Conectar"} />
-              </button>
-            </box>
-          ))
-        })}
-      </box>
+          render()
+          const unsubscribe = source.subscribe?.(render)
+          if (typeof unsubscribe === "function") {
+            self.connect("destroy", () => unsubscribe())
+          }
+        }}
+      />
     </box>
   )
 }

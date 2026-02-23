@@ -17,10 +17,17 @@ export type AudioState = {
   defaultSource: string
   sinks: AudioNode[]
   sources: AudioNode[]
+  volume: number
+  muted: boolean
 }
 
 function shellQuote(value: string): string {
   return `'${value.replace(/'/g, `'\\''`)}'`
+}
+
+function clampPercent(value: number): number {
+  if (!Number.isFinite(value)) return 0
+  return Math.max(0, Math.min(100, Math.trunc(value)))
 }
 
 function parseNodeLine(rawLine: string, kind: AudioNodeKind): AudioNode | null {
@@ -66,14 +73,62 @@ function parseNodes(
   return nodes
 }
 
+async function readSinkVolumeState(): Promise<{
+  volume: number
+  muted: boolean
+}> {
+  try {
+    const wpLine = (
+      await execAsync(
+        `bash -lc "LC_ALL=C wpctl get-volume @DEFAULT_AUDIO_SINK@ 2>/dev/null || true"`,
+      )
+    ).trim()
+
+    if (wpLine) {
+      const match = wpLine.match(/([0-9]+(?:[.,][0-9]+)?)/)
+      if (match) {
+        const parsed = Number.parseFloat(match[1].replace(",", "."))
+        if (Number.isFinite(parsed)) {
+          return {
+            volume: clampPercent(Math.round(parsed * 100)),
+            muted: wpLine.includes("[MUTED]"),
+          }
+        }
+      }
+    }
+  } catch {}
+
+  try {
+    const out = await execAsync(`bash -lc '
+vol=$(pactl get-sink-volume @DEFAULT_SINK@ 2>/dev/null | head -n1 | awk "{print \$5}" | tr -d "%")
+mute=$(pactl get-sink-mute @DEFAULT_SINK@ 2>/dev/null | awk "{print \$2}")
+printf "%s\n%s" "$vol" "$mute"
+'`)
+
+    const [volRaw = "0", muteRaw = "no"] = out
+      .trim()
+      .split("\n")
+      .map((value) => value.trim())
+
+    const parsedVolume = Number.parseInt(volRaw, 10)
+    return {
+      volume: clampPercent(parsedVolume),
+      muted: muteRaw === "yes",
+    }
+  } catch {
+    return { volume: 0, muted: false }
+  }
+}
+
 export async function readAudioState(): Promise<AudioState> {
   try {
-    const [sinksRaw, sourcesRaw, defaultSinkRaw, defaultSourceRaw] =
+    const [sinksRaw, sourcesRaw, defaultSinkRaw, defaultSourceRaw, sinkVolume] =
       await Promise.all([
         execAsync(`bash -lc "pactl list short sinks"`),
         execAsync(`bash -lc "pactl list short sources"`),
         execAsync(`bash -lc "pactl get-default-sink"`),
         execAsync(`bash -lc "pactl get-default-source"`),
+        readSinkVolumeState(),
       ])
 
     const defaultSink = defaultSinkRaw.trim()
@@ -84,6 +139,8 @@ export async function readAudioState(): Promise<AudioState> {
       defaultSource,
       sinks: parseNodes(sinksRaw, "sink", defaultSink),
       sources: parseNodes(sourcesRaw, "source", defaultSource),
+      volume: sinkVolume.volume,
+      muted: sinkVolume.muted,
     }
   } catch {
     return {
@@ -91,6 +148,8 @@ export async function readAudioState(): Promise<AudioState> {
       defaultSource: "",
       sinks: [],
       sources: [],
+      volume: 0,
+      muted: false,
     }
   }
 }
@@ -104,7 +163,22 @@ export async function setDefaultSink(name: string): Promise<void> {
 export async function setDefaultSource(name: string): Promise<void> {
   const cleanName = name.trim()
   if (!cleanName) return
-  await execAsync(`bash -lc "pactl set-default-source ${shellQuote(cleanName)}"`)
+  await execAsync(
+    `bash -lc "pactl set-default-source ${shellQuote(cleanName)}"`,
+  )
+}
+
+export async function setSinkVolume(percent: number): Promise<void> {
+  const safePercent = clampPercent(Math.round(percent))
+  await execAsync(
+    `bash -lc "if command -v wpctl >/dev/null 2>&1; then wpctl set-volume @DEFAULT_AUDIO_SINK@ ${safePercent}%; else pactl set-sink-volume @DEFAULT_SINK@ ${safePercent}%; fi"`,
+  )
+}
+
+export async function toggleSinkMute(): Promise<void> {
+  await execAsync(
+    `bash -lc "if command -v wpctl >/dev/null 2>&1; then wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle; else pactl set-sink-mute @DEFAULT_SINK@ toggle; fi"`,
+  )
 }
 
 export async function openPavucontrol(): Promise<void> {

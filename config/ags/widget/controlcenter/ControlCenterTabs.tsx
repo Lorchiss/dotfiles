@@ -1,6 +1,11 @@
 import { Gtk } from "ags/gtk4"
 
-export type ControlCenterTab = "wifi" | "bluetooth" | "audio" | "session"
+export type ControlCenterTab =
+  | "wifi"
+  | "bluetooth"
+  | "audio"
+  | "system"
+  | "session"
 
 type ControlCenterTabsProps = {
   initialTab?: ControlCenterTab
@@ -51,6 +56,12 @@ export default function ControlCenterTabs({
       </button>
       <button $={registerButton("audio")} onClicked={() => selectTab("audio")}>
         <label label="Audio" />
+      </button>
+      <button
+        $={registerButton("system")}
+        onClicked={() => selectTab("system")}
+      >
+        <label label="Sistema" />
       </button>
       <button
         $={registerButton("session")}

@@ -547,7 +547,7 @@ window.ControlCenter {
   }
 
   .cc-tab-btn {
-    min-width: 96px;
+    min-width: 88px;
     padding: 6px 10px;
     border-radius: 11px;
     background: rgba(255, 255, 255, 0.04);
@@ -628,6 +628,31 @@ window.ControlCenter {
     padding: 7px 8px;
     border: 1px solid rgba(255, 255, 255, 0.08);
     background: rgba(255, 255, 255, 0.02);
+  }
+
+  .cc-audio-volume-row {
+    padding: 8px;
+  }
+
+  .cc-audio-scale trough {
+    min-height: 8px;
+    border-radius: $ag-radius-pill;
+    background: rgba(255, 255, 255, 0.22);
+  }
+
+  .cc-audio-scale highlight {
+    min-height: 8px;
+    border-radius: $ag-radius-pill;
+    background: linear-gradient(
+      90deg,
+      rgba(146, 214, 255, 0.95),
+      rgba(189, 214, 255, 0.95)
+    );
+  }
+
+  .cc-audio-volume-label {
+    min-width: 48px;
+    font-variant-numeric: tabular-nums;
   }
 
   .cc-list-title {
