@@ -46,30 +46,77 @@ window.Bar {
 
   .vol-control {
     > button {
-      min-width: 84px;
-      padding: 6px 10px;
+      min-width: 120px;
+      padding: 6px 14px;
+      border-radius: 16px;
+      background: rgba(28, 36, 64, 0.4);
+    }
+
+    > button:hover {
+      background: rgba(72, 98, 156, 0.36);
+      box-shadow: 0 0 14px rgba(126, 173, 255, 0.24);
     }
 
     popover {
       padding: 0;
     }
 
+    .vol-popover-shell contents {
+      background: transparent;
+      border: none;
+      box-shadow: none;
+      padding: 0;
+    }
+
     #volPopover {
-      padding: 10px;
-      border-radius: 12px;
-      background: rgba(26, 26, 36, 0.96);
-      border: 1px solid rgba(255, 255, 255, 0.1);
+      min-width: 520px;
+      padding: 14px 18px;
+      border-radius: 28px;
+      background: linear-gradient(
+        180deg,
+        rgba(40, 58, 104, 0.86),
+        rgba(30, 44, 82, 0.86)
+      );
+      border: 1px solid rgba(191, 215, 255, 0.34);
+      box-shadow: 0 18px 28px rgba(11, 17, 32, 0.42);
     }
 
-    #volPopoverTitle {
-      font-size: 11px;
-      color: rgba(220, 220, 230, 0.8);
-      margin-bottom: 2px;
+    .vol-mute-btn {
+      min-width: 52px;
+      padding: 8px 10px;
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.08);
     }
 
-    #volPopover button {
+    .vol-slider trough {
+      min-height: 12px;
+      border-radius: 999px;
+      background: rgba(206, 221, 255, 0.2);
+    }
+
+    .vol-slider highlight {
+      border-radius: 999px;
+      background: linear-gradient(
+        90deg,
+        rgba(120, 222, 255, 0.95),
+        rgba(152, 245, 255, 0.95)
+      );
+    }
+
+    .vol-slider slider {
       min-width: 22px;
-      padding: 4px 8px;
+      min-height: 22px;
+      border-radius: 999px;
+      background: rgba(243, 249, 255, 0.96);
+      border: 1px solid rgba(126, 170, 238, 0.45);
+    }
+
+    .vol-percent {
+      min-width: 58px;
+      font-size: 27px;
+      font-weight: 600;
+      letter-spacing: 0;
+      color: rgba(236, 244, 255, 0.96);
     }
   }
 }
