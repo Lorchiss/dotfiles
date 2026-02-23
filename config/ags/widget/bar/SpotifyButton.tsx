@@ -1,6 +1,9 @@
 import { execAsync } from "ags/process"
 import { createPoll } from "ags/time"
 
+const MARQUEE_TICK_MS = 110
+const CHIP_TITLE_WIDTH = 16
+
 let lastClickMs = 0
 
 function marqueeText(text: string, tick: number, width: number) {
@@ -43,12 +46,12 @@ export default function SpotifyButton() {
     }
   })
 
-  const marqueeTick = createPoll(0, 110, (prev) => prev + 1)
+  const marqueeTick = createPoll(0, MARQUEE_TICK_MS, (prev) => prev + 1)
 
   const title = marqueeTick((tick) => {
     const current = track()
     if (!current) return "Spotify"
-    return marqueeText(current, tick, 16)
+    return marqueeText(current, tick, CHIP_TITLE_WIDTH)
   })
 
   const playing = createPoll(false, 2000, async () => {
@@ -87,8 +90,8 @@ export default function SpotifyButton() {
         <label
           class="spotify-chip-title"
           label={title}
-          widthChars={16}
-          maxWidthChars={16}
+          widthChars={CHIP_TITLE_WIDTH}
+          maxWidthChars={CHIP_TITLE_WIDTH}
           singleLineMode
           ellipsize={0}
           xalign={0}

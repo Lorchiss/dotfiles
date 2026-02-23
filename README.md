@@ -10,6 +10,27 @@ Este repositorio configura un entorno de escritorio Linux centrado en **Hyprland
 - `config/kitty`, `config/rofi`: ajustes de terminal y launcher.
 - `config/systemd/user/ags.service`: servicio de usuario para arrancar AGS.
 
+## Identidad visual AGS (Arctic Glass)
+
+Principios:
+
+- Capas translúcidas en superficies (`surface-0/1/2`) con borde suave y sombra corta.
+- Acentos fríos por módulo: volumen (`primary`), Spotify (`secondary`), reloj/workspace (`tertiary`), métricas en neutral.
+- Contraste limpio: texto principal alto (`text-0`) y secundarios legibles (`text-1`).
+- Motion sutil y breve: hover ~`0.08`, pressed ~`0.12`, transición máxima `240ms`.
+
+Tokens clave en `config/ags/style.scss`:
+
+- Superficies: `$ag-surface-0`, `$ag-surface-1`, `$ag-surface-2`.
+- Texto: `$ag-text-0`, `$ag-text-1`.
+- Acentos: `$ag-accent-primary`, `$ag-accent-secondary`, `$ag-accent-tertiary`.
+- Estructura: `$ag-radius-chip`, `$ag-radius-control`, `$ag-radius-card`, `$ag-radius-pill`.
+- Motion: `$ag-motion-fast`, `$ag-motion-base`, `$ag-motion-slow`, `$ag-curve-standard`.
+
+Fase 2 (pendiente):
+
+- Tipografías globales para reforzar identidad sin romper legibilidad del sistema.
+
 ## Cómo validar rápido
 
 1. Ejecutar `bootstrap/deploy.sh`.

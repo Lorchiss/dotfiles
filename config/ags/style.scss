@@ -204,18 +204,18 @@ window.Bar {
       min-width: bar-size(vol-button-min);
       padding: 6px 12px;
       border-radius: $ag-radius-control;
-      background: rgba(146, 214, 255, 0.08);
+      background: rgba(146, 214, 255, 0.06);
       border-color: rgba(146, 214, 255, 0.28);
     }
 
     > button:hover {
-      background: rgba(146, 214, 255, 0.14);
+      background: rgba(146, 214, 255, 0.08);
       border-color: rgba(146, 214, 255, 0.42);
     }
 
     > button:active,
     > button:checked {
-      background: rgba(146, 214, 255, 0.18);
+      background: rgba(146, 214, 255, 0.12);
       border-color: rgba(146, 214, 255, 0.48);
     }
 
@@ -256,8 +256,23 @@ window.Bar {
       min-height: 40px;
       border-radius: 12px;
       padding: 4px;
-      background: rgba(146, 214, 255, 0.1);
+      background: rgba(146, 214, 255, 0.06);
       border: 1px solid rgba(146, 214, 255, 0.26);
+      transition:
+        background-color $ag-motion-base $ag-curve-standard,
+        border-color $ag-motion-base $ag-curve-standard,
+        box-shadow $ag-motion-base $ag-curve-standard;
+    }
+
+    .vol-mute-btn:hover {
+      background: rgba(146, 214, 255, 0.08);
+      border-color: rgba(146, 214, 255, 0.34);
+    }
+
+    .vol-mute-btn:active,
+    .vol-mute-btn:checked {
+      background: rgba(146, 214, 255, 0.12);
+      border-color: rgba(146, 214, 255, 0.42);
     }
 
     .vol-popup-icon {
@@ -289,7 +304,7 @@ window.Bar {
         rgba(146, 214, 255, 0.95),
         rgba(189, 214, 255, 0.95)
       );
-      transition: background-color $ag-motion-base $ag-curve-standard;
+      transition: all $ag-motion-slow $ag-curve-standard;
     }
 
     .vol-percent-label {
@@ -304,6 +319,29 @@ window.Bar {
 
 window.SpotifyPopup {
   background: transparent;
+
+  button {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid $ag-border-soft;
+    color: $ag-text-0;
+    transition:
+      background-color $ag-motion-base $ag-curve-standard,
+      border-color $ag-motion-base $ag-curve-standard,
+      box-shadow $ag-motion-base $ag-curve-standard;
+  }
+
+  button:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: $ag-border-strong;
+    box-shadow: 0 10px 16px -14px $ag-shadow;
+  }
+
+  button:active,
+  button:checked {
+    background: rgba(255, 255, 255, 0.12);
+    border-color: $ag-border-strong;
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+  }
 
   > spotifyPopupCard {
     min-width: 480px;
@@ -391,7 +429,7 @@ window.SpotifyPopup {
       rgba(152, 245, 224, 0.95),
       rgba(146, 214, 255, 0.95)
     );
-    transition: background-color $ag-motion-base $ag-curve-standard;
+    transition: all $ag-motion-slow $ag-curve-standard;
   }
 
   spotifyProgressTime {

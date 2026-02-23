@@ -12,6 +12,10 @@ type SpotifyState = {
   artPath: string
 }
 
+const MARQUEE_TICK_MS = 110
+const POPUP_TITLE_WIDTH = 30
+const POPUP_ARTIST_WIDTH = 34
+
 let lastResolvedArtPath = ""
 
 function marqueeText(text: string, tick: number, width: number) {
@@ -170,12 +174,12 @@ printf "%s\n%s\n%s\n%s\n%s\n%s" "$title" "$artist" "$length" "$art" "$status" "$
   const progress = state((s) =>
     s.totalSec > 0 ? Math.max(0, Math.min(1, s.currentSec / s.totalSec)) : 0,
   )
-  const marqueeTick = createPoll(0, 110, (prev) => prev + 1)
+  const marqueeTick = createPoll(0, MARQUEE_TICK_MS, (prev) => prev + 1)
   const marqueeTitle = marqueeTick((tick) =>
-    marqueeText(state().title || "No hay reproducción", tick, 30),
+    marqueeText(state().title || "No hay reproducción", tick, POPUP_TITLE_WIDTH),
   )
   const marqueeArtist = marqueeTick((tick) =>
-    marqueeText(state().artist || "", tick, 34),
+    marqueeText(state().artist || "", tick, POPUP_ARTIST_WIDTH),
   )
 
   return (
@@ -230,8 +234,8 @@ printf "%s\n%s\n%s\n%s\n%s\n%s" "$title" "$artist" "$length" "$art" "$status" "$
               label={marqueeTitle}
               wrap={false}
               singleLineMode
-              widthChars={30}
-              maxWidthChars={30}
+              widthChars={POPUP_TITLE_WIDTH}
+              maxWidthChars={POPUP_TITLE_WIDTH}
               cssName="spotifyPopupTrack"
               xalign={0}
             />
@@ -239,8 +243,8 @@ printf "%s\n%s\n%s\n%s\n%s\n%s" "$title" "$artist" "$length" "$art" "$status" "$
               label={marqueeArtist}
               wrap={false}
               singleLineMode
-              widthChars={34}
-              maxWidthChars={34}
+              widthChars={POPUP_ARTIST_WIDTH}
+              maxWidthChars={POPUP_ARTIST_WIDTH}
               cssName="spotifyPopupArtist"
               xalign={0}
             />
