@@ -8,8 +8,8 @@ StartLimitBurst=5
 [Service]
 Type=simple
 ExecStartPre=-/usr/bin/pkill -x ags
-ExecStart=/usr/bin/bash -lc 'exec /usr/bin/ags run --gtk 4 --directory "$HOME/.config/ags"'
-Restart=on-abnormal
+ExecStart=/usr/bin/bash -lc 'runtime="${XDG_RUNTIME_DIR:-/run/user/$UID}"; if [ -z "${WAYLAND_DISPLAY:-}" ]; then for _ in $(seq 1 120); do socket_path="$(ls "$runtime"/wayland-* 2>/dev/null | head -n1 || true)"; if [ -n "$socket_path" ]; then export WAYLAND_DISPLAY="$(basename "$socket_path")"; break; fi; sleep 0.25; done; fi; if [ -z "${WAYLAND_DISPLAY:-}" ]; then echo "WAYLAND_DISPLAY no disponible para AGS" >&2; exit 1; fi; exec /usr/bin/ags run --gtk 4 --directory "$HOME/.config/ags"'
+Restart=on-failure
 RestartSec=2
 TimeoutStopSec=5
 KillMode=mixed
