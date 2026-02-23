@@ -30,7 +30,23 @@ function marqueeText(text: string, tick: number, width: number) {
 
 async function openSpotifyApp() {
   await execAsync(
-    `bash -lc 'if command -v spotify >/dev/null 2>&1; then spotify; elif command -v gtk-launch >/dev/null 2>&1; then gtk-launch spotify; else xdg-open spotify:; fi'`,
+    `bash -lc '
+launch_cmd=""
+if command -v spotify >/dev/null 2>&1; then
+  launch_cmd="exec spotify"
+elif command -v gtk-launch >/dev/null 2>&1; then
+  launch_cmd="exec gtk-launch spotify"
+else
+  launch_cmd="exec xdg-open spotify:"
+fi
+
+if command -v systemd-run >/dev/null 2>&1; then
+  unit="ags-open-spotify-$(date +%s%N)"
+  systemd-run --user --quiet --collect --unit "$unit" bash -lc "$launch_cmd" >/dev/null 2>&1 || true
+else
+  bash -lc "$launch_cmd" >/dev/null 2>&1 &
+fi
+'`,
   ).catch(() => {})
 }
 
