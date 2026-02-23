@@ -48,3 +48,16 @@ npm install
 npm run typecheck
 npm run lint
 ```
+
+## Recuperación rápida de `ags.service`
+
+Si ves `start-limit-hit`, ejecuta:
+
+```bash
+systemctl --user daemon-reload
+systemctl --user reset-failed ags.service
+systemctl --user restart ags.service
+journalctl --user -u ags.service -n 120 --no-pager
+```
+
+Con el servicio actualizado se evita conflicto por instancias duplicadas y se limita el reinicio automático a fallos anómalos.
