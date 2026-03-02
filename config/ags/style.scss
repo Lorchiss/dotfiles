@@ -396,10 +396,6 @@ $bar-presets: (
     workspace-chip-min: 64px,
     window-title-chip-min: 240px,
     spotify-chip-min: 146px,
-    metrics-row-min: 238px,
-    cpu-chip-min: 64px,
-    ram-chip-min: 64px,
-    net-chip-min: 84px,
     clock-chip-min: 136px,
     vol-button-min: 74px,
   ),
@@ -410,10 +406,6 @@ $bar-presets: (
     workspace-chip-min: 72px,
     window-title-chip-min: 280px,
     spotify-chip-min: 164px,
-    metrics-row-min: 252px,
-    cpu-chip-min: 68px,
-    ram-chip-min: 68px,
-    net-chip-min: 88px,
     clock-chip-min: 148px,
     vol-button-min: 80px,
   ),
@@ -424,10 +416,6 @@ $bar-presets: (
     workspace-chip-min: 88px,
     window-title-chip-min: 356px,
     spotify-chip-min: 182px,
-    metrics-row-min: 246px,
-    cpu-chip-min: 84px,
-    ram-chip-min: 84px,
-    net-chip-min: 114px,
     clock-chip-min: 198px,
     vol-button-min: 98px,
   ),
@@ -496,7 +484,6 @@ $ag-bar-spotify-active-bg: linear-gradient(
   rgba(98, 208, 190, 0.24)
 );
 $ag-bar-spotify-active-border: rgba(175, 251, 234, 0.68);
-$ag-bar-system-tray-bg: $ag-surface-overlay-soft;
 $ag-bar-clock-bg: rgba(189, 214, 255, 0.09);
 $ag-bar-clock-border: rgba(189, 214, 255, 0.36);
 $ag-bar-clock-hover-bg: rgba(189, 214, 255, 0.2);
@@ -955,43 +942,6 @@ window.Bar {
     background: $ag-bar-spotify-active-bg;
     border-color: $ag-bar-spotify-active-border;
     box-shadow: $ag-shadow-spotify-active;
-  }
-
-  .metrics-row {
-    min-width: bar-size(metrics-row-min);
-  }
-
-  .metric-chip {
-    font-variant-numeric: tabular-nums;
-    @include ag-type($ag-font-body-sm-soft, 600, 0.15px, $ag-text-1);
-  }
-
-  .aur-chip,
-  .news-chip {
-    min-width: 70px;
-  }
-
-  .news-chip-unread {
-    color: $ag-accent-secondary;
-    font-weight: 700;
-  }
-
-  .system-tray-chip {
-    @include ag-surface-subtle(
-      $ag-radius-chip,
-      $ag-bar-system-tray-bg,
-      $ag-border-subtle
-    );
-    padding: $ag-space-4 $ag-space-8;
-  }
-
-  .cpu-chip,
-  .ram-chip {
-    min-width: bar-size(cpu-chip-min);
-  }
-
-  .net-chip {
-    min-width: bar-size(net-chip-min);
   }
 
   .clock-chip > button {
