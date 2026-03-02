@@ -35,7 +35,7 @@ $fg-color: #{"@theme_fg_color"};
 $bg-color: #{"@theme_bg_color"};
 
 $radius-bar: $ag-radius-card;
-$bar-density: balanced !default; // compact | balanced | hero
+$bar-density: hero !default; // compact | balanced | hero
 
 @mixin popup-card-shell {
   border-radius: $ag-radius-card;
@@ -74,18 +74,18 @@ $bar-presets: (
     vol-button-min: 80px,
   ),
   hero: (
-    bar-height: 48px,
-    bar-side-margin: 44px,
-    bar-padding-x: 26px,
-    workspace-chip-min: 80px,
-    window-title-chip-min: 340px,
-    spotify-chip-min: 212px,
-    metrics-row-min: 310px,
-    cpu-chip-min: 78px,
-    ram-chip-min: 78px,
-    net-chip-min: 106px,
-    clock-chip-min: 186px,
-    vol-button-min: 92px,
+    bar-height: 52px,
+    bar-side-margin: 48px,
+    bar-padding-x: 30px,
+    workspace-chip-min: 88px,
+    window-title-chip-min: 356px,
+    spotify-chip-min: 226px,
+    metrics-row-min: 330px,
+    cpu-chip-min: 84px,
+    ram-chip-min: 84px,
+    net-chip-min: 114px,
+    clock-chip-min: 198px,
+    vol-button-min: 98px,
   ),
 );
 
@@ -137,50 +137,81 @@ window.Bar {
   background: transparent;
 
   > centerbox {
-    background: $ag-surface-0;
-    border-radius: $radius-bar;
-
-    margin: 14px $bar-side-margin 0 $bar-side-margin;
     min-height: $bar-height;
+    margin: 8px $bar-side-margin 0;
+    padding: 4px $bar-padding-x;
+    border-radius: $radius-bar;
+    background-image:
+      radial-gradient(
+        circle at 16% 18%,
+        rgba(177, 228, 255, 0.2),
+        transparent 40%
+      ),
+      radial-gradient(
+        circle at 84% 130%,
+        rgba(84, 153, 255, 0.22),
+        transparent 52%
+      ),
+      linear-gradient(156deg, rgba(8, 17, 30, 0.96), rgba(18, 30, 49, 0.97));
+    border: 1px solid rgba(171, 216, 255, 0.33);
+    box-shadow:
+      0 28px 42px -20px rgba(0, 0, 0, 0.82),
+      0 10px 24px -16px rgba(28, 94, 180, 0.42),
+      inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+  }
 
-    padding: 0 $bar-padding-x;
-    border: 1px solid $ag-border-soft;
-    box-shadow: 0 12px 28px -10px $ag-shadow;
+  > centerbox > box {
+    min-height: $bar-height - 8px;
+  }
+
+  .bar-section-start,
+  .bar-section-center,
+  .bar-section-end {
+    min-height: $bar-height - 10px;
+    border-radius: $ag-radius-chip;
   }
 
   label {
-    font-size: 12.5px;
-    letter-spacing: 0.4px;
+    font-size: 13px;
+    letter-spacing: 0.42px;
     color: $ag-text-0;
   }
 
   button,
   menubutton > button {
     border-radius: $ag-radius-chip;
-    padding: 6px 12px;
+    padding: 7px 14px;
+    font-weight: 600;
+    letter-spacing: 0.25px;
     transition:
-      background-color $ag-motion-base $ag-curve-standard,
-      border-color $ag-motion-base $ag-curve-standard,
-      box-shadow $ag-motion-base $ag-curve-standard;
-    background: rgba(255, 255, 255, 0.04);
-    border: 1px solid $ag-border-soft;
+      background-color $ag-motion-fast $ag-curve-standard,
+      border-color $ag-motion-fast $ag-curve-standard,
+      box-shadow $ag-motion-fast $ag-curve-standard;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(210, 228, 245, 0.18);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
     color: $ag-text-0;
   }
 
   button:hover,
   menubutton > button:hover {
-    background: rgba(255, 255, 255, 0.08);
-    border-color: $ag-border-strong;
-    box-shadow: 0 10px 16px -14px $ag-shadow;
+    background: rgba(132, 203, 255, 0.2);
+    border-color: rgba(173, 221, 255, 0.58);
+    box-shadow:
+      0 14px 20px -14px rgba(0, 0, 0, 0.72),
+      0 0 0 1px rgba(135, 216, 255, 0.22),
+      inset 0 1px 0 rgba(233, 245, 255, 0.14);
   }
 
   button:active,
   button:checked,
   menubutton > button:active,
   menubutton > button:checked {
-    background: rgba(255, 255, 255, 0.12);
-    border-color: $ag-border-strong;
-    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+    background: rgba(198, 228, 255, 0.22);
+    border-color: rgba(170, 218, 255, 0.62);
+    box-shadow:
+      inset 0 0 0 1px rgba(237, 247, 255, 0.2),
+      0 8px 16px -14px rgba(15, 45, 86, 0.72);
   }
 
   .workspace-lanes {
@@ -188,45 +219,62 @@ window.Bar {
   }
 
   .workspace-monitor-lane {
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(189, 214, 255, 0.18);
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(189, 214, 255, 0.24);
     border-radius: $ag-radius-chip;
-    padding: 3px 8px;
+    padding: 4px 9px;
   }
 
   .workspace-monitor-badge {
     color: $ag-accent-tertiary;
-    font-size: 11px;
+    font-size: 11.4px;
     font-weight: 700;
-    letter-spacing: 0.35px;
+    letter-spacing: 0.38px;
   }
 
   .workspace-chip {
-    min-width: 30px;
-    padding: 3px 8px;
-    border-radius: 11px;
-    font-size: 11.5px;
+    min-width: 34px;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 12px;
     font-weight: 700;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    background: rgba(255, 255, 255, 0.03);
     font-variant-numeric: tabular-nums;
   }
 
   .workspace-chip-occupied {
-    background: rgba(255, 255, 255, 0.04);
-    border-color: rgba(255, 255, 255, 0.14);
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(225, 235, 246, 0.16);
     color: $ag-text-1;
   }
 
+  .workspace-chip:hover {
+    background: rgba(146, 214, 255, 0.16);
+    border-color: rgba(184, 225, 255, 0.4);
+    box-shadow: 0 12px 16px -16px rgba(0, 0, 0, 0.68);
+  }
+
   .workspace-chip-active.workspace-chip-focused {
-    background: rgba(189, 214, 255, 0.22);
-    border-color: rgba(189, 214, 255, 0.5);
-    color: $ag-accent-tertiary;
-    box-shadow: 0 0 0 1px rgba(189, 214, 255, 0.2);
+    background: linear-gradient(
+      146deg,
+      rgba(189, 214, 255, 0.46),
+      rgba(121, 174, 255, 0.36)
+    );
+    border-color: rgba(208, 232, 255, 0.78);
+    color: rgba(241, 248, 255, 0.99);
+    box-shadow:
+      0 0 0 1px rgba(196, 227, 255, 0.38),
+      0 0 20px rgba(121, 174, 255, 0.34),
+      inset 0 1px 0 rgba(255, 255, 255, 0.18);
+    animation: wsPulse 2s infinite;
   }
 
   .workspace-chip-active.workspace-chip-unfocused {
-    background: rgba(189, 214, 255, 0.14);
-    border-color: rgba(189, 214, 255, 0.36);
+    background: rgba(189, 214, 255, 0.24);
+    border-color: rgba(189, 214, 255, 0.52);
     color: rgba(205, 223, 242, 0.92);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
   }
 
   .workspace-fallback {
@@ -243,25 +291,26 @@ window.Bar {
   }
 
   .connectivity-chip {
-    border-color: rgba(146, 214, 255, 0.28);
-    background: rgba(146, 214, 255, 0.06);
+    border-color: rgba(146, 214, 255, 0.4);
+    background: rgba(146, 214, 255, 0.12);
     color: $ag-accent-primary;
   }
 
   .connectivity-chip:hover {
-    background: rgba(146, 214, 255, 0.08);
-    border-color: rgba(146, 214, 255, 0.42);
+    background: rgba(146, 214, 255, 0.2);
+    border-color: rgba(146, 214, 255, 0.55);
   }
 
   .connectivity-chip:active,
   .connectivity-chip:checked {
-    background: rgba(146, 214, 255, 0.12);
-    border-color: rgba(146, 214, 255, 0.48);
+    background: rgba(146, 214, 255, 0.28);
+    border-color: rgba(146, 214, 255, 0.66);
   }
 
   .spotify-chip {
     min-width: bar-size(spotify-chip-min);
-    border-color: rgba(152, 245, 224, 0.26);
+    border-color: rgba(152, 245, 224, 0.38);
+    background: rgba(152, 245, 224, 0.08);
   }
 
   .spotify-chip-content {
@@ -277,13 +326,20 @@ window.Bar {
   }
 
   .spotify-chip:hover {
-    background: rgba(152, 245, 224, 0.08);
+    background: rgba(152, 245, 224, 0.2);
+    border-color: rgba(152, 245, 224, 0.56);
   }
 
   .spotify-chip.spotify-active {
-    background: rgba(152, 245, 224, 0.12);
-    border-color: rgba(152, 245, 224, 0.42);
-    box-shadow: 0 0 14px rgba(152, 245, 224, 0.2);
+    background: linear-gradient(
+      146deg,
+      rgba(152, 245, 224, 0.26),
+      rgba(98, 208, 190, 0.24)
+    );
+    border-color: rgba(175, 251, 234, 0.68);
+    box-shadow:
+      0 0 16px rgba(152, 245, 224, 0.24),
+      inset 0 1px 0 rgba(236, 255, 248, 0.2);
   }
 
   .metrics-row {
@@ -293,6 +349,8 @@ window.Bar {
   .metric-chip {
     font-variant-numeric: tabular-nums;
     color: $ag-text-1;
+    font-size: 12.3px;
+    font-weight: 600;
   }
 
   .aur-chip,
@@ -323,11 +381,13 @@ window.Bar {
 
   .clock-chip > button {
     min-width: bar-size(clock-chip-min);
-    border-color: rgba(189, 214, 255, 0.24);
+    border-color: rgba(189, 214, 255, 0.36);
+    background: rgba(189, 214, 255, 0.09);
   }
 
   .clock-chip > button:hover {
-    background: rgba(189, 214, 255, 0.08);
+    background: rgba(189, 214, 255, 0.2);
+    border-color: rgba(189, 214, 255, 0.56);
   }
 
   .clock-popover-shell {
@@ -383,21 +443,21 @@ window.Bar {
   .vol-control {
     > button {
       min-width: bar-size(vol-button-min);
-      padding: 6px 12px;
+      padding: 7px 13px;
       border-radius: $ag-radius-control;
-      background: rgba(146, 214, 255, 0.06);
-      border-color: rgba(146, 214, 255, 0.28);
+      background: rgba(146, 214, 255, 0.12);
+      border-color: rgba(146, 214, 255, 0.42);
     }
 
     > button:hover {
-      background: rgba(146, 214, 255, 0.08);
-      border-color: rgba(146, 214, 255, 0.42);
+      background: rgba(146, 214, 255, 0.22);
+      border-color: rgba(146, 214, 255, 0.58);
     }
 
     > button:active,
     > button:checked {
-      background: rgba(146, 214, 255, 0.12);
-      border-color: rgba(146, 214, 255, 0.48);
+      background: rgba(146, 214, 255, 0.3);
+      border-color: rgba(146, 214, 255, 0.68);
     }
 
     .vol-trigger-icon {
@@ -1216,5 +1276,30 @@ window.ControlCenter {
   .cc-session-confirm-timer {
     font-variant-numeric: tabular-nums;
     min-width: 72px;
+  }
+  @keyframes wsPulse {
+    0% {
+      box-shadow:
+        0 0 0 1px rgba(196, 227, 255, 0.38),
+        0 0 20px rgba(121, 174, 255, 0.34),
+        inset 0 1px 0 rgba(255, 255, 255, 0.18),
+        0 0 0 0 rgba(162, 212, 255, 0.46);
+    }
+
+    65% {
+      box-shadow:
+        0 0 0 1px rgba(196, 227, 255, 0.38),
+        0 0 20px rgba(121, 174, 255, 0.34),
+        inset 0 1px 0 rgba(255, 255, 255, 0.18),
+        0 0 0 8px rgba(162, 212, 255, 0.04);
+    }
+
+    100% {
+      box-shadow:
+        0 0 0 1px rgba(196, 227, 255, 0.38),
+        0 0 20px rgba(121, 174, 255, 0.34),
+        inset 0 1px 0 rgba(255, 255, 255, 0.18),
+        0 0 0 0 rgba(162, 212, 255, 0);
+    }
   }
 }

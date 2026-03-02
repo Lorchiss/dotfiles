@@ -20,15 +20,36 @@ export default function Bar(gdkmonitor: any) {
       application={app}
     >
       <centerbox cssName="centerbox">
-        <box $type="start" spacing={10} hexpand halign={Gtk.Align.START}>
+        <box
+          $type="start"
+          class="bar-section-start"
+          spacing={12}
+          valign={Gtk.Align.CENTER}
+          hexpand
+          halign={Gtk.Align.START}
+        >
           <WorkspaceLanes />
         </box>
 
-        <box $type="center" hexpand halign={Gtk.Align.CENTER}>
+        <box
+          $type="center"
+          class="bar-section-center"
+          spacing={10}
+          valign={Gtk.Align.CENTER}
+          hexpand
+          halign={Gtk.Align.CENTER}
+        >
           <SpotifyButton />
         </box>
 
-        <box $type="end" spacing={10} hexpand halign={Gtk.Align.END}>
+        <box
+          $type="end"
+          class="bar-section-end"
+          spacing={12}
+          valign={Gtk.Align.CENTER}
+          hexpand
+          halign={Gtk.Align.END}
+        >
           <button
             class="connectivity-chip"
             onClicked={() =>
