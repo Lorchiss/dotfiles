@@ -2,6 +2,7 @@
 @use "sass:map";
 
 // Identity: Arctic Aurora Unified v1
+// Core tokens: surfaces
 $ag-surface-canvas: #08111d;
 $ag-surface-0: #0f1722;
 $ag-surface-1: #162131;
@@ -9,42 +10,84 @@ $ag-surface-2: #1d2a3c;
 $ag-surface-elevated: rgba(255, 255, 255, 0.04);
 $ag-surface-elevated-strong: rgba(255, 255, 255, 0.08);
 $ag-surface-input: rgba(146, 214, 255, 0.08);
+$ag-surface-overlay-weak: rgba(255, 255, 255, 0.02);
+$ag-surface-overlay-soft: rgba(255, 255, 255, 0.03);
+$ag-surface-overlay-base: rgba(255, 255, 255, 0.04);
+$ag-surface-overlay-strong: rgba(255, 255, 255, 0.05);
+$ag-surface-overlay-stronger: rgba(255, 255, 255, 0.08);
+$ag-surface-danger-soft: rgba(255, 120, 120, 0.06);
+$ag-surface-danger-base: rgba(255, 120, 120, 0.12);
+$ag-surface-danger-strong: rgba(255, 120, 120, 0.18);
+$ag-surface-danger-tint: rgba(255, 110, 110, 0.08);
+$ag-surface-like-tint: rgba(255, 121, 142, 0.2);
+$ag-surface-cover: rgba(11, 16, 24, 0.98);
+$ag-popup-base: linear-gradient(
+  165deg,
+  rgba(11, 18, 31, 0.96),
+  rgba(17, 29, 48, 0.96)
+);
 
+// Core tokens: text
 $ag-text-primary: #e7edf5;
 $ag-text-secondary: rgba(205, 217, 232, 0.9);
 $ag-text-muted: rgba(177, 191, 210, 0.78);
+$ag-text-inverse: rgba(241, 248, 255, 0.99);
+$ag-text-connection: rgba(207, 233, 252, 0.96);
+$ag-text-success: rgba(170, 249, 234, 0.98);
+$ag-text-success-strong: rgba(172, 250, 235, 0.98);
+$ag-text-danger: rgba(255, 188, 188, 0.97);
+$ag-text-danger-strong: rgba(255, 168, 168, 0.95);
+$ag-text-danger-soft: rgba(255, 180, 180, 0.95);
+$ag-text-danger-muted: rgba(255, 200, 200, 0.95);
+$ag-text-like: rgba(255, 231, 237, 0.98);
+$ag-text-workspace-unfocused: rgba(205, 223, 242, 0.92);
 $ag-text-0: $ag-text-primary;
 $ag-text-1: $ag-text-secondary;
 
+// Core tokens: accents
 $ag-accent-primary: rgba(146, 214, 255, 0.97);
 $ag-accent-secondary: rgba(152, 245, 224, 0.97);
 $ag-accent-tertiary: rgba(189, 214, 255, 0.97);
+$ag-accent-primary-95: rgba(146, 214, 255, 0.95);
+$ag-accent-secondary-95: rgba(152, 245, 224, 0.95);
+$ag-accent-tertiary-95: rgba(189, 214, 255, 0.95);
 
+// Core tokens: borders
 $ag-border-subtle: rgba(255, 255, 255, 0.1);
 $ag-border-soft: rgba(255, 255, 255, 0.15);
 $ag-border-strong: rgba(157, 203, 244, 0.44);
 $ag-border-focus: rgba(168, 222, 255, 0.62);
+$ag-border-popup: rgba(163, 208, 255, 0.42);
+$ag-border-like: rgba(255, 121, 142, 0.46);
+$ag-border-danger-soft: rgba(255, 180, 180, 0.26);
+$ag-border-danger-muted: rgba(255, 180, 180, 0.32);
+$ag-border-danger: rgba(255, 168, 168, 0.45);
+$ag-border-danger-strong: rgba(255, 168, 168, 0.52);
+$ag-border-danger-box: rgba(255, 180, 180, 0.28);
 
-$ag-shadow-color: rgba(0, 0, 0, 0.55);
-$ag-shadow: $ag-shadow-color;
-$ag-shadow-xs: 0 10px 16px -14px rgba(0, 0, 0, 0.7);
-$ag-shadow-sm: 0 12px 18px -16px rgba(0, 0, 0, 0.72);
-$ag-shadow-md: 0 14px 20px -14px rgba(0, 0, 0, 0.72);
-$ag-shadow-lg: 0 24px 42px -12px rgba(0, 0, 0, 0.68);
-$ag-shadow-focus-ring: 0 0 0 1px rgba(168, 222, 255, 0.2);
-
-$ag-popup-base: #0b121d;
-$ag-popup-border: rgba(170, 207, 238, 0.3);
-$ag-popup-shadow: $ag-shadow-lg;
-
+// Core tokens: semantic states
 $ag-state-hover-bg: rgba(132, 203, 255, 0.2);
 $ag-state-hover-border: rgba(173, 221, 255, 0.58);
 $ag-state-active-bg: rgba(198, 228, 255, 0.22);
 $ag-state-active-border: rgba(170, 218, 255, 0.62);
+$ag-state-control-bg: $ag-surface-overlay-strong;
+$ag-state-control-border: rgba(210, 228, 245, 0.18);
+$ag-state-control-inset: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+$ag-state-control-hover-ring: 0 0 0 1px rgba(135, 216, 255, 0.22);
+$ag-state-control-hover-inset: inset 0 1px 0 rgba(233, 245, 255, 0.14);
+$ag-state-control-active-inset: inset 0 0 0 1px rgba(237, 247, 255, 0.2);
+$ag-state-control-active-shadow: 0 8px 16px -14px rgba(15, 45, 86, 0.72);
+$ag-state-focus-ring: 0 0 0 1px rgba(168, 222, 255, 0.2);
+$ag-state-focus-inset: inset 0 1px 0 rgba(233, 245, 255, 0.12);
+$ag-state-progress-track: rgba(255, 255, 255, 0.22);
+$ag-state-like-glow: 0 0 14px rgba(255, 121, 142, 0.18);
 
+// Core tokens: radius
 $ag-radius-xs: 10px;
+$ag-radius-sm-tight: 11px;
 $ag-radius-sm: 12px;
 $ag-radius-md: 14px;
+$ag-radius-md-soft: 15px;
 $ag-radius-lg: 16px;
 $ag-radius-xl: 20px;
 $ag-radius-pill: 999px;
@@ -52,19 +95,79 @@ $ag-radius-chip: $ag-radius-md;
 $ag-radius-control: $ag-radius-lg;
 $ag-radius-card: $ag-radius-xl;
 
+// Core tokens: spacing
+$ag-space-0: 0;
+$ag-space-2: 2px;
+$ag-space-3: 3px;
+$ag-space-4: 4px;
+$ag-space-5: 5px;
+$ag-space-6: 6px;
+$ag-space-7: 7px;
+$ag-space-8: 8px;
+$ag-space-9: 9px;
+$ag-space-10: 10px;
+$ag-space-12: 12px;
+$ag-space-13: 13px;
+$ag-space-14: 14px;
+$ag-space-24: 24px;
+
+// Core tokens: typography
+$ag-font-label-2xs: 10.8px;
 $ag-font-label-xs: 11.4px;
+$ag-font-label-sm-soft: 11.5px;
+$ag-font-label-md: 11.6px;
 $ag-font-label-sm: 11.8px;
+$ag-font-body-xs: 11px;
 $ag-font-body-sm: 12px;
+$ag-font-body-sm-soft: 12.3px;
+$ag-font-body-md-soft: 12.8px;
 $ag-font-body-md: 13px;
+$ag-font-body-lg-soft: 13.2px;
 $ag-font-body-lg: 14px;
 $ag-font-title-sm: 14px;
 $ag-font-title-md: 15px;
 $ag-font-title-lg: 16px;
+$ag-font-display: 52px;
 
+// Core tokens: shadows
+$ag-shadow-color: rgba(0, 0, 0, 0.55);
+$ag-shadow: $ag-shadow-color;
+$ag-shadow-xs: 0 10px 16px -14px rgba(0, 0, 0, 0.7);
+$ag-shadow-sm: 0 12px 18px -16px rgba(0, 0, 0, 0.72);
+$ag-shadow-md: 0 14px 20px -14px rgba(0, 0, 0, 0.72);
+$ag-shadow-lg: 0 24px 42px -12px rgba(0, 0, 0, 0.68);
+$ag-shadow-focus-ring: $ag-state-focus-ring;
+$ag-shadow-bar-shell:
+  0 28px 42px -20px rgba(0, 0, 0, 0.82),
+  0 10px 24px -16px rgba(28, 94, 180, 0.42),
+  inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+$ag-shadow-workspace-active:
+  0 0 0 1px rgba(196, 227, 255, 0.38),
+  0 0 20px rgba(121, 174, 255, 0.34),
+  inset 0 1px 0 rgba(255, 255, 255, 0.18);
+$ag-shadow-workspace-pulse: 0 0 0 8px rgba(162, 212, 255, 0.04);
+$ag-shadow-workspace-pulse-origin: 0 0 0 0 rgba(162, 212, 255, 0.46);
+$ag-shadow-workspace-pulse-end: 0 0 0 0 rgba(162, 212, 255, 0);
+$ag-shadow-workspace-unfocused: inset 0 1px 0 rgba(255, 255, 255, 0.1);
+$ag-shadow-spotify-active:
+  0 0 16px rgba(152, 245, 224, 0.24),
+  inset 0 1px 0 rgba(236, 255, 248, 0.2);
+$ag-shadow-play-glow: 0 0 18px rgba(152, 245, 224, 0.2);
+$ag-shadow-action-active: 0 0 14px rgba(152, 245, 224, 0.18);
+$ag-shadow-command-active:
+  0 0 0 1px rgba(196, 227, 255, 0.25),
+  0 0 16px rgba(121, 174, 255, 0.2);
+$ag-shadow-session-pending: inset 0 0 0 1px rgba(146, 214, 255, 0.22);
+
+// Core tokens: motion
 $ag-motion-fast: 120ms;
 $ag-motion-base: 180ms;
 $ag-motion-slow: 240ms;
+$ag-motion-pulse: 2000ms;
 $ag-curve-standard: cubic-bezier(0.2, 0, 0, 1);
+
+$ag-popup-border: $ag-border-popup;
+$ag-popup-shadow: $ag-shadow-lg;
 
 $ag-accent-variants: (
   emerald: (
@@ -158,8 +261,8 @@ $bar-density: hero !default; // compact | balanced | hero
 }
 
 @mixin ag-interactive-control(
-  $bg: rgba(255, 255, 255, 0.05),
-  $border: rgba(210, 228, 245, 0.18),
+  $bg: $ag-state-control-bg,
+  $border: $ag-state-control-border,
   $color: $ag-text-0,
   $hover-bg: $ag-state-hover-bg,
   $hover-border: $ag-state-hover-border,
@@ -173,32 +276,26 @@ $bar-density: hero !default; // compact | balanced | hero
     background-color $ag-motion-fast $ag-curve-standard,
     border-color $ag-motion-fast $ag-curve-standard,
     box-shadow $ag-motion-fast $ag-curve-standard;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  box-shadow: $ag-state-control-inset;
 
   &:hover {
     background: $hover-bg;
     border-color: $hover-border;
     box-shadow:
-      $ag-shadow-md,
-      0 0 0 1px rgba(135, 216, 255, 0.22),
-      inset 0 1px 0 rgba(233, 245, 255, 0.14);
+      $ag-shadow-md, $ag-state-control-hover-ring, $ag-state-control-hover-inset;
   }
 
   &:active,
   &:checked {
     background: $active-bg;
     border-color: $active-border;
-    box-shadow:
-      inset 0 0 0 1px rgba(237, 247, 255, 0.2),
-      0 8px 16px -14px rgba(15, 45, 86, 0.72);
+    box-shadow: $ag-state-control-active-inset, $ag-state-control-active-shadow;
   }
 
   &:focus,
   &:focus-visible {
     border-color: $ag-border-focus;
-    box-shadow:
-      $ag-shadow-focus-ring,
-      inset 0 1px 0 rgba(233, 245, 255, 0.12);
+    box-shadow: $ag-shadow-focus-ring, $ag-state-focus-inset;
     outline: none;
   }
 }
@@ -206,7 +303,7 @@ $bar-density: hero !default; // compact | balanced | hero
 @mixin ag-progress-track {
   min-height: 8px;
   border-radius: $ag-radius-pill;
-  background: rgba(255, 255, 255, 0.22);
+  background: $ag-state-progress-track;
 }
 
 @mixin ag-progress-fill($start: $ag-accent-primary, $end: $ag-accent-tertiary) {
@@ -273,6 +370,167 @@ $bar-height: bar-size(bar-height);
 $bar-side-margin: bar-size(bar-side-margin);
 $bar-padding-x: bar-size(bar-padding-x);
 
+// Component tokens: Bar
+$ag-bar-shell-radial-start: rgba(177, 228, 255, 0.19);
+$ag-bar-shell-radial-end: rgba(84, 153, 255, 0.21);
+$ag-bar-shell-gradient: linear-gradient(
+  156deg,
+  rgba(8, 17, 30, 0.96),
+  rgba(18, 30, 49, 0.97)
+);
+$ag-bar-shell-border: rgba(171, 216, 255, 0.32);
+$ag-bar-shell-margin-top: $ag-space-8;
+$ag-bar-shell-padding-y: $ag-space-4;
+$ag-bar-button-padding-y: $ag-space-7;
+$ag-bar-button-padding-x: $ag-space-14;
+$ag-bar-monitor-lane-bg: $ag-surface-overlay-base;
+$ag-bar-monitor-lane-border: rgba(189, 214, 255, 0.24);
+$ag-bar-monitor-lane-padding-y: $ag-space-4;
+$ag-bar-monitor-lane-padding-x: $ag-space-9;
+$ag-bar-workspace-bg: $ag-surface-overlay-soft;
+$ag-bar-workspace-border: rgba(255, 255, 255, 0.14);
+$ag-bar-workspace-padding-y: $ag-space-4;
+$ag-bar-workspace-padding-x: $ag-space-10;
+$ag-bar-workspace-occupied-border: rgba(225, 235, 246, 0.16);
+$ag-bar-workspace-hover-bg: rgba(146, 214, 255, 0.15);
+$ag-bar-workspace-hover-border: rgba(184, 225, 255, 0.4);
+$ag-bar-workspace-active-bg: linear-gradient(
+  146deg,
+  rgba(189, 214, 255, 0.46),
+  rgba(121, 174, 255, 0.36)
+);
+$ag-bar-workspace-active-border: rgba(208, 232, 255, 0.78);
+$ag-bar-workspace-unfocused-bg: rgba(189, 214, 255, 0.24);
+$ag-bar-workspace-unfocused-border: rgba(189, 214, 255, 0.52);
+$ag-bar-workspace-fallback-border: rgba(189, 214, 255, 0.2);
+$ag-bar-connectivity-bg: rgba(146, 214, 255, 0.12);
+$ag-bar-connectivity-border: rgba(146, 214, 255, 0.4);
+$ag-bar-connectivity-hover-bg: rgba(146, 214, 255, 0.2);
+$ag-bar-connectivity-hover-border: rgba(146, 214, 255, 0.55);
+$ag-bar-connectivity-active-bg: rgba(146, 214, 255, 0.28);
+$ag-bar-connectivity-active-border: rgba(146, 214, 255, 0.66);
+$ag-bar-spotify-bg: rgba(152, 245, 224, 0.08);
+$ag-bar-spotify-border: rgba(152, 245, 224, 0.38);
+$ag-bar-spotify-hover-bg: rgba(152, 245, 224, 0.2);
+$ag-bar-spotify-hover-border: rgba(152, 245, 224, 0.56);
+$ag-bar-spotify-active-bg-soft: rgba(152, 245, 224, 0.24);
+$ag-bar-spotify-active-border-soft: rgba(175, 251, 234, 0.62);
+$ag-bar-spotify-active-bg: linear-gradient(
+  146deg,
+  rgba(152, 245, 224, 0.26),
+  rgba(98, 208, 190, 0.24)
+);
+$ag-bar-spotify-active-border: rgba(175, 251, 234, 0.68);
+$ag-bar-system-tray-bg: $ag-surface-overlay-soft;
+$ag-bar-clock-bg: rgba(189, 214, 255, 0.09);
+$ag-bar-clock-border: rgba(189, 214, 255, 0.36);
+$ag-bar-clock-hover-bg: rgba(189, 214, 255, 0.2);
+$ag-bar-clock-hover-border: rgba(189, 214, 255, 0.56);
+$ag-bar-clock-active-bg: rgba(189, 214, 255, 0.28);
+$ag-bar-clock-active-border: rgba(189, 214, 255, 0.66);
+$ag-bar-card-padding: $ag-space-12;
+$ag-bar-calendar-padding: $ag-space-6;
+$ag-bar-volume-padding-y: $ag-space-7;
+$ag-bar-volume-padding-x: $ag-space-13;
+$ag-bar-volume-bg: rgba(146, 214, 255, 0.12);
+$ag-bar-volume-border: rgba(146, 214, 255, 0.42);
+$ag-bar-volume-hover-bg: rgba(146, 214, 255, 0.22);
+$ag-bar-volume-hover-border: rgba(146, 214, 255, 0.58);
+$ag-bar-volume-active-bg: rgba(146, 214, 255, 0.3);
+$ag-bar-volume-active-border: rgba(146, 214, 255, 0.68);
+$ag-bar-volume-mute-bg: rgba(146, 214, 255, 0.06);
+$ag-bar-volume-mute-border: rgba(146, 214, 255, 0.26);
+$ag-bar-volume-mute-hover-bg: rgba(146, 214, 255, 0.11);
+$ag-bar-volume-mute-hover-border: rgba(146, 214, 255, 0.38);
+$ag-bar-volume-mute-active-bg: rgba(146, 214, 255, 0.16);
+$ag-bar-volume-mute-active-border: rgba(146, 214, 255, 0.48);
+$ag-bar-volume-popover-padding: $ag-space-14;
+
+// Component tokens: Spotify popup
+$ag-spotify-card-padding: $ag-space-14;
+$ag-spotify-button-bg: rgba(24, 33, 47, 0.96);
+$ag-spotify-button-border: rgba(255, 255, 255, 0.18);
+$ag-spotify-button-hover-bg: rgba(34, 45, 63, 0.98);
+$ag-spotify-button-active-bg: rgba(46, 59, 82, 0.99);
+$ag-spotify-api-chip-bg: $ag-surface-overlay-strong;
+$ag-spotify-api-chip-border: rgba(255, 255, 255, 0.12);
+$ag-spotify-status-bg: rgba(152, 245, 224, 0.16);
+$ag-spotify-status-border: rgba(152, 245, 224, 0.4);
+$ag-spotify-status-padding-y: $ag-space-2;
+$ag-spotify-status-padding-x: $ag-space-9;
+$ag-spotify-control-padding-y: $ag-space-6;
+$ag-spotify-control-padding-x: $ag-space-10;
+$ag-spotify-action-padding-y: $ag-space-5;
+$ag-spotify-action-padding-x: $ag-space-10;
+$ag-spotify-play-bg: rgba(152, 245, 224, 0.24);
+$ag-spotify-play-border: rgba(152, 245, 224, 0.48);
+$ag-spotify-play-hover-bg: rgba(152, 245, 224, 0.3);
+$ag-spotify-play-hover-border: rgba(175, 251, 234, 0.62);
+$ag-spotify-play-active-bg: rgba(152, 245, 224, 0.36);
+$ag-spotify-play-active-border: rgba(175, 251, 234, 0.72);
+$ag-spotify-action-bg: $ag-surface-overlay-strong;
+$ag-spotify-action-border: rgba(255, 255, 255, 0.16);
+$ag-spotify-action-hover-bg: $ag-surface-overlay-stronger;
+$ag-spotify-action-active-bg: rgba(255, 255, 255, 0.12);
+$ag-spotify-action-active-border: $ag-border-strong;
+$ag-spotify-action-active-tint: rgba(152, 245, 224, 0.18);
+$ag-spotify-action-active-tint-border: rgba(152, 245, 224, 0.46);
+$ag-spotify-connect-bg: rgba(146, 214, 255, 0.14);
+$ag-spotify-connect-border: rgba(146, 214, 255, 0.46);
+$ag-spotify-connect-hover-bg: rgba(146, 214, 255, 0.22);
+$ag-spotify-connect-hover-border: rgba(146, 214, 255, 0.6);
+$ag-spotify-connect-active-bg: rgba(146, 214, 255, 0.3);
+$ag-spotify-connect-active-border: rgba(146, 214, 255, 0.7);
+
+// Component tokens: Command palette
+$ag-command-shell-padding-x: $ag-space-24;
+$ag-command-card-padding: $ag-space-14;
+$ag-command-input-bg: $ag-surface-input;
+$ag-command-input-border: rgba(146, 214, 255, 0.34);
+$ag-command-input-focus-bg: rgba(146, 214, 255, 0.14);
+$ag-command-input-focus-shadow: 0 10px 18px -14px rgba(0, 0, 0, 0.72);
+$ag-command-item-bg: $ag-surface-overlay-soft;
+$ag-command-item-border: rgba(255, 255, 255, 0.12);
+$ag-command-item-hover-bg: rgba(132, 203, 255, 0.16);
+$ag-command-item-hover-border: rgba(170, 220, 255, 0.48);
+$ag-command-item-active-bg: linear-gradient(
+  148deg,
+  rgba(189, 214, 255, 0.34),
+  rgba(121, 174, 255, 0.26)
+);
+$ag-command-item-active-border: rgba(202, 230, 255, 0.74);
+$ag-command-category-bg: rgba(146, 214, 255, 0.13);
+$ag-command-category-border: rgba(146, 214, 255, 0.34);
+
+// Component tokens: Control center
+$ag-control-center-card-padding: $ag-space-14;
+$ag-control-center-button-bg: $ag-surface-overlay-base;
+$ag-control-center-button-border: $ag-border-subtle;
+$ag-control-center-button-hover-bg: $ag-surface-overlay-stronger;
+$ag-control-center-button-active-bg: rgba(255, 255, 255, 0.12);
+$ag-control-center-tab-active-bg: rgba(146, 214, 255, 0.14);
+$ag-control-center-tab-active-border: rgba(146, 214, 255, 0.38);
+$ag-control-center-tab-active-shadow: inset 0 0 0 1px rgba(146, 214, 255, 0.18);
+$ag-control-center-section-padding: $ag-space-12;
+$ag-control-center-password-padding-y: $ag-space-4;
+$ag-control-center-password-padding-x: $ag-space-10;
+$ag-control-center-password-bg: $ag-surface-overlay-base;
+$ag-control-center-password-border: rgba(255, 255, 255, 0.14);
+$ag-control-center-password-focus-bg: rgba(146, 214, 255, 0.14);
+$ag-control-center-list-row-bg: $ag-surface-overlay-weak;
+$ag-control-center-list-row-border: $ag-surface-overlay-stronger;
+$ag-control-center-list-row-padding-y: $ag-space-7;
+$ag-control-center-list-row-padding-x: $ag-space-8;
+$ag-control-center-action-bg: $ag-surface-overlay-strong;
+$ag-control-center-action-border: rgba(255, 255, 255, 0.14);
+$ag-control-center-action-hover-bg: $ag-surface-overlay-stronger;
+$ag-control-center-action-active-bg: rgba(255, 255, 255, 0.12);
+$ag-control-center-confirm-padding: $ag-space-8;
+$ag-control-center-session-padding-y: $ag-space-10;
+$ag-control-center-session-padding-x: $ag-space-8;
+$ag-control-center-session-pending-border: rgba(146, 214, 255, 0.42);
+$ag-control-center-session-pending-bg: rgba(146, 214, 255, 0.12);
+
 .popup-accent-surface {
   @include popup-card-shell;
   transition:
@@ -292,36 +550,33 @@ window.Bar {
 
   > centerbox {
     min-height: $bar-height;
-    margin: 8px $bar-side-margin 0;
-    padding: 4px $bar-padding-x;
+    margin: $ag-bar-shell-margin-top $bar-side-margin 0;
+    padding: $ag-bar-shell-padding-y $bar-padding-x;
     border-radius: $radius-bar;
     background-image:
       radial-gradient(
         circle at 16% 18%,
-        rgba(177, 228, 255, 0.19),
+        $ag-bar-shell-radial-start,
         transparent 40%
       ),
       radial-gradient(
         circle at 84% 130%,
-        rgba(84, 153, 255, 0.21),
+        $ag-bar-shell-radial-end,
         transparent 52%
       ),
-      linear-gradient(156deg, rgba(8, 17, 30, 0.96), rgba(18, 30, 49, 0.97));
-    border: 1px solid rgba(171, 216, 255, 0.32);
-    box-shadow:
-      0 28px 42px -20px rgba(0, 0, 0, 0.82),
-      0 10px 24px -16px rgba(28, 94, 180, 0.42),
-      inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+      $ag-bar-shell-gradient;
+    border: 1px solid $ag-bar-shell-border;
+    box-shadow: $ag-shadow-bar-shell;
   }
 
   > centerbox > box {
-    min-height: $bar-height - 8px;
+    min-height: $bar-height - $ag-space-8;
   }
 
   .bar-section-start,
   .bar-section-center,
   .bar-section-end {
-    min-height: $bar-height - 10px;
+    min-height: $bar-height - $ag-space-10;
     border-radius: $ag-radius-chip;
   }
 
@@ -332,7 +587,7 @@ window.Bar {
   button,
   menubutton > button {
     border-radius: $ag-radius-chip;
-    padding: 7px 14px;
+    padding: $ag-bar-button-padding-y $ag-bar-button-padding-x;
     @include ag-type($ag-font-body-sm, 600, 0.25px, $ag-text-0);
     @include ag-interactive-control();
   }
@@ -344,10 +599,10 @@ window.Bar {
   .workspace-monitor-lane {
     @include ag-surface-subtle(
       $ag-radius-chip,
-      rgba(255, 255, 255, 0.04),
-      rgba(189, 214, 255, 0.24)
+      $ag-bar-monitor-lane-bg,
+      $ag-bar-monitor-lane-border
     );
-    padding: 4px 9px;
+    padding: $ag-bar-monitor-lane-padding-y $ag-bar-monitor-lane-padding-x;
   }
 
   .workspace-monitor-badge {
@@ -356,11 +611,11 @@ window.Bar {
 
   .workspace-chip {
     min-width: 34px;
-    padding: 4px 10px;
+    padding: $ag-bar-workspace-padding-y $ag-bar-workspace-padding-x;
     @include ag-surface-subtle(
       $ag-radius-sm,
-      rgba(255, 255, 255, 0.03),
-      rgba(255, 255, 255, 0.14)
+      $ag-bar-workspace-bg,
+      $ag-bar-workspace-border
     );
     @include ag-type($ag-font-body-sm, 700, 0.15px, $ag-text-0);
     transition:
@@ -372,36 +627,29 @@ window.Bar {
 
   .workspace-chip-occupied {
     background: $ag-surface-elevated-strong;
-    border-color: rgba(225, 235, 246, 0.16);
+    border-color: $ag-bar-workspace-occupied-border;
     color: $ag-text-1;
   }
 
   .workspace-chip:hover {
-    background: rgba(146, 214, 255, 0.15);
-    border-color: rgba(184, 225, 255, 0.4);
+    background: $ag-bar-workspace-hover-bg;
+    border-color: $ag-bar-workspace-hover-border;
     box-shadow: $ag-shadow-sm;
   }
 
   .workspace-chip-active.workspace-chip-focused {
-    background: linear-gradient(
-      146deg,
-      rgba(189, 214, 255, 0.46),
-      rgba(121, 174, 255, 0.36)
-    );
-    border-color: rgba(208, 232, 255, 0.78);
-    color: rgba(241, 248, 255, 0.99);
-    box-shadow:
-      0 0 0 1px rgba(196, 227, 255, 0.38),
-      0 0 20px rgba(121, 174, 255, 0.34),
-      inset 0 1px 0 rgba(255, 255, 255, 0.18);
-    animation: wsPulse 2s infinite;
+    background: $ag-bar-workspace-active-bg;
+    border-color: $ag-bar-workspace-active-border;
+    color: $ag-text-inverse;
+    box-shadow: $ag-shadow-workspace-active;
+    animation: wsPulse $ag-motion-pulse infinite;
   }
 
   .workspace-chip-active.workspace-chip-unfocused {
-    background: rgba(189, 214, 255, 0.24);
-    border-color: rgba(189, 214, 255, 0.52);
-    color: rgba(205, 223, 242, 0.92);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    background: $ag-bar-workspace-unfocused-bg;
+    border-color: $ag-bar-workspace-unfocused-border;
+    color: $ag-text-workspace-unfocused;
+    box-shadow: $ag-shadow-workspace-unfocused;
   }
 
   .workspace-fallback {
@@ -410,8 +658,8 @@ window.Bar {
     font-weight: 700;
     @include ag-surface-subtle(
       $ag-radius-chip,
-      rgba(255, 255, 255, 0.04),
-      rgba(189, 214, 255, 0.2)
+      $ag-bar-monitor-lane-bg,
+      $ag-bar-workspace-fallback-border
     );
   }
 
@@ -422,25 +670,25 @@ window.Bar {
 
   .connectivity-chip {
     @include ag-interactive-control(
-      $bg: rgba(146, 214, 255, 0.12),
-      $border: rgba(146, 214, 255, 0.4),
+      $bg: $ag-bar-connectivity-bg,
+      $border: $ag-bar-connectivity-border,
       $color: $ag-accent-primary,
-      $hover-bg: rgba(146, 214, 255, 0.2),
-      $hover-border: rgba(146, 214, 255, 0.55),
-      $active-bg: rgba(146, 214, 255, 0.28),
-      $active-border: rgba(146, 214, 255, 0.66)
+      $hover-bg: $ag-bar-connectivity-hover-bg,
+      $hover-border: $ag-bar-connectivity-hover-border,
+      $active-bg: $ag-bar-connectivity-active-bg,
+      $active-border: $ag-bar-connectivity-active-border
     );
   }
 
   .spotify-chip {
     min-width: bar-size(spotify-chip-min);
     @include ag-interactive-control(
-      $bg: rgba(152, 245, 224, 0.08),
-      $border: rgba(152, 245, 224, 0.38),
-      $hover-bg: rgba(152, 245, 224, 0.2),
-      $hover-border: rgba(152, 245, 224, 0.56),
-      $active-bg: rgba(152, 245, 224, 0.24),
-      $active-border: rgba(175, 251, 234, 0.62)
+      $bg: $ag-bar-spotify-bg,
+      $border: $ag-bar-spotify-border,
+      $hover-bg: $ag-bar-spotify-hover-bg,
+      $hover-border: $ag-bar-spotify-hover-border,
+      $active-bg: $ag-bar-spotify-active-bg-soft,
+      $active-border: $ag-bar-spotify-active-border-soft
     );
   }
 
@@ -457,15 +705,9 @@ window.Bar {
   }
 
   .spotify-chip.spotify-active {
-    background: linear-gradient(
-      146deg,
-      rgba(152, 245, 224, 0.26),
-      rgba(98, 208, 190, 0.24)
-    );
-    border-color: rgba(175, 251, 234, 0.68);
-    box-shadow:
-      0 0 16px rgba(152, 245, 224, 0.24),
-      inset 0 1px 0 rgba(236, 255, 248, 0.2);
+    background: $ag-bar-spotify-active-bg;
+    border-color: $ag-bar-spotify-active-border;
+    box-shadow: $ag-shadow-spotify-active;
   }
 
   .metrics-row {
@@ -474,7 +716,7 @@ window.Bar {
 
   .metric-chip {
     font-variant-numeric: tabular-nums;
-    @include ag-type(12.3px, 600, 0.15px, $ag-text-1);
+    @include ag-type($ag-font-body-sm-soft, 600, 0.15px, $ag-text-1);
   }
 
   .aur-chip,
@@ -490,10 +732,10 @@ window.Bar {
   .system-tray-chip {
     @include ag-surface-subtle(
       $ag-radius-chip,
-      rgba(255, 255, 255, 0.03),
+      $ag-bar-system-tray-bg,
       $ag-border-subtle
     );
-    padding: 4px 8px;
+    padding: $ag-space-4 $ag-space-8;
   }
 
   .cpu-chip,
@@ -508,12 +750,12 @@ window.Bar {
   .clock-chip > button {
     min-width: bar-size(clock-chip-min);
     @include ag-interactive-control(
-      $bg: rgba(189, 214, 255, 0.09),
-      $border: rgba(189, 214, 255, 0.36),
-      $hover-bg: rgba(189, 214, 255, 0.2),
-      $hover-border: rgba(189, 214, 255, 0.56),
-      $active-bg: rgba(189, 214, 255, 0.28),
-      $active-border: rgba(189, 214, 255, 0.66)
+      $bg: $ag-bar-clock-bg,
+      $border: $ag-bar-clock-border,
+      $hover-bg: $ag-bar-clock-hover-bg,
+      $hover-border: $ag-bar-clock-hover-border,
+      $active-bg: $ag-bar-clock-active-bg,
+      $active-border: $ag-bar-clock-active-border
     );
   }
 
@@ -530,7 +772,7 @@ window.Bar {
 
   .clock-popover-card {
     min-width: 292px;
-    padding: 12px;
+    padding: $ag-bar-card-padding;
   }
 
   .clock-popover-heading {
@@ -540,10 +782,10 @@ window.Bar {
   .clock-popover-calendar {
     @include ag-surface-subtle(
       $ag-radius-md,
-      rgba(255, 255, 255, 0.03),
+      $ag-surface-overlay-soft,
       $ag-border-subtle
     );
-    padding: 6px;
+    padding: $ag-bar-calendar-padding;
   }
 
   @each $accent-name, $accent-token in $ag-accent-variants {
@@ -555,21 +797,21 @@ window.Bar {
   .vol-control {
     > button {
       min-width: bar-size(vol-button-min);
-      padding: 7px 13px;
+      padding: $ag-bar-volume-padding-y $ag-bar-volume-padding-x;
       border-radius: $ag-radius-control;
       @include ag-interactive-control(
-        $bg: rgba(146, 214, 255, 0.12),
-        $border: rgba(146, 214, 255, 0.42),
+        $bg: $ag-bar-volume-bg,
+        $border: $ag-bar-volume-border,
         $color: $ag-accent-primary,
-        $hover-bg: rgba(146, 214, 255, 0.22),
-        $hover-border: rgba(146, 214, 255, 0.58),
-        $active-bg: rgba(146, 214, 255, 0.3),
-        $active-border: rgba(146, 214, 255, 0.68)
+        $hover-bg: $ag-bar-volume-hover-bg,
+        $hover-border: $ag-bar-volume-hover-border,
+        $active-bg: $ag-bar-volume-active-bg,
+        $active-border: $ag-bar-volume-active-border
       );
     }
 
     .vol-trigger-icon {
-      margin-right: 2px;
+      margin-right: $ag-space-2;
       color: $ag-accent-primary;
     }
 
@@ -591,21 +833,21 @@ window.Bar {
 
     volPopover {
       min-width: 480px;
-      padding: 14px;
+      padding: $ag-bar-volume-popover-padding;
     }
 
     .vol-mute-btn {
       min-width: 40px;
       min-height: 40px;
       border-radius: $ag-radius-sm;
-      padding: 4px;
+      padding: $ag-space-4;
       @include ag-interactive-control(
-        $bg: rgba(146, 214, 255, 0.06),
-        $border: rgba(146, 214, 255, 0.26),
-        $hover-bg: rgba(146, 214, 255, 0.11),
-        $hover-border: rgba(146, 214, 255, 0.38),
-        $active-bg: rgba(146, 214, 255, 0.16),
-        $active-border: rgba(146, 214, 255, 0.48)
+        $bg: $ag-bar-volume-mute-bg,
+        $border: $ag-bar-volume-mute-border,
+        $hover-bg: $ag-bar-volume-mute-hover-bg,
+        $hover-border: $ag-bar-volume-mute-hover-border,
+        $active-bg: $ag-bar-volume-mute-active-bg,
+        $active-border: $ag-bar-volume-mute-active-border
       );
     }
 
@@ -626,10 +868,7 @@ window.Bar {
     }
 
     .vol-scale highlight {
-      @include ag-progress-fill(
-        rgba(146, 214, 255, 0.95),
-        rgba(189, 214, 255, 0.95)
-      );
+      @include ag-progress-fill($ag-accent-primary-95, $ag-accent-tertiary-95);
     }
 
     @each $accent-name, $accent-token in $ag-accent-variants {
@@ -654,18 +893,18 @@ window.SpotifyPopup {
 
   button {
     @include ag-interactive-control(
-      $bg: rgba(24, 33, 47, 0.96),
-      $border: rgba(255, 255, 255, 0.18),
-      $hover-bg: rgba(34, 45, 63, 0.98),
+      $bg: $ag-spotify-button-bg,
+      $border: $ag-spotify-button-border,
+      $hover-bg: $ag-spotify-button-hover-bg,
       $hover-border: $ag-border-strong,
-      $active-bg: rgba(46, 59, 82, 0.99),
+      $active-bg: $ag-spotify-button-active-bg,
       $active-border: $ag-border-strong
     );
   }
 
   .spotifyPopupCardShell {
     @include popup-card-shell;
-    padding: 14px;
+    padding: $ag-spotify-card-padding;
   }
 
   .spotifyPopupCardShell.spotify-layout-horizontal {
@@ -703,13 +942,13 @@ window.SpotifyPopup {
 
   .spotifyApiChip {
     min-width: 0;
-    padding: 4px 10px;
+    padding: $ag-space-4 $ag-space-10;
     @include ag-surface-subtle(
       $ag-radius-pill,
-      rgba(255, 255, 255, 0.05),
-      rgba(255, 255, 255, 0.12)
+      $ag-spotify-api-chip-bg,
+      $ag-spotify-api-chip-border
     );
-    @include ag-type(11px, 600, 0.18px, $ag-text-1);
+    @include ag-type($ag-font-body-xs, 600, 0.18px, $ag-text-1);
   }
 
   .spotifyPopupHeading {
@@ -718,10 +957,10 @@ window.SpotifyPopup {
 
   .spotifyPopupStatus {
     border-radius: $ag-radius-pill;
-    padding: 2px 9px;
-    @include ag-type($ag-font-label-sm, 700, 0.2px, rgba(170, 249, 234, 0.98));
-    background: rgba(152, 245, 224, 0.16);
-    border: 1px solid rgba(152, 245, 224, 0.4);
+    padding: $ag-spotify-status-padding-y $ag-spotify-status-padding-x;
+    @include ag-type($ag-font-label-sm, 700, 0.2px, $ag-text-success);
+    background: $ag-spotify-status-bg;
+    border: 1px solid $ag-spotify-status-border;
   }
 
   .spotifyPopupTrack {
@@ -736,7 +975,7 @@ window.SpotifyPopup {
 
   .spotifyPrimaryControls button {
     border-radius: $ag-radius-md;
-    padding: 6px 10px;
+    padding: $ag-spotify-control-padding-y $ag-spotify-control-padding-x;
     min-width: 60px;
   }
 
@@ -744,7 +983,7 @@ window.SpotifyPopup {
     .spotifyPrimaryControls
     button {
     min-width: 0;
-    padding: 6px 0;
+    padding: $ag-spotify-control-padding-y 0;
   }
 
   .spotify-primary-btn {
@@ -753,14 +992,14 @@ window.SpotifyPopup {
 
   .spotifyPlayButton {
     @include ag-interactive-control(
-      $bg: rgba(152, 245, 224, 0.24),
-      $border: rgba(152, 245, 224, 0.48),
-      $hover-bg: rgba(152, 245, 224, 0.3),
-      $hover-border: rgba(175, 251, 234, 0.62),
-      $active-bg: rgba(152, 245, 224, 0.36),
-      $active-border: rgba(175, 251, 234, 0.72)
+      $bg: $ag-spotify-play-bg,
+      $border: $ag-spotify-play-border,
+      $hover-bg: $ag-spotify-play-hover-bg,
+      $hover-border: $ag-spotify-play-hover-border,
+      $active-bg: $ag-spotify-play-active-bg,
+      $active-border: $ag-spotify-play-active-border
     );
-    box-shadow: 0 0 18px rgba(152, 245, 224, 0.2);
+    box-shadow: $ag-shadow-play-glow;
   }
 
   .spotifyCoverWrap {
@@ -768,28 +1007,28 @@ window.SpotifyPopup {
     min-height: 188px;
     @include ag-card-shell(
       $ag-radius-control,
-      rgba(11, 16, 24, 0.98),
-      rgba(255, 255, 255, 0.22),
+      $ag-surface-cover,
+      $ag-state-progress-track,
       none
     );
-    padding: 2px;
+    padding: $ag-space-2;
   }
 
   .spotifyCover {
     min-width: 184px;
     min-height: 184px;
-    border-radius: 15px;
+    border-radius: $ag-radius-md-soft;
   }
 
   .spotifyCoverFallback {
     min-width: 184px;
     min-height: 184px;
-    font-size: 52px;
+    font-size: $ag-font-display;
     color: $ag-text-1;
   }
 
   .spotifyProgressGroup {
-    margin-top: 2px;
+    margin-top: $ag-space-2;
   }
 
   .spotifyProgressBar trough {
@@ -797,10 +1036,7 @@ window.SpotifyPopup {
   }
 
   .spotifyProgressBar progress {
-    @include ag-progress-fill(
-      rgba(152, 245, 224, 0.95),
-      rgba(146, 214, 255, 0.95)
-    );
+    @include ag-progress-fill($ag-accent-secondary-95, $ag-accent-primary-95);
   }
 
   .spotifyProgressTime {
@@ -819,15 +1055,15 @@ window.SpotifyPopup {
     border-radius: $ag-radius-md;
     min-width: 68px;
     min-height: 32px;
-    padding: 5px 10px;
+    padding: $ag-spotify-action-padding-y $ag-spotify-action-padding-x;
     @include ag-type($ag-font-label-sm, 700, 0.22px, $ag-text-0);
     @include ag-interactive-control(
-      $bg: rgba(255, 255, 255, 0.05),
-      $border: rgba(255, 255, 255, 0.16),
-      $hover-bg: rgba(255, 255, 255, 0.08),
+      $bg: $ag-spotify-action-bg,
+      $border: $ag-spotify-action-border,
+      $hover-bg: $ag-spotify-action-hover-bg,
       $hover-border: $ag-border-strong,
-      $active-bg: rgba(255, 255, 255, 0.12),
-      $active-border: $ag-border-strong
+      $active-bg: $ag-spotify-action-active-bg,
+      $active-border: $ag-spotify-action-active-border
     );
   }
 
@@ -839,33 +1075,33 @@ window.SpotifyPopup {
   }
 
   .spotify-action-btn.spotify-action-active {
-    color: rgba(172, 250, 235, 0.98);
-    background: rgba(152, 245, 224, 0.18);
-    border-color: rgba(152, 245, 224, 0.46);
-    box-shadow: 0 0 14px rgba(152, 245, 224, 0.18);
+    color: $ag-text-success-strong;
+    background: $ag-spotify-action-active-tint;
+    border-color: $ag-spotify-action-active-tint-border;
+    box-shadow: $ag-shadow-action-active;
   }
 
   .spotify-action-btn.spotify-like-active {
-    color: rgba(255, 231, 237, 0.98);
-    background: rgba(255, 121, 142, 0.2);
-    border-color: rgba(255, 121, 142, 0.46);
-    box-shadow: 0 0 14px rgba(255, 121, 142, 0.18);
+    color: $ag-text-like;
+    background: $ag-surface-like-tint;
+    border-color: $ag-border-like;
+    box-shadow: $ag-state-like-glow;
   }
 
   .spotifyConnectButton {
     border-radius: $ag-radius-md;
     min-width: 84px;
     min-height: 32px;
-    padding: 5px 10px;
-    @include ag-type($ag-font-label-sm, 700, 0.22px, rgba(207, 233, 252, 0.96));
+    padding: $ag-spotify-action-padding-y $ag-spotify-action-padding-x;
+    @include ag-type($ag-font-label-sm, 700, 0.22px, $ag-text-connection);
     @include ag-interactive-control(
-      $bg: rgba(146, 214, 255, 0.14),
-      $border: rgba(146, 214, 255, 0.46),
-      $color: rgba(207, 233, 252, 0.96),
-      $hover-bg: rgba(146, 214, 255, 0.22),
-      $hover-border: rgba(146, 214, 255, 0.6),
-      $active-bg: rgba(146, 214, 255, 0.3),
-      $active-border: rgba(146, 214, 255, 0.7)
+      $bg: $ag-spotify-connect-bg,
+      $border: $ag-spotify-connect-border,
+      $color: $ag-text-connection,
+      $hover-bg: $ag-spotify-connect-hover-bg,
+      $hover-border: $ag-spotify-connect-hover-border,
+      $active-bg: $ag-spotify-connect-active-bg,
+      $active-border: $ag-spotify-connect-active-border
     );
   }
 
@@ -893,12 +1129,12 @@ window.CommandPalette {
   background: transparent;
 
   .command-palette-shell {
-    padding: 0 24px;
+    padding: 0 $ag-command-shell-padding-x;
   }
 
   .command-palette-card {
     min-width: 640px;
-    padding: 14px;
+    padding: $ag-command-card-padding;
   }
 
   .command-palette-header {
@@ -906,25 +1142,19 @@ window.CommandPalette {
   }
 
   .command-palette-title {
-    font-size: 15px;
-    font-weight: 700;
-    letter-spacing: 0.24px;
-    color: $ag-text-0;
+    @include ag-type($ag-font-title-md, 700, 0.24px, $ag-text-0);
   }
 
   .command-palette-hint {
-    font-size: 11.5px;
-    font-weight: 600;
-    letter-spacing: 0.18px;
-    color: $ag-text-1;
+    @include ag-type($ag-font-label-sm-soft, 600, 0.18px, $ag-text-1);
   }
 
   .command-palette-input {
     min-height: 38px;
-    border-radius: 12px;
-    padding: 0 12px;
-    border: 1px solid rgba(146, 214, 255, 0.34);
-    background: rgba(146, 214, 255, 0.08);
+    border-radius: $ag-radius-sm;
+    padding: 0 $ag-space-12;
+    border: 1px solid $ag-command-input-border;
+    background: $ag-command-input-bg;
     color: $ag-text-0;
     caret-color: $ag-accent-primary;
     transition:
@@ -934,11 +1164,9 @@ window.CommandPalette {
   }
 
   .command-palette-input:focus {
-    border-color: rgba(168, 222, 255, 0.62);
-    background: rgba(146, 214, 255, 0.14);
-    box-shadow:
-      0 0 0 1px rgba(168, 222, 255, 0.2),
-      0 10px 18px -14px rgba(0, 0, 0, 0.72);
+    border-color: $ag-border-focus;
+    background: $ag-command-input-focus-bg;
+    box-shadow: $ag-shadow-focus-ring, $ag-command-input-focus-shadow;
   }
 
   .command-palette-scroll {
@@ -954,10 +1182,10 @@ window.CommandPalette {
   }
 
   .command-palette-item {
-    border-radius: 12px;
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    background: rgba(255, 255, 255, 0.03);
-    padding: 8px 10px;
+    border-radius: $ag-radius-sm;
+    border: 1px solid $ag-command-item-border;
+    background: $ag-command-item-bg;
+    padding: $ag-space-8 $ag-space-10;
     transition:
       background-color $ag-motion-fast $ag-curve-standard,
       border-color $ag-motion-fast $ag-curve-standard,
@@ -965,52 +1193,46 @@ window.CommandPalette {
   }
 
   .command-palette-item:hover {
-    background: rgba(132, 203, 255, 0.16);
-    border-color: rgba(170, 220, 255, 0.48);
-    box-shadow: 0 12px 18px -16px rgba(0, 0, 0, 0.72);
+    background: $ag-command-item-hover-bg;
+    border-color: $ag-command-item-hover-border;
+    box-shadow: $ag-shadow-sm;
   }
 
   .command-palette-item-active,
   .command-palette-item-active:hover {
-    background: linear-gradient(
-      148deg,
-      rgba(189, 214, 255, 0.34),
-      rgba(121, 174, 255, 0.26)
-    );
-    border-color: rgba(202, 230, 255, 0.74);
-    box-shadow:
-      0 0 0 1px rgba(196, 227, 255, 0.25),
-      0 0 16px rgba(121, 174, 255, 0.2);
+    background: $ag-command-item-active-bg;
+    border-color: $ag-command-item-active-border;
+    box-shadow: $ag-shadow-command-active;
   }
 
   .command-palette-item-title {
     color: $ag-text-0;
-    font-size: 13.2px;
+    font-size: $ag-font-body-lg-soft;
     font-weight: 700;
     letter-spacing: 0.16px;
   }
 
   .command-palette-item-subtitle {
     color: $ag-text-1;
-    font-size: 11.8px;
+    font-size: $ag-font-label-sm;
     letter-spacing: 0.12px;
   }
 
   .command-palette-item-category {
     border-radius: $ag-radius-pill;
-    padding: 3px 9px;
-    background: rgba(146, 214, 255, 0.13);
-    border: 1px solid rgba(146, 214, 255, 0.34);
+    padding: $ag-space-3 $ag-space-9;
+    background: $ag-command-category-bg;
+    border: 1px solid $ag-command-category-border;
     color: $ag-accent-primary;
-    font-size: 10.8px;
+    font-size: $ag-font-label-2xs;
     font-weight: 700;
     letter-spacing: 0.22px;
   }
 
   .command-palette-empty {
     color: $ag-text-1;
-    font-size: 12px;
-    padding: 10px 2px;
+    font-size: $ag-font-body-sm;
+    padding: $ag-space-10 $ag-space-2;
   }
 
   .command-palette-footer {
@@ -1019,12 +1241,12 @@ window.CommandPalette {
 
   .command-palette-status {
     color: $ag-text-1;
-    font-size: 11.8px;
+    font-size: $ag-font-label-sm;
     letter-spacing: 0.15px;
   }
 
   .command-palette-status-error {
-    color: rgba(255, 188, 188, 0.97);
+    color: $ag-text-danger;
   }
 }
 
@@ -1033,7 +1255,7 @@ window.ControlCenter {
 
   > ccCard {
     min-width: 560px;
-    padding: 14px;
+    padding: $ag-control-center-card-padding;
   }
 
   .cc-header {
@@ -1050,18 +1272,18 @@ window.ControlCenter {
     padding: 0;
     border-radius: $ag-radius-xs;
     @include ag-interactive-control(
-      $bg: rgba(255, 255, 255, 0.04),
-      $border: rgba(255, 255, 255, 0.1),
+      $bg: $ag-control-center-button-bg,
+      $border: $ag-control-center-button-border,
       $color: $ag-text-1,
-      $hover-bg: rgba(255, 255, 255, 0.08),
+      $hover-bg: $ag-control-center-button-hover-bg,
       $hover-border: $ag-border-strong,
-      $active-bg: rgba(255, 255, 255, 0.12),
+      $active-bg: $ag-control-center-button-active-bg,
       $active-border: $ag-border-strong
     );
   }
 
   .cc-tabbar {
-    padding: 2px 0;
+    padding: $ag-space-2 0;
   }
 
   .cc-sections-scroll {
@@ -1078,30 +1300,30 @@ window.ControlCenter {
   }
 
   .cc-tab-pane {
-    padding-right: 2px;
+    padding-right: $ag-space-2;
   }
 
   .cc-tab-btn {
     min-width: 88px;
-    padding: 6px 10px;
-    border-radius: 11px;
+    padding: $ag-space-6 $ag-space-10;
+    border-radius: $ag-radius-sm-tight;
     @include ag-type($ag-font-body-sm, 600, 0.15px, $ag-text-1);
     @include ag-interactive-control(
-      $bg: rgba(255, 255, 255, 0.04),
-      $border: rgba(255, 255, 255, 0.1),
+      $bg: $ag-control-center-button-bg,
+      $border: $ag-control-center-button-border,
       $color: $ag-text-1,
-      $hover-bg: rgba(255, 255, 255, 0.08),
+      $hover-bg: $ag-control-center-button-hover-bg,
       $hover-border: $ag-border-strong,
-      $active-bg: rgba(255, 255, 255, 0.12),
+      $active-bg: $ag-control-center-button-active-bg,
       $active-border: $ag-border-strong
     );
   }
 
   .cc-tab-btn-active {
-    background: rgba(146, 214, 255, 0.14);
-    border-color: rgba(146, 214, 255, 0.38);
+    background: $ag-control-center-tab-active-bg;
+    border-color: $ag-control-center-tab-active-border;
     color: $ag-accent-primary;
-    box-shadow: inset 0 0 0 1px rgba(146, 214, 255, 0.18);
+    box-shadow: $ag-control-center-tab-active-shadow;
   }
 
   @each $accent-name, $accent-token in $ag-accent-variants {
@@ -1116,8 +1338,8 @@ window.ControlCenter {
     background: $ag-surface-1;
     border: 1px solid $ag-border-soft;
     border-radius: $ag-radius-md;
-    padding: 12px;
-    margin-top: 2px;
+    padding: $ag-control-center-section-padding;
+    margin-top: $ag-space-2;
   }
 
   .cc-section-title {
@@ -1141,16 +1363,17 @@ window.ControlCenter {
   }
 
   .cc-inline-message-error {
-    color: rgba(255, 168, 168, 0.95);
+    color: $ag-text-danger-strong;
   }
 
   .cc-password-entry {
     min-height: 34px;
-    padding: 4px 10px;
+    padding: $ag-control-center-password-padding-y
+      $ag-control-center-password-padding-x;
     @include ag-surface-subtle(
       $ag-radius-xs,
-      rgba(255, 255, 255, 0.04),
-      rgba(255, 255, 255, 0.14)
+      $ag-control-center-password-bg,
+      $ag-control-center-password-border
     );
     color: $ag-text-0;
     transition:
@@ -1160,11 +1383,9 @@ window.ControlCenter {
   }
 
   .cc-password-entry:focus {
-    background: rgba(146, 214, 255, 0.14);
+    background: $ag-control-center-password-focus-bg;
     border-color: $ag-border-focus;
-    box-shadow:
-      $ag-shadow-focus-ring,
-      inset 0 1px 0 rgba(233, 245, 255, 0.12);
+    box-shadow: $ag-shadow-focus-ring, $ag-state-focus-inset;
     outline: none;
   }
 
@@ -1175,15 +1396,16 @@ window.ControlCenter {
 
   .cc-list-row {
     @include ag-surface-subtle(
-      11px,
-      rgba(255, 255, 255, 0.02),
-      rgba(255, 255, 255, 0.08)
+      $ag-radius-sm-tight,
+      $ag-control-center-list-row-bg,
+      $ag-control-center-list-row-border
     );
-    padding: 7px 8px;
+    padding: $ag-control-center-list-row-padding-y
+      $ag-control-center-list-row-padding-x;
   }
 
   .cc-audio-volume-row {
-    padding: 8px;
+    padding: $ag-space-8;
   }
 
   .cc-audio-scale trough {
@@ -1191,10 +1413,7 @@ window.ControlCenter {
   }
 
   .cc-audio-scale highlight {
-    @include ag-progress-fill(
-      rgba(146, 214, 255, 0.95),
-      rgba(189, 214, 255, 0.95)
-    );
+    @include ag-progress-fill($ag-accent-primary-95, $ag-accent-tertiary-95);
   }
 
   @each $accent-name, $accent-token in $ag-accent-variants {
@@ -1212,54 +1431,54 @@ window.ControlCenter {
   }
 
   .cc-list-title {
-    @include ag-type(12.8px, 600, 0.12px, $ag-text-0);
+    @include ag-type($ag-font-body-md-soft, 600, 0.12px, $ag-text-0);
   }
 
   .cc-list-subtitle {
-    @include ag-type(11.6px, 600, 0.1px, $ag-text-1);
+    @include ag-type($ag-font-label-md, 600, 0.1px, $ag-text-1);
   }
 
   .cc-empty-state {
     @include ag-type($ag-font-body-sm, 600, 0.1px, $ag-text-1);
-    padding: 8px 0;
+    padding: $ag-space-8 0;
   }
 
   .cc-action-btn {
     min-width: 82px;
-    border-radius: 11px;
-    padding: 6px 12px;
+    border-radius: $ag-radius-sm-tight;
+    padding: $ag-space-6 $ag-space-12;
     @include ag-type($ag-font-body-sm, 600, 0.14px, $ag-text-0);
     @include ag-interactive-control(
-      $bg: rgba(255, 255, 255, 0.05),
-      $border: rgba(255, 255, 255, 0.14),
-      $hover-bg: rgba(255, 255, 255, 0.08),
+      $bg: $ag-control-center-action-bg,
+      $border: $ag-control-center-action-border,
+      $hover-bg: $ag-control-center-action-hover-bg,
       $hover-border: $ag-border-strong,
-      $active-bg: rgba(255, 255, 255, 0.12),
+      $active-bg: $ag-control-center-action-active-bg,
       $active-border: $ag-border-strong
     );
   }
 
   .cc-danger-btn {
-    border-color: rgba(255, 180, 180, 0.32);
-    color: rgba(255, 200, 200, 0.95);
+    border-color: $ag-border-danger-muted;
+    color: $ag-text-danger-muted;
   }
 
   .cc-danger-btn:hover {
-    background: rgba(255, 120, 120, 0.12);
-    border-color: rgba(255, 168, 168, 0.45);
+    background: $ag-surface-danger-base;
+    border-color: $ag-border-danger;
   }
 
   .cc-danger-btn:active,
   .cc-danger-btn:checked {
-    background: rgba(255, 120, 120, 0.18);
-    border-color: rgba(255, 168, 168, 0.52);
+    background: $ag-surface-danger-strong;
+    border-color: $ag-border-danger-strong;
   }
 
   .cc-confirm-box {
-    border: 1px solid rgba(255, 180, 180, 0.28);
-    background: rgba(255, 110, 110, 0.08);
+    border: 1px solid $ag-border-danger-box;
+    background: $ag-surface-danger-tint;
     border-radius: $ag-radius-sm;
-    padding: 8px;
+    padding: $ag-control-center-confirm-padding;
   }
 
   .cc-session-section {
@@ -1277,7 +1496,8 @@ window.ControlCenter {
   .cc-session-tile {
     min-width: 0;
     min-height: 136px;
-    padding: 10px 8px;
+    padding: $ag-control-center-session-padding-y
+      $ag-control-center-session-padding-x;
   }
 
   .cc-session-tile-content {
@@ -1291,19 +1511,19 @@ window.ControlCenter {
   }
 
   .cc-session-tile-pending {
-    border-color: rgba(146, 214, 255, 0.42);
-    background: rgba(146, 214, 255, 0.12);
-    box-shadow: inset 0 0 0 1px rgba(146, 214, 255, 0.22);
+    border-color: $ag-control-center-session-pending-border;
+    background: $ag-control-center-session-pending-bg;
+    box-shadow: $ag-shadow-session-pending;
   }
 
   .cc-session-tile-danger {
-    border-color: rgba(255, 180, 180, 0.26);
-    background: rgba(255, 120, 120, 0.06);
+    border-color: $ag-border-danger-soft;
+    background: $ag-surface-danger-soft;
   }
 
   .cc-session-tile-danger:hover {
-    background: rgba(255, 120, 120, 0.12);
-    border-color: rgba(255, 168, 168, 0.45);
+    background: $ag-surface-danger-base;
+    border-color: $ag-border-danger;
   }
 
   .cc-session-tile-icon {
@@ -1317,11 +1537,11 @@ window.ControlCenter {
   }
 
   .cc-session-tile-icon-danger {
-    color: rgba(255, 180, 180, 0.95);
+    color: $ag-text-danger-soft;
   }
 
   .cc-session-tile-title {
-    @include ag-type(13.2px, 700, 0.12px, $ag-text-0);
+    @include ag-type($ag-font-body-lg-soft, 700, 0.12px, $ag-text-0);
   }
 
   .cc-session-tile-hint {
@@ -1329,7 +1549,7 @@ window.ControlCenter {
   }
 
   .cc-session-confirm-box {
-    padding: 9px;
+    padding: $ag-space-9;
     align-items: center;
   }
 
@@ -1345,26 +1565,14 @@ window.ControlCenter {
 
 @keyframes wsPulse {
   0% {
-    box-shadow:
-      0 0 0 1px rgba(196, 227, 255, 0.38),
-      0 0 20px rgba(121, 174, 255, 0.34),
-      inset 0 1px 0 rgba(255, 255, 255, 0.18),
-      0 0 0 0 rgba(162, 212, 255, 0.46);
+    box-shadow: $ag-shadow-workspace-active, $ag-shadow-workspace-pulse-origin;
   }
 
   65% {
-    box-shadow:
-      0 0 0 1px rgba(196, 227, 255, 0.38),
-      0 0 20px rgba(121, 174, 255, 0.34),
-      inset 0 1px 0 rgba(255, 255, 255, 0.18),
-      0 0 0 8px rgba(162, 212, 255, 0.04);
+    box-shadow: $ag-shadow-workspace-active, $ag-shadow-workspace-pulse;
   }
 
   100% {
-    box-shadow:
-      0 0 0 1px rgba(196, 227, 255, 0.38),
-      0 0 20px rgba(121, 174, 255, 0.34),
-      inset 0 1px 0 rgba(255, 255, 255, 0.18),
-      0 0 0 0 rgba(162, 212, 255, 0);
+    box-shadow: $ag-shadow-workspace-active, $ag-shadow-workspace-pulse-end;
   }
 }
