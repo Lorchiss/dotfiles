@@ -908,6 +908,145 @@ window.SpotifyPopup {
   }
 }
 
+window.CommandPalette {
+  background: transparent;
+
+  .command-palette-shell {
+    padding: 0 24px;
+  }
+
+  .command-palette-card {
+    min-width: 640px;
+    padding: 14px;
+  }
+
+  .command-palette-header {
+    min-height: 30px;
+  }
+
+  .command-palette-title {
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 0.24px;
+    color: $ag-text-0;
+  }
+
+  .command-palette-hint {
+    font-size: 11.5px;
+    font-weight: 600;
+    letter-spacing: 0.18px;
+    color: $ag-text-1;
+  }
+
+  .command-palette-input {
+    min-height: 38px;
+    border-radius: 12px;
+    padding: 0 12px;
+    border: 1px solid rgba(146, 214, 255, 0.34);
+    background: rgba(146, 214, 255, 0.08);
+    color: $ag-text-0;
+    caret-color: $ag-accent-primary;
+    transition:
+      background-color $ag-motion-fast $ag-curve-standard,
+      border-color $ag-motion-fast $ag-curve-standard,
+      box-shadow $ag-motion-fast $ag-curve-standard;
+  }
+
+  .command-palette-input:focus {
+    border-color: rgba(168, 222, 255, 0.62);
+    background: rgba(146, 214, 255, 0.14);
+    box-shadow:
+      0 0 0 1px rgba(168, 222, 255, 0.2),
+      0 10px 18px -14px rgba(0, 0, 0, 0.72);
+  }
+
+  .command-palette-scroll {
+    min-height: 276px;
+  }
+
+  .command-palette-scroll viewport {
+    background: transparent;
+  }
+
+  .command-palette-list {
+    min-width: 0;
+  }
+
+  .command-palette-item {
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: rgba(255, 255, 255, 0.03);
+    padding: 8px 10px;
+    transition:
+      background-color $ag-motion-fast $ag-curve-standard,
+      border-color $ag-motion-fast $ag-curve-standard,
+      box-shadow $ag-motion-fast $ag-curve-standard;
+  }
+
+  .command-palette-item:hover {
+    background: rgba(132, 203, 255, 0.16);
+    border-color: rgba(170, 220, 255, 0.48);
+    box-shadow: 0 12px 18px -16px rgba(0, 0, 0, 0.72);
+  }
+
+  .command-palette-item-active,
+  .command-palette-item-active:hover {
+    background: linear-gradient(
+      148deg,
+      rgba(189, 214, 255, 0.34),
+      rgba(121, 174, 255, 0.26)
+    );
+    border-color: rgba(202, 230, 255, 0.74);
+    box-shadow:
+      0 0 0 1px rgba(196, 227, 255, 0.25),
+      0 0 16px rgba(121, 174, 255, 0.2);
+  }
+
+  .command-palette-item-title {
+    color: $ag-text-0;
+    font-size: 13.2px;
+    font-weight: 700;
+    letter-spacing: 0.16px;
+  }
+
+  .command-palette-item-subtitle {
+    color: $ag-text-1;
+    font-size: 11.8px;
+    letter-spacing: 0.12px;
+  }
+
+  .command-palette-item-category {
+    border-radius: $ag-radius-pill;
+    padding: 3px 9px;
+    background: rgba(146, 214, 255, 0.13);
+    border: 1px solid rgba(146, 214, 255, 0.34);
+    color: $ag-accent-primary;
+    font-size: 10.8px;
+    font-weight: 700;
+    letter-spacing: 0.22px;
+  }
+
+  .command-palette-empty {
+    color: $ag-text-1;
+    font-size: 12px;
+    padding: 10px 2px;
+  }
+
+  .command-palette-footer {
+    min-height: 24px;
+  }
+
+  .command-palette-status {
+    color: $ag-text-1;
+    font-size: 11.8px;
+    letter-spacing: 0.15px;
+  }
+
+  .command-palette-status-error {
+    color: rgba(255, 188, 188, 0.97);
+  }
+}
+
 window.ControlCenter {
   background: transparent;
 

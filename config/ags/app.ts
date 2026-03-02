@@ -3,6 +3,7 @@ import style from "./style.scss"
 import Bar from "./widget/Bar"
 import SpotifyPopup from "./widget/Spotify"
 import ControlCenter from "./widget/ControlCenter"
+import CommandPalette from "./widget/CommandPalette"
 
 print("LOADING app.ts")
 
@@ -12,5 +13,6 @@ app.start({
     app.get_monitors().map(Bar)
     SpotifyPopup()
     ControlCenter()
+    CommandPalette()
   },
 })
