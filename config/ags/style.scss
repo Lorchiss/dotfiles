@@ -1,35 +1,122 @@
 // https://gitlab.gnome.org/GNOME/gtk/-/blob/gtk-3-24/gtk/theme/Adwaita/_colors-public.scss
 @use "sass:map";
 
-// Identity: Arctic Solid
+// Identity: Arctic Aurora Unified v1
+$ag-surface-canvas: #08111d;
 $ag-surface-0: #0f1722;
 $ag-surface-1: #162131;
 $ag-surface-2: #1d2a3c;
-$ag-text-0: #e7edf5;
-$ag-text-1: rgba(205, 217, 232, 0.9);
+$ag-surface-elevated: rgba(255, 255, 255, 0.04);
+$ag-surface-elevated-strong: rgba(255, 255, 255, 0.08);
+$ag-surface-input: rgba(146, 214, 255, 0.08);
+
+$ag-text-primary: #e7edf5;
+$ag-text-secondary: rgba(205, 217, 232, 0.9);
+$ag-text-muted: rgba(177, 191, 210, 0.78);
+$ag-text-0: $ag-text-primary;
+$ag-text-1: $ag-text-secondary;
+
 $ag-accent-primary: rgba(146, 214, 255, 0.97);
 $ag-accent-secondary: rgba(152, 245, 224, 0.97);
 $ag-accent-tertiary: rgba(189, 214, 255, 0.97);
+
+$ag-border-subtle: rgba(255, 255, 255, 0.1);
 $ag-border-soft: rgba(255, 255, 255, 0.15);
 $ag-border-strong: rgba(157, 203, 244, 0.44);
-$ag-shadow: rgba(0, 0, 0, 0.55);
+$ag-border-focus: rgba(168, 222, 255, 0.62);
+
+$ag-shadow-color: rgba(0, 0, 0, 0.55);
+$ag-shadow: $ag-shadow-color;
+$ag-shadow-xs: 0 10px 16px -14px rgba(0, 0, 0, 0.7);
+$ag-shadow-sm: 0 12px 18px -16px rgba(0, 0, 0, 0.72);
+$ag-shadow-md: 0 14px 20px -14px rgba(0, 0, 0, 0.72);
+$ag-shadow-lg: 0 24px 42px -12px rgba(0, 0, 0, 0.68);
+$ag-shadow-focus-ring: 0 0 0 1px rgba(168, 222, 255, 0.2);
+
 $ag-popup-base: #0b121d;
 $ag-popup-border: rgba(170, 207, 238, 0.3);
-$ag-popup-shadow: 0 24px 42px -12px rgba(0, 0, 0, 0.68);
+$ag-popup-shadow: $ag-shadow-lg;
 
-$ag-accent-emerald-border: rgba(138, 242, 196, 0.44);
-$ag-accent-cyan-border: rgba(123, 230, 247, 0.44);
-$ag-accent-blue-border: rgba(121, 174, 255, 0.46);
-$ag-accent-amber-border: rgba(248, 197, 108, 0.48);
-$ag-accent-rose-border: rgba(245, 132, 161, 0.46);
-$ag-radius-chip: 14px;
-$ag-radius-control: 16px;
-$ag-radius-card: 20px;
+$ag-state-hover-bg: rgba(132, 203, 255, 0.2);
+$ag-state-hover-border: rgba(173, 221, 255, 0.58);
+$ag-state-active-bg: rgba(198, 228, 255, 0.22);
+$ag-state-active-border: rgba(170, 218, 255, 0.62);
+
+$ag-radius-xs: 10px;
+$ag-radius-sm: 12px;
+$ag-radius-md: 14px;
+$ag-radius-lg: 16px;
+$ag-radius-xl: 20px;
 $ag-radius-pill: 999px;
+$ag-radius-chip: $ag-radius-md;
+$ag-radius-control: $ag-radius-lg;
+$ag-radius-card: $ag-radius-xl;
+
+$ag-font-label-xs: 11.4px;
+$ag-font-label-sm: 11.8px;
+$ag-font-body-sm: 12px;
+$ag-font-body-md: 13px;
+$ag-font-body-lg: 14px;
+$ag-font-title-sm: 14px;
+$ag-font-title-md: 15px;
+$ag-font-title-lg: 16px;
+
 $ag-motion-fast: 120ms;
 $ag-motion-base: 180ms;
 $ag-motion-slow: 240ms;
 $ag-curve-standard: cubic-bezier(0.2, 0, 0, 1);
+
+$ag-accent-variants: (
+  emerald: (
+    border: rgba(138, 242, 196, 0.44),
+    text: rgba(211, 255, 240, 0.98),
+    tint: rgba(138, 242, 196, 0.2),
+    fill-start: rgba(138, 242, 196, 0.95),
+    fill-end: rgba(93, 227, 166, 0.95),
+  ),
+  cyan: (
+    border: rgba(123, 230, 247, 0.44),
+    text: rgba(218, 250, 255, 0.98),
+    tint: rgba(123, 230, 247, 0.2),
+    fill-start: rgba(123, 230, 247, 0.96),
+    fill-end: rgba(99, 195, 240, 0.95),
+  ),
+  blue: (
+    border: rgba(121, 174, 255, 0.46),
+    text: rgba(224, 236, 255, 0.98),
+    tint: rgba(121, 174, 255, 0.2),
+    fill-start: rgba(121, 174, 255, 0.96),
+    fill-end: rgba(91, 141, 238, 0.95),
+  ),
+  amber: (
+    border: rgba(248, 197, 108, 0.48),
+    text: rgba(255, 241, 214, 0.98),
+    tint: rgba(248, 197, 108, 0.22),
+    fill-start: rgba(248, 197, 108, 0.96),
+    fill-end: rgba(241, 162, 61, 0.95),
+  ),
+  rose: (
+    border: rgba(245, 132, 161, 0.46),
+    text: rgba(255, 225, 234, 0.98),
+    tint: rgba(245, 132, 161, 0.22),
+    fill-start: rgba(245, 132, 161, 0.96),
+    fill-end: rgba(233, 103, 141, 0.95),
+  ),
+);
+
+@function ag-accent($name, $token) {
+  $variant: map.get($ag-accent-variants, $name);
+  @if $variant == null {
+    @return null;
+  }
+  @return map.get($variant, $token);
+}
+
+$ag-accent-emerald-border: ag-accent(emerald, border);
+$ag-accent-cyan-border: ag-accent(cyan, border);
+$ag-accent-blue-border: ag-accent(blue, border);
+$ag-accent-amber-border: ag-accent(amber, border);
+$ag-accent-rose-border: ag-accent(rose, border);
 
 $fg-color: #{"@theme_fg_color"};
 $bg-color: #{"@theme_bg_color"};
@@ -37,11 +124,101 @@ $bg-color: #{"@theme_bg_color"};
 $radius-bar: $ag-radius-card;
 $bar-density: hero !default; // compact | balanced | hero
 
+@mixin ag-type(
+  $size,
+  $weight: 600,
+  $spacing: 0.2px,
+  $color: $ag-text-0
+) {
+  font-size: $size;
+  font-weight: $weight;
+  letter-spacing: $spacing;
+  color: $color;
+}
+
+@mixin ag-card-shell(
+  $radius: $ag-radius-card,
+  $bg: $ag-popup-base,
+  $border: $ag-popup-border,
+  $shadow: $ag-popup-shadow
+) {
+  border-radius: $radius;
+  background: $bg;
+  border: 1px solid $border;
+  box-shadow: $shadow;
+}
+
 @mixin popup-card-shell {
-  border-radius: $ag-radius-card;
-  background: $ag-popup-base;
-  border: 1px solid $ag-popup-border;
-  box-shadow: $ag-popup-shadow;
+  @include ag-card-shell();
+}
+
+@mixin ag-surface-subtle(
+  $radius: $ag-radius-sm,
+  $bg: $ag-surface-elevated,
+  $border: $ag-border-subtle
+) {
+  border-radius: $radius;
+  background: $bg;
+  border: 1px solid $border;
+}
+
+@mixin ag-interactive-control(
+  $bg: rgba(255, 255, 255, 0.05),
+  $border: rgba(210, 228, 245, 0.18),
+  $color: $ag-text-0,
+  $hover-bg: $ag-state-hover-bg,
+  $hover-border: $ag-state-hover-border,
+  $active-bg: $ag-state-active-bg,
+  $active-border: $ag-state-active-border
+) {
+  background: $bg;
+  border: 1px solid $border;
+  color: $color;
+  transition:
+    background-color $ag-motion-fast $ag-curve-standard,
+    border-color $ag-motion-fast $ag-curve-standard,
+    box-shadow $ag-motion-fast $ag-curve-standard;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+
+  &:hover {
+    background: $hover-bg;
+    border-color: $hover-border;
+    box-shadow:
+      $ag-shadow-md,
+      0 0 0 1px rgba(135, 216, 255, 0.22),
+      inset 0 1px 0 rgba(233, 245, 255, 0.14);
+  }
+
+  &:active,
+  &:checked {
+    background: $active-bg;
+    border-color: $active-border;
+    box-shadow:
+      inset 0 0 0 1px rgba(237, 247, 255, 0.2),
+      0 8px 16px -14px rgba(15, 45, 86, 0.72);
+  }
+
+  &:focus,
+  &:focus-visible {
+    border-color: $ag-border-focus;
+    box-shadow:
+      $ag-shadow-focus-ring,
+      inset 0 1px 0 rgba(233, 245, 255, 0.12);
+    outline: none;
+  }
+}
+
+@mixin ag-progress-track {
+  min-height: 8px;
+  border-radius: $ag-radius-pill;
+  background: rgba(255, 255, 255, 0.22);
+}
+
+@mixin ag-progress-fill($start: $ag-accent-primary, $end: $ag-accent-tertiary) {
+  min-height: 8px;
+  border-radius: $ag-radius-pill;
+  background: linear-gradient(90deg, $start, $end);
+  transition: all $ag-motion-slow $ag-curve-standard;
 }
 
 $bar-presets: (
@@ -108,29 +285,11 @@ $bar-padding-x: bar-size(bar-padding-x);
     box-shadow $ag-motion-base $ag-curve-standard;
 }
 
-.popup-accent-surface.spotify-accent-emerald,
-window.SpotifyPopup .spotifyPopupCardShell.spotify-accent-emerald {
-  border-color: $ag-accent-emerald-border;
-}
-
-.popup-accent-surface.spotify-accent-cyan,
-window.SpotifyPopup .spotifyPopupCardShell.spotify-accent-cyan {
-  border-color: $ag-accent-cyan-border;
-}
-
-.popup-accent-surface.spotify-accent-blue,
-window.SpotifyPopup .spotifyPopupCardShell.spotify-accent-blue {
-  border-color: $ag-accent-blue-border;
-}
-
-.popup-accent-surface.spotify-accent-amber,
-window.SpotifyPopup .spotifyPopupCardShell.spotify-accent-amber {
-  border-color: $ag-accent-amber-border;
-}
-
-.popup-accent-surface.spotify-accent-rose,
-window.SpotifyPopup .spotifyPopupCardShell.spotify-accent-rose {
-  border-color: $ag-accent-rose-border;
+@each $accent-name, $accent-token in $ag-accent-variants {
+  .popup-accent-surface.spotify-accent-#{$accent-name},
+  window.SpotifyPopup .spotifyPopupCardShell.spotify-accent-#{$accent-name} {
+    border-color: map.get($accent-token, border);
+  }
 }
 
 window.Bar {
