@@ -10,6 +10,11 @@ import {
   type AudioNode,
   type AudioState,
 } from "../../lib/audio"
+import { safeText } from "../../lib/text"
+import {
+  controlCenterInlineMessageClass,
+  controlCenterInlineMessageLabel,
+} from "../../lib/uiFeedback"
 
 type AudioSectionProps = {
   isActive: () => boolean
@@ -24,16 +29,35 @@ type AudioUiState = AudioState & {
 const AUDIO_POLL_MS = 2000
 const AUDIO_VOLUME_STEP = 5
 const AUDIO_INACTIVE_SKIP_TICKS = 12
+const AUDIO_MODULE = "CC_AUDIO"
+
+function audioText(value: unknown, fallback: string, field: string): string {
+  return safeText(value, fallback, AUDIO_MODULE, field)
+}
 
 function errorMessage(error: unknown): string {
-  if (error instanceof Error && error.message) return error.message
-  if (typeof error === "string" && error) return error
-  return "No se pudo completar la operación de audio"
+  if (error instanceof Error && error.message)
+    return audioText(
+      error.message,
+      "No se pudo completar la operación de audio",
+      "error",
+    )
+  if (typeof error === "string" && error)
+    return audioText(
+      error,
+      "No se pudo completar la operación de audio",
+      "error",
+    )
+  return audioText(
+    "No se pudo completar la operación de audio",
+    "No se pudo completar la operación de audio",
+    "error-fallback",
+  )
 }
 
 function shortNodeName(node: AudioNode): string {
   const parts = node.name.split(".")
-  return parts[parts.length - 1] || node.name
+  return audioText(parts[parts.length - 1] || node.name, "audio", "node-name")
 }
 
 function clampVolume(value: number): number {
@@ -125,16 +149,28 @@ export default function AudioSection({ isActive }: AudioSectionProps) {
   const runAction = async (label: string, action: () => Promise<void>) => {
     if (actionInFlight) return
     actionInFlight = true
-    message = `${label}...`
+    message = audioText(
+      `${label}...`,
+      "Procesando audio...",
+      "run-action-start",
+    )
     messageIsError = false
     forceRefresh = 1
 
     try {
       await action()
-      message = `${label}: OK`
+      message = audioText(
+        `${label}: OK`,
+        "Acción de audio: OK",
+        "run-action-ok",
+      )
       messageIsError = false
     } catch (error) {
-      message = `${label}: ${errorMessage(error)}`
+      message = audioText(
+        `${label}: ${errorMessage(error)}`,
+        "No se pudo completar la acción de audio",
+        "run-action-error",
+      )
       messageIsError = true
     } finally {
       actionInFlight = false
@@ -146,7 +182,11 @@ export default function AudioSection({ isActive }: AudioSectionProps) {
     try {
       await setSinkVolume(clampVolume(value))
     } catch {
-      message = "No se pudo ajustar el volumen"
+      message = audioText(
+        "No se pudo ajustar el volumen",
+        "No se pudo ajustar el volumen",
+        "set-volume-error",
+      )
       messageIsError = true
     }
   }
@@ -173,12 +213,22 @@ export default function AudioSection({ isActive }: AudioSectionProps) {
       })
       left.set_hexpand(true)
 
-      const title = new Gtk.Label({ label: shortNodeName(sink) })
+      const sinkName = audioText(shortNodeName(sink), "Salida", "sink-title")
+      const title = new Gtk.Label({ label: sinkName })
       setClasses(title, "cc-list-title")
       title.set_xalign(0)
 
+      const sinkState = audioText(
+        sink.state || "desconocido",
+        "desconocido",
+        "sink-state",
+      )
       const subtitle = new Gtk.Label({
-        label: `${sink.state || "desconocido"}${sink.isDefault ? " · Predeterminada" : ""}`,
+        label: audioText(
+          `${sinkState}${sink.isDefault ? " · Predeterminada" : ""}`,
+          "desconocido",
+          "sink-subtitle",
+        ),
       })
       setClasses(subtitle, "cc-list-subtitle")
       subtitle.set_xalign(0)
@@ -190,12 +240,23 @@ export default function AudioSection({ isActive }: AudioSectionProps) {
       setClasses(action, "cc-action-btn")
       action.set_sensitive(!snapshot.busy && !sink.isDefault)
       action.connect("clicked", () => {
-        void runAction(`Cambiar salida a ${shortNodeName(sink)}`, () =>
-          setDefaultSink(sink.name),
+        void runAction(
+          audioText(
+            `Cambiar salida a ${sinkName}`,
+            "Cambiar salida",
+            "sink-action-label",
+          ),
+          () => setDefaultSink(sink.name),
         )
       })
       action.set_child(
-        new Gtk.Label({ label: sink.isDefault ? "Activa" : "Usar" }),
+        new Gtk.Label({
+          label: audioText(
+            sink.isDefault ? "Activa" : "Usar",
+            "Usar",
+            "sink-action-button",
+          ),
+        }),
       )
 
       row.append(left)
@@ -226,12 +287,26 @@ export default function AudioSection({ isActive }: AudioSectionProps) {
       })
       left.set_hexpand(true)
 
-      const title = new Gtk.Label({ label: shortNodeName(source) })
+      const sourceName = audioText(
+        shortNodeName(source),
+        "Entrada",
+        "source-title",
+      )
+      const title = new Gtk.Label({ label: sourceName })
       setClasses(title, "cc-list-title")
       title.set_xalign(0)
 
+      const sourceState = audioText(
+        source.state || "desconocido",
+        "desconocido",
+        "source-state",
+      )
       const subtitle = new Gtk.Label({
-        label: `${source.state || "desconocido"}${source.isDefault ? " · Predeterminada" : ""}`,
+        label: audioText(
+          `${sourceState}${source.isDefault ? " · Predeterminada" : ""}`,
+          "desconocido",
+          "source-subtitle",
+        ),
       })
       setClasses(subtitle, "cc-list-subtitle")
       subtitle.set_xalign(0)
@@ -243,12 +318,23 @@ export default function AudioSection({ isActive }: AudioSectionProps) {
       setClasses(action, "cc-action-btn")
       action.set_sensitive(!snapshot.busy && !source.isDefault)
       action.connect("clicked", () => {
-        void runAction(`Cambiar entrada a ${shortNodeName(source)}`, () =>
-          setDefaultSource(source.name),
+        void runAction(
+          audioText(
+            `Cambiar entrada a ${sourceName}`,
+            "Cambiar entrada",
+            "source-action-label",
+          ),
+          () => setDefaultSource(source.name),
         )
       })
       action.set_child(
-        new Gtk.Label({ label: source.isDefault ? "Activa" : "Usar" }),
+        new Gtk.Label({
+          label: audioText(
+            source.isDefault ? "Activa" : "Usar",
+            "Usar",
+            "source-action-button",
+          ),
+        }),
       )
 
       row.append(left)
@@ -329,18 +415,23 @@ export default function AudioSection({ isActive }: AudioSectionProps) {
 
         <label
           class="cc-section-subtitle cc-audio-volume-label"
-          label={state((snapshot) => `${clampVolume(snapshot.volume)}%`)}
+          label={state((snapshot) =>
+            audioText(`${clampVolume(snapshot.volume)}%`, "0%", "volume-label"),
+          )}
         />
       </box>
 
       <label
         class={state((snapshot) =>
-          snapshot.messageIsError
-            ? "cc-inline-message cc-inline-message-error"
-            : "cc-inline-message cc-inline-message-success",
+          controlCenterInlineMessageClass(snapshot.messageIsError),
         )}
         label={state((snapshot) =>
-          snapshot.busy ? `⏳ ${snapshot.message}` : snapshot.message,
+          controlCenterInlineMessageLabel(
+            snapshot.message,
+            snapshot.busy,
+            AUDIO_MODULE,
+            "inline-message",
+          ),
         )}
         visible={state((snapshot) => Boolean(snapshot.message))}
         xalign={0}

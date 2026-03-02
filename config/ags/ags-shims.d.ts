@@ -39,6 +39,13 @@ declare module "ags/gtk4/jsx-runtime" {
   export const Fragment: any
 }
 
+declare module "gi://GLib" {
+  const GLib: {
+    getenv: (name: string) => string | null
+  }
+  export default GLib
+}
+
 declare namespace JSX {
   interface IntrinsicElements {
     [elemName: string]: any

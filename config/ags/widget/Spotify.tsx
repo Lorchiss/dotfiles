@@ -16,6 +16,7 @@ import {
   startSpotifyPkceLogin,
   toggleLike,
 } from "../lib/spotifyApi"
+import { safeText } from "../lib/text"
 
 type SpotifyState = {
   title: string
@@ -54,6 +55,7 @@ const LIKE_OVERRIDE_TTL_MS = 7000
 const AUTH_OVERRIDE_TTL_MS = 15_000
 const SHUFFLE_OVERRIDE_TTL_MS = 3_200
 const DEFAULT_ACCENT_CLASS = "spotify-accent-default"
+const SPOTIFY_MODULE = "SPOTIFY_POPUP"
 
 const EMPTY_STATE: SpotifyState = {
   title: "No hay reproducción",
@@ -93,6 +95,10 @@ let authOverrideUntil = 0
 
 let shuffleOverrideValue: boolean | null = null
 let shuffleOverrideUntil = 0
+
+function popupText(value: unknown, fallback: string, field: string): string {
+  return safeText(value, fallback, SPOTIFY_MODULE, field)
+}
 
 function marqueeText(text: string, tick: number, width: number) {
   const clean = text.trim()
@@ -248,8 +254,8 @@ function clearExpiredEphemeralState(trackId: string, now: number) {
 }
 
 function notifyUser(title: string, body: string) {
-  const cleanTitle = title.trim() || "Spotify"
-  const cleanBody = body.trim()
+  const cleanTitle = popupText(title, "Spotify", "notify-title")
+  const cleanBody = popupText(body, "", "notify-body")
   if (!cleanBody) return
 
   const command = `notify-send ${shellQuoted(cleanTitle)} ${shellQuoted(cleanBody)}`
@@ -257,7 +263,11 @@ function notifyUser(title: string, body: string) {
 }
 
 function buildPopupClass(state: SpotifyState) {
-  let className = `spotifyPopupCardShell spotify-layout-${POPUP_LAYOUT} ${state.accentClass || DEFAULT_ACCENT_CLASS}`
+  const accentClass =
+    popupText(state.accentClass, DEFAULT_ACCENT_CLASS, "accent-class")
+      .split(" ")
+      .find(Boolean) ?? DEFAULT_ACCENT_CLASS
+  let className = `spotifyPopupCardShell spotify-layout-${POPUP_LAYOUT} ${accentClass}`
   if (state.apiBusy) className += " spotify-api-busy"
   return className
 }
@@ -364,12 +374,16 @@ printf "%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s" "$title" "$artist" "$length" "$art" 
         apiAuthorized = authOverrideValue
       }
 
-      const apiMessage = currentManualMessage(now) || likeCacheMessage
+      const apiMessage = popupText(
+        currentManualMessage(now) || likeCacheMessage,
+        "",
+        "api-message",
+      )
 
       return {
-        title: titleRaw || "No hay reproducción",
-        artist: artistRaw,
-        status,
+        title: popupText(titleRaw, "No hay reproducción", "title"),
+        artist: popupText(artistRaw, "", "artist"),
+        status: popupText(status, "Stopped", "status"),
         totalSec,
         currentSec,
         artPath,
@@ -396,7 +410,7 @@ printf "%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s" "$title" "$artist" "$length" "$art" 
         apiAuthorized: fallbackAuthorized,
         liked: likeOverrideValue === true,
         apiBusy: apiBusyFlag,
-        apiMessage,
+        apiMessage: popupText(apiMessage, "", "api-message-fallback"),
         accentClass: DEFAULT_ACCENT_CLASS,
       }
     }
@@ -410,15 +424,27 @@ printf "%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s" "$title" "$artist" "$length" "$art" 
   const marqueeTick = createPoll(0, MARQUEE_TICK_MS, (prev) => prev + 1)
 
   const marqueeTitle = marqueeTick((tick) =>
-    marqueeText(
-      state().title || "No hay reproducción",
-      tick,
-      POPUP_TITLE_WIDTH,
+    popupText(
+      marqueeText(
+        popupText(state().title, "No hay reproducción", "title-marquee-source"),
+        tick,
+        POPUP_TITLE_WIDTH,
+      ),
+      "Spotify",
+      "title-marquee",
     ),
   )
 
   const marqueeArtist = marqueeTick((tick) =>
-    marqueeText(state().artist || "", tick, POPUP_ARTIST_WIDTH),
+    popupText(
+      marqueeText(
+        popupText(state().artist, "", "artist-marquee-source"),
+        tick,
+        POPUP_ARTIST_WIDTH,
+      ),
+      "",
+      "artist-marquee",
+    ),
   )
 
   const withApiAction = async (runner: () => Promise<void>) => {
@@ -630,7 +656,9 @@ printf "%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s" "$title" "$artist" "$length" "$art" 
               xalign={0}
             />
             <label
-              label={state((s) => statusLabel(s.status))}
+              label={state((s) =>
+                popupText(statusLabel(s.status), "Detenido", "status-label"),
+              )}
               cssName="spotifyPopupStatus"
               class="spotifyPopupStatus"
             />
@@ -670,14 +698,18 @@ printf "%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s" "$title" "$artist" "$length" "$art" 
             />
             <box>
               <label
-                label={state((s) => formatTime(s.currentSec))}
+                label={state((s) =>
+                  popupText(formatTime(s.currentSec), "0:00", "time-current"),
+                )}
                 cssName="spotifyProgressTime"
                 class="spotifyProgressTime"
                 hexpand
                 xalign={0}
               />
               <label
-                label={state((s) => formatTime(s.totalSec))}
+                label={state((s) =>
+                  popupText(formatTime(s.totalSec), "0:00", "time-total"),
+                )}
                 cssName="spotifyProgressTime"
                 class="spotifyProgressTime"
                 xalign={1}
@@ -735,7 +767,15 @@ printf "%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s" "$title" "$artist" "$length" "$art" 
               sensitive={state((s) => !s.apiBusy && !!s.trackId)}
               onClicked={toggleLikeTrack}
             >
-              <label label={state((s) => (s.liked ? "❤ Like" : "♡ Like"))} />
+              <label
+                label={state((s) =>
+                  popupText(
+                    s.liked ? "❤ Like" : "♡ Like",
+                    "Like",
+                    "like-label",
+                  ),
+                )}
+              />
             </button>
 
             <button

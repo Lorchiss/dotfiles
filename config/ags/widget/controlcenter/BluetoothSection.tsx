@@ -12,6 +12,11 @@ import {
   type BluetoothDevice,
   type BluetoothState,
 } from "../../lib/bluetooth"
+import { safeText } from "../../lib/text"
+import {
+  controlCenterInlineMessageClass,
+  controlCenterInlineMessageLabel,
+} from "../../lib/uiFeedback"
 
 type BluetoothSectionProps = {
   isActive: () => boolean
@@ -25,11 +30,34 @@ type BluetoothUiState = BluetoothState & {
 
 const BLUETOOTH_POLL_MS = 2000
 const BLUETOOTH_INACTIVE_SKIP_TICKS = 15
+const BLUETOOTH_MODULE = "CC_BLUETOOTH"
+
+function bluetoothText(
+  value: unknown,
+  fallback: string,
+  field: string,
+): string {
+  return safeText(value, fallback, BLUETOOTH_MODULE, field)
+}
 
 function errorMessage(error: unknown): string {
-  if (error instanceof Error && error.message) return error.message
-  if (typeof error === "string" && error) return error
-  return "No se pudo completar la operación Bluetooth"
+  if (error instanceof Error && error.message)
+    return bluetoothText(
+      error.message,
+      "No se pudo completar la operación Bluetooth",
+      "error",
+    )
+  if (typeof error === "string" && error)
+    return bluetoothText(
+      error,
+      "No se pudo completar la operación Bluetooth",
+      "error",
+    )
+  return bluetoothText(
+    "No se pudo completar la operación Bluetooth",
+    "No se pudo completar la operación Bluetooth",
+    "error-fallback",
+  )
 }
 
 function clearChildren(container: any) {
@@ -111,16 +139,28 @@ export default function BluetoothSection({ isActive }: BluetoothSectionProps) {
   const runAction = async (label: string, action: () => Promise<void>) => {
     if (actionInFlight) return
     actionInFlight = true
-    message = `${label}...`
+    message = bluetoothText(
+      `${label}...`,
+      "Procesando acción Bluetooth...",
+      "run-action-start",
+    )
     messageIsError = false
     forceRefresh = 1
 
     try {
       await action()
-      message = `${label}: OK`
+      message = bluetoothText(
+        `${label}: OK`,
+        "Acción Bluetooth: OK",
+        "run-action-ok",
+      )
       messageIsError = false
     } catch (error) {
-      message = `${label}: ${errorMessage(error)}`
+      message = bluetoothText(
+        `${label}: ${errorMessage(error)}`,
+        "No se pudo completar la acción Bluetooth",
+        "run-action-error",
+      )
       messageIsError = true
     } finally {
       actionInFlight = false
@@ -131,7 +171,11 @@ export default function BluetoothSection({ isActive }: BluetoothSectionProps) {
   const togglePower = async () => {
     const current = readState()
     await runAction(
-      current.powered ? "Apagar Bluetooth" : "Encender Bluetooth",
+      bluetoothText(
+        current.powered ? "Apagar Bluetooth" : "Encender Bluetooth",
+        "Bluetooth",
+        "toggle-power",
+      ),
       () => setBluetoothPower(!current.powered),
     )
   }
@@ -139,27 +183,53 @@ export default function BluetoothSection({ isActive }: BluetoothSectionProps) {
   const toggleScan = async () => {
     const current = readState()
     await runAction(
-      current.discovering ? "Detener escaneo" : "Iniciar escaneo",
+      bluetoothText(
+        current.discovering ? "Detener escaneo" : "Iniciar escaneo",
+        "Escaneo Bluetooth",
+        "toggle-scan",
+      ),
       () => setBluetoothScan(!current.discovering),
     )
   }
 
   const pairDevice = async (device: BluetoothDevice) =>
-    runAction(`Emparejar ${device.name}`, () => pairAndTrustDevice(device.mac))
+    runAction(
+      bluetoothText(
+        `Emparejar ${device.name}`,
+        "Emparejar dispositivo",
+        "pair-device",
+      ),
+      () => pairAndTrustDevice(device.mac),
+    )
 
   const connectDevice = async (device: BluetoothDevice) =>
-    runAction(`Conectar ${device.name}`, () =>
-      connectBluetoothDevice(device.mac),
+    runAction(
+      bluetoothText(
+        `Conectar ${device.name}`,
+        "Conectar dispositivo",
+        "connect-device",
+      ),
+      () => connectBluetoothDevice(device.mac),
     )
 
   const disconnectDevice = async (device: BluetoothDevice) =>
-    runAction(`Desconectar ${device.name}`, () =>
-      disconnectBluetoothDevice(device.mac),
+    runAction(
+      bluetoothText(
+        `Desconectar ${device.name}`,
+        "Desconectar dispositivo",
+        "disconnect-device",
+      ),
+      () => disconnectBluetoothDevice(device.mac),
     )
 
   const removeDevice = async (device: BluetoothDevice) =>
-    runAction(`Eliminar ${device.name}`, () =>
-      removeBluetoothDevice(device.mac),
+    runAction(
+      bluetoothText(
+        `Eliminar ${device.name}`,
+        "Eliminar dispositivo",
+        "remove-device",
+      ),
+      () => removeBluetoothDevice(device.mac),
     )
 
   const renderDevices = (container: any, snapshot: BluetoothUiState) => {
@@ -184,12 +254,17 @@ export default function BluetoothSection({ isActive }: BluetoothSectionProps) {
       })
       left.set_hexpand(true)
 
-      const title = new Gtk.Label({ label: device.name })
+      const deviceName = bluetoothText(device.name, "Bluetooth", "device-name")
+      const title = new Gtk.Label({ label: deviceName })
       setClasses(title, "cc-list-title")
       title.set_xalign(0)
 
       const subtitle = new Gtk.Label({
-        label: `${device.mac} · ${device.connected ? "Conectado" : device.paired ? "Emparejado" : "Disponible"}`,
+        label: bluetoothText(
+          `${device.mac} · ${device.connected ? "Conectado" : device.paired ? "Emparejado" : "Disponible"}`,
+          "Sin estado",
+          "device-subtitle",
+        ),
       })
       setClasses(subtitle, "cc-list-subtitle")
       subtitle.set_xalign(0)
@@ -207,7 +282,11 @@ export default function BluetoothSection({ isActive }: BluetoothSectionProps) {
       pairButton.connect("clicked", () => {
         void pairDevice(device)
       })
-      pairButton.set_child(new Gtk.Label({ label: "Pair+Trust" }))
+      pairButton.set_child(
+        new Gtk.Label({
+          label: bluetoothText("Pair+Trust", "Pair+Trust", "pair-label"),
+        }),
+      )
 
       const connectButton = new Gtk.Button()
       setClasses(connectButton, "cc-action-btn")
@@ -220,7 +299,11 @@ export default function BluetoothSection({ isActive }: BluetoothSectionProps) {
       connectButton.connect("clicked", () => {
         void connectDevice(device)
       })
-      connectButton.set_child(new Gtk.Label({ label: "Conectar" }))
+      connectButton.set_child(
+        new Gtk.Label({
+          label: bluetoothText("Conectar", "Conectar", "connect-label"),
+        }),
+      )
 
       const disconnectButton = new Gtk.Button()
       setClasses(disconnectButton, "cc-action-btn")
@@ -230,7 +313,15 @@ export default function BluetoothSection({ isActive }: BluetoothSectionProps) {
       disconnectButton.connect("clicked", () => {
         void disconnectDevice(device)
       })
-      disconnectButton.set_child(new Gtk.Label({ label: "Desconectar" }))
+      disconnectButton.set_child(
+        new Gtk.Label({
+          label: bluetoothText(
+            "Desconectar",
+            "Desconectar",
+            "disconnect-label",
+          ),
+        }),
+      )
 
       const removeButton = new Gtk.Button()
       setClasses(removeButton, "cc-action-btn cc-danger-btn")
@@ -238,7 +329,11 @@ export default function BluetoothSection({ isActive }: BluetoothSectionProps) {
       removeButton.connect("clicked", () => {
         void removeDevice(device)
       })
-      removeButton.set_child(new Gtk.Label({ label: "Eliminar" }))
+      removeButton.set_child(
+        new Gtk.Label({
+          label: bluetoothText("Eliminar", "Eliminar", "remove-label"),
+        }),
+      )
 
       actions.append(pairButton)
       actions.append(connectButton)
@@ -262,11 +357,15 @@ export default function BluetoothSection({ isActive }: BluetoothSectionProps) {
         <label
           class="cc-section-subtle"
           label={state((snapshot) =>
-            snapshot.controllerName
-              ? `${snapshot.controllerName} · ${snapshot.powered ? "Activo" : "Apagado"}`
-              : snapshot.powered
-                ? "Activo"
-                : "Apagado",
+            bluetoothText(
+              snapshot.controllerName
+                ? `${snapshot.controllerName} · ${snapshot.powered ? "Activo" : "Apagado"}`
+                : snapshot.powered
+                  ? "Activo"
+                  : "Apagado",
+              "Bluetooth",
+              "controller-subtitle",
+            ),
           )}
         />
       </box>
@@ -279,7 +378,11 @@ export default function BluetoothSection({ isActive }: BluetoothSectionProps) {
         >
           <label
             label={state((snapshot) =>
-              snapshot.powered ? "Apagar Bluetooth" : "Encender Bluetooth",
+              bluetoothText(
+                snapshot.powered ? "Apagar Bluetooth" : "Encender Bluetooth",
+                "Bluetooth",
+                "power-label",
+              ),
             )}
           />
         </button>
@@ -291,7 +394,11 @@ export default function BluetoothSection({ isActive }: BluetoothSectionProps) {
         >
           <label
             label={state((snapshot) =>
-              snapshot.discovering ? "Detener escaneo" : "Escanear",
+              bluetoothText(
+                snapshot.discovering ? "Detener escaneo" : "Escanear",
+                "Escanear",
+                "scan-label",
+              ),
             )}
           />
         </button>
@@ -309,12 +416,15 @@ export default function BluetoothSection({ isActive }: BluetoothSectionProps) {
 
       <label
         class={state((snapshot) =>
-          snapshot.messageIsError
-            ? "cc-inline-message cc-inline-message-error"
-            : "cc-inline-message cc-inline-message-success",
+          controlCenterInlineMessageClass(snapshot.messageIsError),
         )}
         label={state((snapshot) =>
-          snapshot.busy ? `⏳ ${snapshot.message}` : snapshot.message,
+          controlCenterInlineMessageLabel(
+            snapshot.message,
+            snapshot.busy,
+            BLUETOOTH_MODULE,
+            "inline-message",
+          ),
         )}
         visible={state((snapshot) => Boolean(snapshot.message))}
         xalign={0}

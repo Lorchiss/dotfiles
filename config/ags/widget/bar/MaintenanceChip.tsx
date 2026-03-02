@@ -1,6 +1,8 @@
 import { Gtk } from "ags/gtk4"
 import { barSystemStateBinding } from "../../lib/barSignals"
 import { createMusicAccentClassState } from "../../lib/musicAccent"
+import { safeText } from "../../lib/text"
+import { barLog } from "../../lib/barObservability"
 
 function maintenanceStatus(updates: number | null, news: number) {
   if (news > 0) return "warn"
@@ -8,7 +10,12 @@ function maintenanceStatus(updates: number | null, news: number) {
   return "ok"
 }
 
+function countText(value: unknown): string {
+  return safeText(value, "--", "MAINTENANCE", "counter")
+}
+
 export default function MaintenanceChip() {
+  barLog("MAINTENANCE", "mounting MaintenanceChip")
   const accentClass = createMusicAccentClassState()
   const system = barSystemStateBinding()
 
@@ -18,10 +25,17 @@ export default function MaintenanceChip() {
         (s) =>
           `maintenance-chip maintenance-${maintenanceStatus(s.updatesCount, s.archNewsUnreadCount)}`,
       )}
-      tooltipText={system(
-        (s) =>
-          `Updates ${s.updatesCount ?? "--"} · AUR ${s.updatesAurCount ?? "--"} · News ${s.archNewsUnreadCount}`,
-      )}
+      tooltipText={system((s) => {
+        const updates = countText(s.updatesCount)
+        const aur = countText(s.updatesAurCount)
+        const news = countText(s.archNewsUnreadCount)
+        return safeText(
+          `Updates ${updates} · AUR ${aur} · News ${news}`,
+          "Updates -- · AUR -- · News --",
+          "MAINTENANCE",
+          "chip-tooltip",
+        )
+      })}
     >
       <box class="maintenance-content" spacing={6}>
         <label class="maintenance-label" label="●" />
@@ -29,10 +43,17 @@ export default function MaintenanceChip() {
           <label class="chip-caption" label="Maintenance" xalign={0} />
           <label
             class="maintenance-inline"
-            label={system(
-              (s) =>
-                `U${s.updatesCount ?? "--"} A${s.updatesAurCount ?? "--"} N${s.archNewsUnreadCount}`,
-            )}
+            label={system((s) => {
+              const updates = countText(s.updatesCount)
+              const aur = countText(s.updatesAurCount)
+              const news = countText(s.archNewsUnreadCount)
+              return safeText(
+                `U${updates} A${aur} N${news}`,
+                "U-- A-- N--",
+                "MAINTENANCE",
+                "chip-inline",
+              )
+            })}
             xalign={0}
           />
         </box>
@@ -62,7 +83,7 @@ export default function MaintenanceChip() {
             />
             <label
               class="maintenance-popover-value"
-              label={system((s) => `${s.updatesCount ?? "--"}`)}
+              label={system((s) => countText(s.updatesCount))}
             />
           </box>
 
@@ -75,7 +96,7 @@ export default function MaintenanceChip() {
             />
             <label
               class="maintenance-popover-value"
-              label={system((s) => `${s.updatesAurCount ?? "--"}`)}
+              label={system((s) => countText(s.updatesAurCount))}
             />
           </box>
 
@@ -88,7 +109,7 @@ export default function MaintenanceChip() {
             />
             <label
               class="maintenance-popover-value"
-              label={system((s) => `${s.archNewsUnreadCount}`)}
+              label={system((s) => countText(s.archNewsUnreadCount))}
             />
           </box>
         </box>

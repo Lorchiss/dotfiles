@@ -7,6 +7,8 @@ import {
   switchWorkspaceOnMonitor,
   workspaceChipState,
 } from "../../lib/hypr"
+import { safeText } from "../../lib/text"
+import { barLog } from "../../lib/barObservability"
 
 const HYPR_POLL_MS = 900
 
@@ -54,7 +56,8 @@ function laneWidget(lane: MonitorLaneState) {
   })
   setClasses(laneBox, "workspace-monitor-lane")
 
-  const badge = new Gtk.Label({ label: String(lane.monitorLabel) })
+  const monitorText = safeText(lane.monitorLabel, "--", "WS", "monitor-label")
+  const badge = new Gtk.Label({ label: monitorText })
   setClasses(badge, "workspace-monitor-badge")
 
   const chipsBox = new Gtk.Box({
@@ -63,10 +66,11 @@ function laneWidget(lane: MonitorLaneState) {
   })
 
   for (const workspaceId of lane.workspaceIds) {
+    const workspaceText = safeText(workspaceId, "--", "WS", "workspace-id")
     const button = new Gtk.Button()
     setClasses(button, chipClassFor(lane, workspaceId))
     button.set_tooltip_text(
-      `Monitor ${lane.monitorLabel} · Workspace ${workspaceId}`,
+      `Monitor ${monitorText} · Workspace ${workspaceText}`,
     )
     button.connect("clicked", () => {
       void switchWorkspaceOnMonitor(lane.monitorName, workspaceId).catch(
@@ -74,7 +78,7 @@ function laneWidget(lane: MonitorLaneState) {
       )
     })
 
-    const label = new Gtk.Label({ label: `${workspaceId}` })
+    const label = new Gtk.Label({ label: workspaceText })
     button.set_child(label)
     chipsBox.append(button)
   }
@@ -85,6 +89,7 @@ function laneWidget(lane: MonitorLaneState) {
 }
 
 export default function WorkspaceLanes() {
+  barLog("WS", "mounting WorkspaceLanes")
   const lanes = createPoll<HyprWorkspaceState>(
     { lanes: [], hasError: false },
     HYPR_POLL_MS,

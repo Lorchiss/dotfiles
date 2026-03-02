@@ -1,6 +1,8 @@
 import { execAsync } from "ags/process"
 import { barSystemStateBinding } from "../../lib/barSignals"
 import SpotifyButton from "./SpotifyButton"
+import { safeText } from "../../lib/text"
+import { barLog } from "../../lib/barObservability"
 
 function resolveAlertLabel(
   batteryAvailable: boolean,
@@ -28,7 +30,13 @@ function resolveAlertLabel(
   return ""
 }
 
-export default function PrimaryStatusBlock() {
+type PrimaryStatusBlockProps = {
+  spotifyEnabled?: boolean
+}
+
+export default function PrimaryStatusBlock({
+  spotifyEnabled = true,
+}: PrimaryStatusBlockProps) {
   const system = barSystemStateBinding()
 
   return system((s) => {
@@ -40,6 +48,7 @@ export default function PrimaryStatusBlock() {
     )
 
     if (alertLabel) {
+      barLog("SPOTIFY", "critical alert active; rendering alert block")
       return (
         <button
           class="primary-status-alert"
@@ -50,12 +59,25 @@ export default function PrimaryStatusBlock() {
         >
           <box spacing={6}>
             <label label="⚠" />
-            <label label={alertLabel} />
+            <label
+              label={safeText(
+                alertLabel,
+                "ALERTA",
+                "SPOTIFY",
+                "primary-alert-label",
+              )}
+            />
           </box>
         </button>
       )
     }
 
+    if (!spotifyEnabled) {
+      barLog("SPOTIFY", "spotify module disabled; skipping SpotifyButton")
+      return null
+    }
+
+    barLog("SPOTIFY", "rendering SpotifyButton")
     return <SpotifyButton />
   })
 }

@@ -12,6 +12,11 @@ import {
   type PowerProfile,
   type SystemState,
 } from "../../lib/system"
+import { safeText } from "../../lib/text"
+import {
+  controlCenterInlineMessageClass,
+  controlCenterInlineMessageLabel,
+} from "../../lib/uiFeedback"
 
 type SystemSectionProps = {
   isActive: () => boolean
@@ -25,11 +30,30 @@ type SystemUiState = SystemState & {
 
 const SYSTEM_POLL_MS = 4000
 const SYSTEM_INACTIVE_SKIP_TICKS = 8
+const SYSTEM_MODULE = "CC_SYSTEM"
+
+function systemText(value: unknown, fallback: string, field: string): string {
+  return safeText(value, fallback, SYSTEM_MODULE, field)
+}
 
 function errorMessage(error: unknown): string {
-  if (error instanceof Error && error.message) return error.message
-  if (typeof error === "string" && error) return error
-  return "No se pudo completar la acción de sistema"
+  if (error instanceof Error && error.message)
+    return systemText(
+      error.message,
+      "No se pudo completar la acción de sistema",
+      "error",
+    )
+  if (typeof error === "string" && error)
+    return systemText(
+      error,
+      "No se pudo completar la acción de sistema",
+      "error",
+    )
+  return systemText(
+    "No se pudo completar la acción de sistema",
+    "No se pudo completar la acción de sistema",
+    "error-fallback",
+  )
 }
 
 function profileLabel(profile: PowerProfile): string {
@@ -51,7 +75,7 @@ function formatCount(value: number | null): string {
 }
 
 function shortTitle(title: string): string {
-  const clean = title.trim()
+  const clean = systemText(title, "", "arch-news-title-raw")
   if (!clean) return "Arch News: sin datos"
   if (clean.length <= 64) return `Arch News: ${clean}`
   return `Arch News: ${clean.slice(0, 61)}...`
@@ -109,12 +133,20 @@ function updatesSubtitle(snapshot: SystemUiState): string {
     : "n/d"
   const total = formatCount(snapshot.updatesCount)
 
-  return `Oficial: ${official} · AUR: ${aur} · Total: ${total}`
+  return systemText(
+    `Oficial: ${official} · AUR: ${aur} · Total: ${total}`,
+    "Oficial: -- · AUR: -- · Total: --",
+    "updates-subtitle",
+  )
 }
 
 function archNewsSubtitle(snapshot: SystemUiState): string {
   const unread = snapshot.archNewsUnreadCount > 0 ? " · Nuevo" : ""
-  return `${shortTitle(snapshot.archNewsTitle)}${unread}`
+  return systemText(
+    `${shortTitle(snapshot.archNewsTitle)}${unread}`,
+    "Arch News: sin datos",
+    "arch-news-subtitle",
+  )
 }
 
 export default function SystemSection({ isActive }: SystemSectionProps) {
@@ -166,17 +198,29 @@ export default function SystemSection({ isActive }: SystemSectionProps) {
   ): Promise<boolean> => {
     if (busy) return false
     busy = true
-    message = `${label}...`
+    message = systemText(
+      `${label}...`,
+      "Procesando acción de sistema...",
+      "run-action-start",
+    )
     messageIsError = false
     forceRefresh = 1
 
     try {
       await action()
-      message = `${label}: OK`
+      message = systemText(
+        `${label}: OK`,
+        "Acción de sistema: OK",
+        "run-action-ok",
+      )
       messageIsError = false
       return true
     } catch (error) {
-      message = `${label}: ${errorMessage(error)}`
+      message = systemText(
+        `${label}: ${errorMessage(error)}`,
+        "No se pudo completar la acción de sistema",
+        "run-action-error",
+      )
       messageIsError = true
       return false
     } finally {
@@ -188,19 +232,30 @@ export default function SystemSection({ isActive }: SystemSectionProps) {
   const refreshUpdates = async () => {
     if (busy) return
     busy = true
-    message = "Refrescar actualizaciones..."
+    message = systemText(
+      "Refrescar actualizaciones...",
+      "Refrescando actualizaciones...",
+      "refresh-start",
+    )
     messageIsError = false
     forceRefresh = 1
 
     try {
       const updates = await refreshSystemUpdatesCache()
-      message =
+      message = systemText(
         updates === null
           ? "Refrescar actualizaciones: sin datos"
-          : `Refrescar actualizaciones: total ${updates}`
+          : `Refrescar actualizaciones: total ${updates}`,
+        "Refrescar actualizaciones: sin datos",
+        "refresh-result",
+      )
       messageIsError = false
     } catch (error) {
-      message = `Refrescar actualizaciones: ${errorMessage(error)}`
+      message = systemText(
+        `Refrescar actualizaciones: ${errorMessage(error)}`,
+        "No se pudo refrescar actualizaciones",
+        "refresh-error",
+      )
       messageIsError = true
     } finally {
       busy = false
@@ -233,12 +288,24 @@ export default function SystemSection({ isActive }: SystemSectionProps) {
         <label class="cc-list-title" label="Actualizaciones" xalign={0} />
         <label
           class="cc-list-subtitle"
-          label={state((snapshot) => updatesSubtitle(snapshot))}
+          label={state((snapshot) =>
+            systemText(
+              updatesSubtitle(snapshot),
+              "--",
+              "updates-subtitle-label",
+            ),
+          )}
           xalign={0}
         />
         <label
           class="cc-list-subtitle"
-          label={state((snapshot) => archNewsSubtitle(snapshot))}
+          label={state((snapshot) =>
+            systemText(
+              archNewsSubtitle(snapshot),
+              "Arch News: sin datos",
+              "arch-news-label",
+            ),
+          )}
           xalign={0}
         />
 
@@ -282,9 +349,13 @@ export default function SystemSection({ isActive }: SystemSectionProps) {
         <label
           class="cc-list-subtitle"
           label={state((snapshot) =>
-            snapshot.snapperAvailable
-              ? "Snapper disponible (config root)"
-              : snapshot.snapperStatusReason,
+            systemText(
+              snapshot.snapperAvailable
+                ? "Snapper disponible (config root)"
+                : snapshot.snapperStatusReason,
+              "Snapper no disponible",
+              "snapper-status",
+            ),
           )}
           xalign={0}
         />
@@ -311,12 +382,24 @@ export default function SystemSection({ isActive }: SystemSectionProps) {
         <label class="cc-list-title" label="Batería" xalign={0} />
         <label
           class="cc-list-subtitle"
-          label={state((snapshot) => batteryPrimaryLine(snapshot))}
+          label={state((snapshot) =>
+            systemText(
+              batteryPrimaryLine(snapshot),
+              "No disponible (desktop)",
+              "battery-primary",
+            ),
+          )}
           xalign={0}
         />
         <label
           class="cc-list-subtitle"
-          label={state((snapshot) => batterySecondaryLine(snapshot))}
+          label={state((snapshot) =>
+            systemText(
+              batterySecondaryLine(snapshot),
+              "Sin datos de batería",
+              "battery-secondary",
+            ),
+          )}
           xalign={0}
         />
       </box>
@@ -331,9 +414,13 @@ export default function SystemSection({ isActive }: SystemSectionProps) {
         <label
           class="cc-list-subtitle"
           label={state((snapshot) =>
-            snapshot.maxTemperatureC === null
-              ? "--"
-              : `${snapshot.maxTemperatureC.toFixed(1)}°C`,
+            systemText(
+              snapshot.maxTemperatureC === null
+                ? "--"
+                : `${snapshot.maxTemperatureC.toFixed(1)}°C`,
+              "--",
+              "max-temperature",
+            ),
           )}
         />
       </box>
@@ -347,9 +434,13 @@ export default function SystemSection({ isActive }: SystemSectionProps) {
         <label
           class="cc-list-subtitle"
           label={state((snapshot) =>
-            snapshot.powerProfileAvailable
-              ? `Actual: ${profileLabel(snapshot.powerProfile)}`
-              : "powerprofilesctl no disponible",
+            systemText(
+              snapshot.powerProfileAvailable
+                ? `Actual: ${profileLabel(snapshot.powerProfile)}`
+                : "powerprofilesctl no disponible",
+              "Perfil de energía no disponible",
+              "power-profile",
+            ),
           )}
           xalign={0}
         />
@@ -399,12 +490,15 @@ export default function SystemSection({ isActive }: SystemSectionProps) {
 
       <label
         class={state((snapshot) =>
-          snapshot.messageIsError
-            ? "cc-inline-message cc-inline-message-error"
-            : "cc-inline-message cc-inline-message-success",
+          controlCenterInlineMessageClass(snapshot.messageIsError),
         )}
         label={state((snapshot) =>
-          snapshot.busy ? `⏳ ${snapshot.message}` : snapshot.message,
+          controlCenterInlineMessageLabel(
+            snapshot.message,
+            snapshot.busy,
+            SYSTEM_MODULE,
+            "inline-message",
+          ),
         )}
         visible={state((snapshot) => Boolean(snapshot.message))}
         xalign={0}

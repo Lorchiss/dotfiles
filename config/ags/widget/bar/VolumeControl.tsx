@@ -2,6 +2,8 @@ import { Gtk } from "ags/gtk4"
 import { execAsync } from "ags/process"
 import { createPoll } from "ags/time"
 import { createMusicAccentClassState } from "../../lib/musicAccent"
+import { safeText } from "../../lib/text"
+import { barLog } from "../../lib/barObservability"
 
 const volumeStep = 5
 const keepVolumePopoverOpen = false
@@ -13,7 +15,9 @@ type VolumeState = {
 }
 
 function clampVolume(value: number) {
-  return Math.max(0, Math.min(100, value))
+  const numeric = Number(value)
+  if (!Number.isFinite(numeric)) return 0
+  return Math.max(0, Math.min(100, numeric))
 }
 
 function volumeIconName(value: number, muted: boolean) {
@@ -24,6 +28,7 @@ function volumeIconName(value: number, muted: boolean) {
 }
 
 export default function VolumeControl() {
+  barLog("AUDIO", "mounting VolumeControl")
   let syncingScale = false
   let ignoreStateSyncUntil = 0
   const accentClass = createMusicAccentClassState()
@@ -103,7 +108,14 @@ printf "%s\n%s" "$vol" "$mute"
         />
         <label
           class="vol-trigger-label"
-          label={state((s) => `VOL ${clampVolume(s.value)}%`)}
+          label={state((s) =>
+            safeText(
+              `VOL ${clampVolume(s.value)}%`,
+              "VOL --",
+              "AUDIO",
+              "trigger-label",
+            ),
+          )}
         />
       </box>
 
@@ -141,7 +153,14 @@ printf "%s\n%s" "$vol" "$mute"
               />
               <label
                 class="vol-percent-label"
-                label={state((s) => `${clampVolume(s.value)}%`)}
+                label={state((s) =>
+                  safeText(
+                    `${clampVolume(s.value)}%`,
+                    "--%",
+                    "AUDIO",
+                    "popover-percent",
+                  ),
+                )}
               />
             </box>
 

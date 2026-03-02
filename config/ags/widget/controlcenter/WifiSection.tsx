@@ -10,6 +10,11 @@ import {
   type WifiState,
   wifiNeedsPassword,
 } from "../../lib/network"
+import { safeText } from "../../lib/text"
+import {
+  controlCenterInlineMessageClass,
+  controlCenterInlineMessageLabel,
+} from "../../lib/uiFeedback"
 
 type WifiSectionProps = {
   isActive: () => boolean
@@ -24,11 +29,26 @@ type WifiUiState = WifiState & {
 
 const WIFI_POLL_MS = 1500
 const WIFI_INACTIVE_SKIP_TICKS = 16
+const WIFI_MODULE = "CC_WIFI"
+
+function wifiText(value: unknown, fallback: string, field: string): string {
+  return safeText(value, fallback, WIFI_MODULE, field)
+}
 
 function errorMessage(error: unknown): string {
-  if (error instanceof Error && error.message) return error.message
-  if (typeof error === "string" && error) return error
-  return "No se pudo completar la operación Wi-Fi"
+  if (error instanceof Error && error.message)
+    return wifiText(
+      error.message,
+      "No se pudo completar la operación Wi-Fi",
+      "error",
+    )
+  if (typeof error === "string" && error)
+    return wifiText(error, "No se pudo completar la operación Wi-Fi", "error")
+  return wifiText(
+    "No se pudo completar la operación Wi-Fi",
+    "No se pudo completar la operación Wi-Fi",
+    "error-fallback",
+  )
 }
 
 function clearChildren(container: any) {
@@ -131,17 +151,25 @@ export default function WifiSection({ isActive }: WifiSectionProps) {
   ): Promise<boolean> => {
     if (actionInFlight) return false
     actionInFlight = true
-    message = `${label}...`
+    message = wifiText(
+      `${label}...`,
+      "Procesando acción Wi-Fi...",
+      "run-action-start",
+    )
     messageIsError = false
     forceNetworkRefresh = 1
 
     try {
       await action()
-      message = `${label}: OK`
+      message = wifiText(`${label}: OK`, "Acción Wi-Fi: OK", "run-action-ok")
       messageIsError = false
       return true
     } catch (error) {
-      message = `${label}: ${errorMessage(error)}`
+      message = wifiText(
+        `${label}: ${errorMessage(error)}`,
+        "No se pudo completar la acción Wi-Fi",
+        "run-action-error",
+      )
       messageIsError = true
       return false
     } finally {
@@ -152,18 +180,35 @@ export default function WifiSection({ isActive }: WifiSectionProps) {
 
   const connectToNetwork = async (network: WifiNetwork) => {
     const current = readState()
+    const networkName = wifiText(
+      network.displayName,
+      "Red Wi-Fi",
+      "network-name",
+    )
     if (network.inUse) {
-      message = `${network.displayName} ya está conectada`
+      message = wifiText(
+        `${networkName} ya está conectada`,
+        "Red ya conectada",
+        "already-connected",
+      )
       messageIsError = false
       return
     }
     if (!network.ssid) {
-      message = "Red oculta: usa nmtui para configuración avanzada"
+      message = wifiText(
+        "Red oculta: usa nmtui para configuración avanzada",
+        "Red oculta: usa nmtui",
+        "hidden-network",
+      )
       messageIsError = true
       return
     }
     if (!current.primaryInterface) {
-      message = "No hay interfaz Wi-Fi disponible"
+      message = wifiText(
+        "No hay interfaz Wi-Fi disponible",
+        "No hay interfaz Wi-Fi disponible",
+        "missing-interface",
+      )
       messageIsError = true
       return
     }
@@ -171,24 +216,38 @@ export default function WifiSection({ isActive }: WifiSectionProps) {
       if (passwordTarget !== network.ssid) {
         passwordTarget = network.ssid
         wifiPassword = ""
-        message = `Ingresa la contraseña para ${network.displayName}`
+        message = wifiText(
+          `Ingresa la contraseña para ${networkName}`,
+          "Ingresa la contraseña de la red",
+          "password-required",
+        )
         messageIsError = false
         return
       }
 
       if (!wifiPassword.trim()) {
-        message = `Ingresa la contraseña para ${network.displayName}`
+        message = wifiText(
+          `Ingresa la contraseña para ${networkName}`,
+          "Ingresa la contraseña de la red",
+          "password-empty",
+        )
         messageIsError = false
         return
       }
     }
 
-    const success = await runAction(`Conectar ${network.displayName}`, () =>
-      connectWifiNetwork(
-        network.ssid,
-        current.primaryInterface,
-        wifiNeedsPassword(network) ? wifiPassword : undefined,
+    const success = await runAction(
+      wifiText(
+        `Conectar ${networkName}`,
+        "Conectar red Wi-Fi",
+        "connect-network",
       ),
+      () =>
+        connectWifiNetwork(
+          network.ssid,
+          current.primaryInterface,
+          wifiNeedsPassword(network) ? wifiPassword : undefined,
+        ),
     )
     if (success) {
       passwordTarget = ""
@@ -209,7 +268,11 @@ export default function WifiSection({ isActive }: WifiSectionProps) {
     const current = readState()
     passwordTarget = ""
     await runAction(
-      current.radioEnabled ? "Apagar Wi-Fi" : "Encender Wi-Fi",
+      wifiText(
+        current.radioEnabled ? "Apagar Wi-Fi" : "Encender Wi-Fi",
+        "Wi-Fi",
+        "toggle-radio",
+      ),
       () => setWifiRadio(!current.radioEnabled),
     )
   }
@@ -242,6 +305,19 @@ export default function WifiSection({ isActive }: WifiSectionProps) {
     }
 
     for (const network of snapshot.networks) {
+      const networkName = wifiText(
+        network.displayName,
+        "Red Wi-Fi",
+        "network-title",
+      )
+      const networkSecurity = wifiText(
+        network.security || "Abierta",
+        "Abierta",
+        "network-security",
+      )
+      const networkBars = network.bars
+        ? wifiText(network.bars, "", "network-bars")
+        : ""
       const row = new Gtk.Box({
         orientation: Gtk.Orientation.VERTICAL,
         spacing: 8,
@@ -255,12 +331,16 @@ export default function WifiSection({ isActive }: WifiSectionProps) {
       })
       left.set_hexpand(true)
 
-      const title = new Gtk.Label({ label: network.displayName })
+      const title = new Gtk.Label({ label: networkName })
       setClasses(title, "cc-list-title")
       title.set_xalign(0)
 
       const subtitle = new Gtk.Label({
-        label: `${network.signal}% · ${network.security || "Abierta"} ${network.bars ? `· ${network.bars}` : ""}`,
+        label: wifiText(
+          `${network.signal}% · ${networkSecurity} ${networkBars ? `· ${networkBars}` : ""}`,
+          "Sin datos de señal",
+          "network-subtitle",
+        ),
       })
       setClasses(subtitle, "cc-list-subtitle")
       subtitle.set_xalign(0)
@@ -277,7 +357,13 @@ export default function WifiSection({ isActive }: WifiSectionProps) {
         void connectToNetwork(network)
       })
       action.set_child(
-        new Gtk.Label({ label: network.inUse ? "Conectada" : "Conectar" }),
+        new Gtk.Label({
+          label: wifiText(
+            network.inUse ? "Conectada" : "Conectar",
+            "Conectar",
+            "network-action-label",
+          ),
+        }),
       )
 
       topRow.append(left)
@@ -289,7 +375,11 @@ export default function WifiSection({ isActive }: WifiSectionProps) {
         setClasses(passwordRow, "cc-inline-auth-row")
 
         const passwordEntry = new Gtk.Entry({
-          placeholder_text: `Contraseña para ${network.displayName}`,
+          placeholder_text: wifiText(
+            `Contraseña para ${networkName}`,
+            "Contraseña de la red",
+            "password-placeholder",
+          ),
           visibility: false,
         })
         passwordEntry.set_text(wifiPassword)
@@ -336,9 +426,13 @@ export default function WifiSection({ isActive }: WifiSectionProps) {
         <label
           class="cc-section-subtle"
           label={state((snapshot) =>
-            snapshot.currentConnection
-              ? `Conectado: ${snapshot.currentConnection}`
-              : "Sin conexión activa",
+            wifiText(
+              snapshot.currentConnection
+                ? `Conectado: ${snapshot.currentConnection}`
+                : "Sin conexión activa",
+              "Sin conexión activa",
+              "connection-subtitle",
+            ),
           )}
         />
       </box>
@@ -351,7 +445,11 @@ export default function WifiSection({ isActive }: WifiSectionProps) {
         >
           <label
             label={state((snapshot) =>
-              snapshot.radioEnabled ? "Apagar Wi-Fi" : "Encender Wi-Fi",
+              wifiText(
+                snapshot.radioEnabled ? "Apagar Wi-Fi" : "Encender Wi-Fi",
+                "Wi-Fi",
+                "radio-label",
+              ),
             )}
           />
         </button>
@@ -382,12 +480,15 @@ export default function WifiSection({ isActive }: WifiSectionProps) {
 
       <label
         class={state((snapshot) =>
-          snapshot.messageIsError
-            ? "cc-inline-message cc-inline-message-error"
-            : "cc-inline-message cc-inline-message-success",
+          controlCenterInlineMessageClass(snapshot.messageIsError),
         )}
         label={state((snapshot) =>
-          snapshot.busy ? `⏳ ${snapshot.message}` : snapshot.message,
+          controlCenterInlineMessageLabel(
+            snapshot.message,
+            snapshot.busy,
+            WIFI_MODULE,
+            "inline-message",
+          ),
         )}
         visible={state((snapshot) => Boolean(snapshot.message))}
         xalign={0}

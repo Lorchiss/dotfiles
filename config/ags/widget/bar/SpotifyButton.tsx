@@ -1,14 +1,24 @@
 import { execAsync } from "ags/process"
 import { createPoll } from "ags/time"
 import { openSpotifyApp } from "../../lib/spotify"
+import { safeText } from "../../lib/text"
+import { barLog } from "../../lib/barObservability"
 
 const MARQUEE_TICK_MS = 140
 const CHIP_TITLE_WIDTH = 16
+const SPOTIFY_FALLBACK = "Spotify"
 
 let lastClickMs = 0
 
+function sanitizeChipText(value: unknown, fallback = SPOTIFY_FALLBACK): string {
+  const cleaned = safeText(value, fallback, "SPOTIFY", "chip-text")
+  if (!cleaned)
+    return safeText(fallback, SPOTIFY_FALLBACK, "SPOTIFY", "chip-text-fallback")
+  return cleaned
+}
+
 function marqueeText(text: string, tick: number, width: number) {
-  const clean = text.trim()
+  const clean = sanitizeChipText(text, "")
   if (!clean) return ""
 
   const chars = Array.from(clean)
@@ -30,12 +40,13 @@ function marqueeText(text: string, tick: number, width: number) {
 }
 
 export default function SpotifyButton() {
+  barLog("SPOTIFY", "mounting SpotifyButton")
   const track = createPoll("", 2000, async () => {
     try {
       const out = await execAsync(
         `playerctl -p spotify metadata --format '{{title}}' 2>/dev/null || echo ''`,
       )
-      return out.trim()
+      return sanitizeChipText(out, "")
     } catch {
       return ""
     }
@@ -44,9 +55,12 @@ export default function SpotifyButton() {
   const marqueeTick = createPoll(0, MARQUEE_TICK_MS, (prev) => prev + 1)
 
   const title = marqueeTick((tick) => {
-    const current = track()
-    if (!current) return "Spotify"
-    return marqueeText(current, tick, CHIP_TITLE_WIDTH)
+    const current = sanitizeChipText(track(), "")
+    if (!current) return SPOTIFY_FALLBACK
+    return sanitizeChipText(
+      marqueeText(current, tick, CHIP_TITLE_WIDTH),
+      SPOTIFY_FALLBACK,
+    )
   })
 
   const playing = createPoll(false, 2000, async () => {
@@ -54,7 +68,8 @@ export default function SpotifyButton() {
       const out = await execAsync(
         `playerctl -p spotify status 2>/dev/null || echo ''`,
       )
-      return out.trim() === "Playing"
+      const status = sanitizeChipText(out, "")
+      return status.trim() === "Playing"
     } catch {
       return false
     }

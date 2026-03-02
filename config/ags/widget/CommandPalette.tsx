@@ -10,6 +10,7 @@ import {
   registerOverlayWindow,
 } from "../lib/overlayOrchestrator"
 import { openInTerminal } from "../lib/terminal"
+import { safeText } from "../lib/text"
 import { COMMAND_PALETTE_UI } from "../lib/uiTokens"
 
 type PaletteAction = {
@@ -30,6 +31,25 @@ const SMOKE_SCRIPT_CANDIDATES = [
   "$HOME/.dotfiles/bootstrap/ags-smoke.sh",
   "$HOME/Desktop/dev/dotfiles/bootstrap/ags-smoke.sh",
 ]
+const COMMAND_PALETTE_MODULE = "COMMAND_PALETTE"
+
+function paletteText(value: unknown, fallback: string, field: string): string {
+  return safeText(value, fallback, COMMAND_PALETTE_MODULE, field)
+}
+
+function paletteActionText(
+  action: PaletteAction,
+  value: unknown,
+  fallback: string,
+  field: string,
+): string {
+  return safeText(
+    value,
+    fallback,
+    `${COMMAND_PALETTE_MODULE}:${action.id}`,
+    field,
+  )
+}
 
 function normalizeText(value: string): string {
   return value
@@ -65,8 +85,8 @@ function normalizeErrorMessage(error: unknown): string {
 }
 
 async function notify(title: string, body: string, urgency = "normal") {
-  const cleanTitle = title.trim() || "Command Palette"
-  const cleanBody = body.trim()
+  const cleanTitle = paletteText(title, "Command Palette", "notify-title")
+  const cleanBody = paletteText(body, "", "notify-body")
   if (!cleanBody) return
 
   const command = `notify-send -u ${shellQuote(urgency)} ${shellQuote(cleanTitle)} ${shellQuote(cleanBody)}`
@@ -411,7 +431,7 @@ export default function CommandPalette() {
 
   const setStatus = (message: string, isError: boolean) => {
     if (!statusRef) return
-    statusRef.set_label?.(message)
+    statusRef.set_label?.(paletteText(message, "", "status-message"))
     setClasses(
       statusRef,
       isError
@@ -445,6 +465,24 @@ export default function CommandPalette() {
 
     for (let i = 0; i < filteredActions.length; i++) {
       const action = filteredActions[i]
+      const actionTitle = paletteActionText(
+        action,
+        action.title,
+        "Acción",
+        "title",
+      )
+      const actionSubtitle = paletteActionText(
+        action,
+        action.subtitle,
+        "",
+        "subtitle",
+      )
+      const actionCategory = paletteActionText(
+        action,
+        action.category,
+        "Sistema",
+        "category",
+      )
       const button = new Gtk.Button({
         halign: Gtk.Align.FILL,
         hexpand: true,
@@ -459,18 +497,18 @@ export default function CommandPalette() {
       })
       left.set_hexpand(true)
 
-      const title = new Gtk.Label({ label: action.title })
+      const title = new Gtk.Label({ label: actionTitle })
       title.set_xalign(0)
       setClasses(title, "command-palette-item-title")
 
-      const subtitle = new Gtk.Label({ label: action.subtitle })
+      const subtitle = new Gtk.Label({ label: actionSubtitle })
       subtitle.set_xalign(0)
       setClasses(subtitle, "command-palette-item-subtitle")
 
       left.append(title)
       left.append(subtitle)
 
-      const category = new Gtk.Label({ label: action.category })
+      const category = new Gtk.Label({ label: actionCategory })
       setClasses(category, "command-palette-item-category")
 
       row.append(left)
@@ -517,7 +555,22 @@ export default function CommandPalette() {
       await action.run()
     } catch (error) {
       const detail = normalizeErrorMessage(error)
-      await notify("Command Palette", `${action.title}: ${detail}`, "critical")
+      const actionTitle = paletteActionText(
+        action,
+        action.title,
+        "Acción",
+        "title",
+      )
+      const detailText = paletteText(
+        detail,
+        "No se pudo completar la acción",
+        "error-detail",
+      )
+      await notify(
+        "Command Palette",
+        `${actionTitle}: ${detailText}`,
+        "critical",
+      )
     }
   }
 
@@ -673,7 +726,7 @@ export default function CommandPalette() {
                 "Buscar acción (terminal, spotify, lock, logs, update, smoke...)",
               )
               entry.connect("changed", () => {
-                query = String(entry.get_text?.() ?? "")
+                query = paletteText(entry.get_text?.() ?? "", "", "query-input")
                 refreshFilter()
               })
               entry.connect("activate", () => {
@@ -685,12 +738,12 @@ export default function CommandPalette() {
           <Gtk.ScrolledWindow
             class="command-palette-scroll"
             vexpand
+            heightRequest={COMMAND_PALETTE_UI.minListHeight}
             $={(scroll: any) => {
               scroll.set_policy?.(
                 Gtk.PolicyType.NEVER,
                 Gtk.PolicyType.AUTOMATIC,
               )
-              scroll.set_min_content_height?.(COMMAND_PALETTE_UI.minListHeight)
             }}
           >
             <box

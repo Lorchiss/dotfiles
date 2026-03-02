@@ -5,6 +5,11 @@ import {
   sessionActionLabel,
   type SessionAction,
 } from "../../lib/session"
+import { safeText } from "../../lib/text"
+import {
+  controlCenterInlineMessageClass,
+  controlCenterInlineMessageLabel,
+} from "../../lib/uiFeedback"
 
 type SessionUiState = {
   confirmAction: SessionAction | null
@@ -49,11 +54,30 @@ const SESSION_ACTION_ROWS = [
   SESSION_ACTIONS.slice(0, 2),
   SESSION_ACTIONS.slice(2, 4),
 ]
+const SESSION_MODULE = "CC_SESSION"
+
+function sessionText(value: unknown, fallback: string, field: string): string {
+  return safeText(value, fallback, SESSION_MODULE, field)
+}
 
 function errorMessage(error: unknown): string {
-  if (error instanceof Error && error.message) return error.message
-  if (typeof error === "string" && error) return error
-  return "No se pudo completar la acción de sesión"
+  if (error instanceof Error && error.message)
+    return sessionText(
+      error.message,
+      "No se pudo completar la acción de sesión",
+      "error",
+    )
+  if (typeof error === "string" && error)
+    return sessionText(
+      error,
+      "No se pudo completar la acción de sesión",
+      "error",
+    )
+  return sessionText(
+    "No se pudo completar la acción de sesión",
+    "No se pudo completar la acción de sesión",
+    "error-fallback",
+  )
 }
 
 function isDangerousAction(action: SessionAction): boolean {
@@ -114,19 +138,36 @@ export default function SessionSection() {
   const executeConfirmedAction = async () => {
     if (!confirmAction || busy) return
     const action = confirmAction
+    const actionLabel = sessionText(
+      sessionActionLabel(action),
+      "acción",
+      "action-label",
+    )
 
     busy = true
-    message = `Ejecutando ${sessionActionLabel(action)}...`
+    message = sessionText(
+      `Ejecutando ${actionLabel}...`,
+      "Ejecutando acción...",
+      "execute-start",
+    )
     messageIsError = false
 
     try {
       await executeSessionAction(action)
-      message = `${sessionActionLabel(action)} ejecutado`
+      message = sessionText(
+        `${actionLabel} ejecutado`,
+        "Acción ejecutada",
+        "execute-ok",
+      )
       messageIsError = false
       confirmAction = null
       confirmStartedAt = 0
     } catch (error) {
-      message = `${sessionActionLabel(action)}: ${errorMessage(error)}`
+      message = sessionText(
+        `${actionLabel}: ${errorMessage(error)}`,
+        "No se pudo completar la acción de sesión",
+        "execute-error",
+      )
       messageIsError = true
     } finally {
       busy = false
@@ -200,7 +241,11 @@ export default function SessionSection() {
                   />
                   <label
                     class="cc-session-tile-title"
-                    label={sessionActionLabel(item.action)}
+                    label={sessionText(
+                      sessionActionLabel(item.action),
+                      "Acción",
+                      `tile-title-${item.action}`,
+                    )}
                     xalign={0.5}
                     visible={state(
                       (snapshot) => snapshot.confirmAction !== item.action,
@@ -223,12 +268,15 @@ export default function SessionSection() {
 
       <label
         class={state((snapshot) =>
-          snapshot.messageIsError
-            ? "cc-inline-message cc-inline-message-error"
-            : "cc-inline-message cc-inline-message-success",
+          controlCenterInlineMessageClass(snapshot.messageIsError),
         )}
         label={state((snapshot) =>
-          snapshot.busy ? `⏳ ${snapshot.message}` : snapshot.message,
+          controlCenterInlineMessageLabel(
+            snapshot.message,
+            snapshot.busy,
+            SESSION_MODULE,
+            "inline-message",
+          ),
         )}
         visible={state((snapshot) => Boolean(snapshot.message))}
         xalign={0}
