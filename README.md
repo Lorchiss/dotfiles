@@ -205,6 +205,61 @@ El smoke test:
 - abre/cierra popup de Spotify
 - falla (`exit 1`) si detecta `JS ERROR`, `TypeError`, `Traceback`, `CRITICAL` o `ERROR` en logs recientes
 
+## QA dual obligatorio (Runtime + Visual)
+
+Comando único de aprobación:
+
+```bash
+bash bootstrap/qa.sh
+```
+
+Gates obligatorios:
+
+- `Runtime QA` (`bootstrap/qa-runtime.sh`):
+  - valida `ags.service` activo y estable
+  - ejecuta `bootstrap/ags-smoke.sh` (compatibilidad mantenida)
+  - marca FAIL ante `JS ERROR`, `TypeError`, `Traceback`, `CRITICAL`, errores Sass/compilación o restart loop
+- `Visual/UX QA` (`bootstrap/qa-visual.sh`):
+  - bloquea forbidden strings (`[object`, `undefined`, `null`, `instance wrapper`, `native@`)
+  - valida constraints de layout/hierarchy (máx 6 bloques, truncación, métricas agrupadas, foco único)
+  - valida policy de popups (prioridad, offsets dinámicos, binding multi-monitor)
+  - valida legibilidad básica (contraste dark + tamaño tipográfico mínimo)
+
+Criterio de aprobación:
+
+- `PASS` solo si Runtime PASS **y** Visual PASS.
+- Si uno falla, el estado final es `FAIL` y se bloquea aprobación.
+
+Evidencia por corrida:
+
+- Carpeta: `/tmp/ags-qa/<timestamp>/`
+- Reporte consolidado: `qa-report.txt`
+- Runtime:
+  - `runtime/runtime.summary`
+  - `runtime/runtime.failures`
+  - `runtime/runtime.journal.log`
+- Visual:
+  - `visual/visual.summary`
+  - `visual/visual.failures`
+  - `visual/visual.details.log`
+
+Ejemplo PASS (resumen):
+
+```text
+[qa] runtime-qa PASS
+[qa] visual-qa PASS
+[qa] final status: PASS
+```
+
+Ejemplo FAIL (resumen):
+
+```text
+[qa] runtime-qa PASS
+[qa] visual-qa FAIL
+[qa]   P0 forbidden-activewindow-strings: Metadata de ventana activa contiene strings prohibidos
+[qa] final status: FAIL
+```
+
 ## Recuperación rápida de `ags.service`
 
 Si ves `start-limit-hit`, ejecuta:
