@@ -10,10 +10,35 @@ type ActiveWindowState = {
 
 const ACTIVE_WINDOW_POLL_MS = 1200
 const TITLE_MAX_CHARS = 38
+const DEBUG_LEAK_MARKERS = [
+  "accessor {",
+  "[object instance wrapper",
+  "giname:gtk.",
+  "jsobj@0x",
+  "native@0x",
+]
+
+function normalizeText(value: unknown): string {
+  if (typeof value !== "string") return ""
+  return value.replace(/\s+/g, " ").trim()
+}
+
+function removeDebugLeak(text: string): string {
+  const lowered = text.toLowerCase()
+  let end = text.length
+
+  for (const marker of DEBUG_LEAK_MARKERS) {
+    const index = lowered.indexOf(marker)
+    if (index >= 0 && index < end) end = index
+  }
+
+  return text.slice(0, end).trim()
+}
 
 function safeText(value: unknown): string {
-  if (typeof value !== "string") return ""
-  return value.trim()
+  const normalized = normalizeText(value)
+  if (!normalized) return ""
+  return removeDebugLeak(normalized)
 }
 
 function parseWorkspaceId(value: unknown): number | null {
