@@ -525,6 +525,10 @@ $ag-bar-obs-bg: rgba($aa-pr-white, 0.05);
 $ag-bar-obs-border: rgba($aa-pr-frost-200, 0.26);
 $ag-bar-obs-warn-bg: rgba(248, 197, 108, 0.12);
 $ag-bar-obs-warn-border: rgba(248, 197, 108, 0.44);
+$ag-bar-health-bg: rgba($aa-pr-white, 0.05);
+$ag-bar-health-border: rgba($aa-pr-frost-200, 0.24);
+$ag-bar-maintenance-bg: rgba($aa-pr-white, 0.05);
+$ag-bar-maintenance-border: rgba($aa-pr-frost-200, 0.24);
 
 // Component tokens: Spotify popup
 $ag-spotify-card-padding: $ag-space-16;
@@ -681,6 +685,27 @@ window.Bar {
     border-radius: $ag-radius-chip;
   }
 
+  .work-context-block {
+    min-width: 0;
+    padding: $ag-space-4 $ag-space-8;
+    border-radius: $ag-radius-chip;
+    background: rgba($aa-pr-white, 0.03);
+  }
+
+  .primary-status-zone {
+    min-width: 0;
+  }
+
+  .right-controls-zone {
+    min-width: 0;
+  }
+
+  .quick-controls-cluster {
+    padding: $ag-space-3 $ag-space-5;
+    border-radius: $ag-radius-chip;
+    background: rgba($aa-pr-white, 0.03);
+  }
+
   label {
     @include ag-type($ag-font-body-md, 600, 0.42px, $ag-text-0);
   }
@@ -742,8 +767,7 @@ window.Bar {
     background: $ag-bar-workspace-active-bg;
     border-color: $ag-bar-workspace-active-border;
     color: $ag-text-inverse;
-    box-shadow: $ag-shadow-workspace-active;
-    animation: wsPulse 2200ms 1;
+    box-shadow: inset 0 0 0 1px rgba($aa-pr-frost-200, 0.22);
   }
 
   .workspace-chip-active.workspace-chip-unfocused {
@@ -770,14 +794,11 @@ window.Bar {
   }
 
   .active-window-chip {
-    min-width: 260px;
-    max-width: 420px;
-    padding: $ag-space-5 $ag-space-10;
-    @include ag-surface-subtle(
-      $ag-radius-sm-tight,
-      $ag-bar-active-window-bg,
-      $ag-bar-active-window-border
-    );
+    min-width: 220px;
+    max-width: 390px;
+    padding: $ag-space-4 $ag-space-8;
+    border-radius: $ag-radius-sm-tight;
+    background: $ag-bar-active-window-bg;
   }
 
   .active-window-app {
@@ -793,54 +814,37 @@ window.Bar {
     @include ag-type($ag-font-body-sm-soft, 600, 0.15px, $ag-text-0);
   }
 
-  .critical-alert-chip {
+  .primary-status-alert {
     padding: $ag-space-6 $ag-space-10;
     border-radius: $ag-radius-sm-tight;
     @include ag-type($ag-font-label-sm, 700, 0.2px, $ag-text-danger-strong);
-  }
-
-  .critical-alert-chip.critical-alert-critical {
     background: $ag-bar-critical-bg;
     border: 1px solid $ag-bar-critical-border;
-    box-shadow: 0 0 0 1px rgba($aa-pr-danger-300, 0.2);
   }
 
-  .critical-alert-chip.critical-alert-warn {
-    background: $ag-bar-critical-warn-bg;
-    border: 1px solid $ag-bar-critical-warn-border;
-    color: rgba(255, 235, 198, 0.98);
+  .primary-status-alert:hover {
+    background: rgba($aa-pr-danger-300, 0.2);
   }
 
-  .mode-chip {
-    border-radius: $ag-radius-pill;
-    padding: $ag-space-5 $ag-space-10;
-    @include ag-type($ag-font-label-sm, 700, 0.18px, $ag-text-1);
-    background: $ag-bar-mode-bg;
-    border: 1px solid $ag-bar-mode-border;
+  .primary-status-alert:active {
+    background: rgba($aa-pr-danger-300, 0.24);
   }
 
-  .mode-chip.mode-chip-eco {
-    background: $ag-bar-mode-eco-bg;
-    border-color: $ag-bar-mode-eco-border;
-    color: $ag-text-success;
+  .primary-status-alert label {
+    color: $ag-text-danger-strong;
   }
 
-  .mode-chip.mode-chip-work {
-    color: $ag-text-connection;
+  .compact-cc-chip {
+    padding: $ag-space-5 $ag-space-9;
+    min-width: 58px;
   }
 
-  .mode-chip.mode-chip-boost {
-    background: $ag-bar-mode-boost-bg;
-    border-color: $ag-bar-mode-boost-border;
-    color: rgba(255, 238, 210, 0.98);
-  }
-
-  .observability-chip > button {
+  .health-chip > button {
     padding: $ag-space-6 $ag-space-10;
-    min-width: 190px;
+    min-width: 148px;
     @include ag-interactive-control(
-      $bg: $ag-bar-obs-bg,
-      $border: $ag-bar-obs-border,
+      $bg: $ag-bar-health-bg,
+      $border: $ag-bar-health-border,
       $hover-bg: $ag-bar-volume-hover-bg,
       $hover-border: $ag-bar-volume-hover-border,
       $active-bg: $ag-bar-volume-active-bg,
@@ -848,56 +852,93 @@ window.Bar {
     );
   }
 
-  .observability-chip.obs-warn > button {
+  .health-dot {
+    @include ag-type($ag-font-body-md, 700, 0.1px, $ag-text-1);
+  }
+
+  .health-dot-ok {
+    color: rgba($aa-pr-frost-250, 0.9);
+  }
+
+  .health-dot-warn {
+    color: rgba(248, 197, 108, 0.96);
+  }
+
+  .health-dot-critical {
+    color: rgba($aa-pr-danger-300, 0.96);
+  }
+
+  .health-inline {
+    @include ag-type($ag-font-label-sm, 700, 0.14px, $ag-text-0);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .maintenance-chip > button {
+    padding: $ag-space-6 $ag-space-10;
+    min-width: 150px;
+    @include ag-interactive-control(
+      $bg: $ag-bar-maintenance-bg,
+      $border: $ag-bar-maintenance-border,
+      $hover-bg: $ag-bar-volume-hover-bg,
+      $hover-border: $ag-bar-volume-hover-border,
+      $active-bg: $ag-bar-volume-active-bg,
+      $active-border: $ag-bar-volume-active-border
+    );
+  }
+
+  .maintenance-chip.maintenance-warn > button {
     background: $ag-bar-obs-warn-bg;
     border-color: $ag-bar-obs-warn-border;
   }
 
-  .observability-inline {
+  .maintenance-label {
+    @include ag-type($ag-font-label-sm, 700, 0.16px, $ag-accent-tertiary);
+  }
+
+  .maintenance-inline {
     @include ag-type($ag-font-label-sm, 600, 0.1px, $ag-text-1);
     font-variant-numeric: tabular-nums;
   }
 
-  .observability-badge {
-    border-radius: $ag-radius-pill;
-    padding: $ag-space-2 $ag-space-6;
-    background: rgba($aa-pr-frost-300, 0.16);
-    border: 1px solid rgba($aa-pr-frost-300, 0.3);
-    @include ag-type($ag-font-label-2xs, 700, 0.14px, $ag-accent-primary);
-  }
-
-  .obs-popover-shell {
+  .health-popover-shell,
+  .maintenance-popover-shell {
     padding: 0;
   }
 
-  .obs-popover-shell contents {
+  .health-popover-shell contents,
+  .maintenance-popover-shell contents {
     background: transparent;
     border: none;
     box-shadow: none;
     padding: 0;
   }
 
-  .obs-popover-card {
+  .health-popover-card,
+  .maintenance-popover-card {
     min-width: 320px;
     padding: $ag-space-12;
   }
 
-  .obs-popover-heading {
+  .health-popover-heading,
+  .maintenance-popover-heading {
     @include ag-type($ag-font-title-sm, 700, 0.2px, $ag-text-0);
   }
 
-  .obs-popover-row {
+  .health-popover-row,
+  .maintenance-popover-row {
     padding: $ag-space-6 $ag-space-8;
     border-radius: $ag-radius-sm-tight;
     background: rgba($aa-pr-white, 0.03);
     border: 1px solid rgba($aa-pr-white, 0.1);
   }
 
-  .obs-popover-key {
+  .health-popover-key,
+  .maintenance-popover-key {
     @include ag-type($ag-font-label-sm, 700, 0.14px, $ag-text-1);
   }
 
-  .obs-popover-value {
+  .health-popover-value,
+  .maintenance-popover-value {
     @include ag-type($ag-font-label-sm, 600, 0.14px, $ag-text-0);
     font-variant-numeric: tabular-nums;
   }
@@ -941,7 +982,7 @@ window.Bar {
   .spotify-chip.spotify-active {
     background: $ag-bar-spotify-active-bg;
     border-color: $ag-bar-spotify-active-border;
-    box-shadow: $ag-shadow-spotify-active;
+    box-shadow: none;
   }
 
   .clock-chip > button {
