@@ -507,28 +507,20 @@ $ag-bar-volume-mute-hover-border: rgba($aa-pr-frost-300, 0.4);
 $ag-bar-volume-mute-active-bg: rgba($aa-pr-frost-300, 0.18);
 $ag-bar-volume-mute-active-border: rgba($aa-pr-frost-300, 0.5);
 $ag-bar-volume-popover-padding: $ag-space-16;
+$ag-bar-block-height: 34px;
+$ag-bar-block-radius: $ag-radius-sm-tight;
 $ag-bar-active-window-bg: rgba($aa-pr-white, 0.05);
 $ag-bar-active-window-border: rgba($aa-pr-frost-200, 0.24);
 $ag-bar-active-window-app-bg: rgba($aa-pr-frost-300, 0.14);
 $ag-bar-active-window-app-border: rgba($aa-pr-frost-300, 0.34);
 $ag-bar-critical-bg: rgba($aa-pr-danger-300, 0.14);
 $ag-bar-critical-border: rgba($aa-pr-danger-300, 0.56);
-$ag-bar-critical-warn-bg: rgba(248, 197, 108, 0.14);
-$ag-bar-critical-warn-border: rgba(248, 197, 108, 0.52);
-$ag-bar-mode-bg: rgba($aa-pr-frost-200, 0.12);
-$ag-bar-mode-border: rgba($aa-pr-frost-200, 0.36);
-$ag-bar-mode-eco-bg: rgba($aa-pr-frost-250, 0.16);
-$ag-bar-mode-eco-border: rgba($aa-pr-frost-250, 0.42);
-$ag-bar-mode-boost-bg: rgba(248, 197, 108, 0.18);
-$ag-bar-mode-boost-border: rgba(248, 197, 108, 0.58);
-$ag-bar-obs-bg: rgba($aa-pr-white, 0.05);
-$ag-bar-obs-border: rgba($aa-pr-frost-200, 0.26);
-$ag-bar-obs-warn-bg: rgba(248, 197, 108, 0.12);
-$ag-bar-obs-warn-border: rgba(248, 197, 108, 0.44);
 $ag-bar-health-bg: rgba($aa-pr-white, 0.05);
 $ag-bar-health-border: rgba($aa-pr-frost-200, 0.24);
 $ag-bar-maintenance-bg: rgba($aa-pr-white, 0.05);
 $ag-bar-maintenance-border: rgba($aa-pr-frost-200, 0.24);
+$ag-bar-maintenance-warn-bg: rgba(248, 197, 108, 0.1);
+$ag-bar-maintenance-warn-border: rgba(248, 197, 108, 0.34);
 
 // Component tokens: Spotify popup
 $ag-spotify-card-padding: $ag-space-16;
@@ -712,10 +704,18 @@ window.Bar {
 
   button,
   menubutton > button {
-    border-radius: $ag-radius-chip;
+    min-height: $ag-bar-block-height;
+    border-radius: $ag-bar-block-radius;
     padding: $ag-bar-button-padding-y $ag-bar-button-padding-x;
     @include ag-type($ag-font-body-sm, 600, 0.25px, $ag-text-0);
-    @include ag-interactive-control();
+    @include ag-interactive-control(
+      $bg: rgba($aa-pr-white, 0.04),
+      $border: rgba($aa-pr-white, 0.1),
+      $hover-bg: rgba($aa-pr-frost-300, 0.12),
+      $hover-border: rgba($aa-pr-frost-300, 0.26),
+      $active-bg: rgba($aa-pr-frost-300, 0.18),
+      $active-border: rgba($aa-pr-frost-300, 0.32)
+    );
   }
 
   .workspace-lanes {
@@ -797,8 +797,9 @@ window.Bar {
     min-width: 220px;
     max-width: 390px;
     padding: $ag-space-4 $ag-space-8;
-    border-radius: $ag-radius-sm-tight;
+    border-radius: $ag-bar-block-radius;
     background: $ag-bar-active-window-bg;
+    min-height: $ag-bar-block-height;
   }
 
   .active-window-app {
@@ -814,9 +815,14 @@ window.Bar {
     @include ag-type($ag-font-body-sm-soft, 600, 0.15px, $ag-text-0);
   }
 
+  .chip-caption {
+    @include ag-type($ag-font-label-2xs, 700, 0.18px, $ag-text-muted);
+    text-transform: uppercase;
+  }
+
   .primary-status-alert {
     padding: $ag-space-6 $ag-space-10;
-    border-radius: $ag-radius-sm-tight;
+    border-radius: $ag-bar-block-radius;
     @include ag-type($ag-font-label-sm, 700, 0.2px, $ag-text-danger-strong);
     background: $ag-bar-critical-bg;
     border: 1px solid $ag-bar-critical-border;
@@ -842,6 +848,7 @@ window.Bar {
   .health-chip > button {
     padding: $ag-space-6 $ag-space-10;
     min-width: 148px;
+    border-radius: $ag-bar-block-radius;
     @include ag-interactive-control(
       $bg: $ag-bar-health-bg,
       $border: $ag-bar-health-border,
@@ -869,13 +876,14 @@ window.Bar {
   }
 
   .health-inline {
-    @include ag-type($ag-font-label-sm, 700, 0.14px, $ag-text-0);
+    @include ag-type($ag-font-body-sm, 700, 0.12px, $ag-text-0);
     font-variant-numeric: tabular-nums;
   }
 
   .maintenance-chip > button {
     padding: $ag-space-6 $ag-space-10;
     min-width: 150px;
+    border-radius: $ag-bar-block-radius;
     @include ag-interactive-control(
       $bg: $ag-bar-maintenance-bg,
       $border: $ag-bar-maintenance-border,
@@ -887,8 +895,8 @@ window.Bar {
   }
 
   .maintenance-chip.maintenance-warn > button {
-    background: $ag-bar-obs-warn-bg;
-    border-color: $ag-bar-obs-warn-border;
+    background: $ag-bar-maintenance-warn-bg;
+    border-color: $ag-bar-maintenance-warn-border;
   }
 
   .maintenance-label {
@@ -896,7 +904,7 @@ window.Bar {
   }
 
   .maintenance-inline {
-    @include ag-type($ag-font-label-sm, 600, 0.1px, $ag-text-1);
+    @include ag-type($ag-font-body-sm, 700, 0.1px, $ag-text-0);
     font-variant-numeric: tabular-nums;
   }
 
@@ -1833,20 +1841,6 @@ window.ControlCenter {
   .cc-session-confirm-timer {
     font-variant-numeric: tabular-nums;
     min-width: 72px;
-  }
-}
-
-@keyframes wsPulse {
-  0% {
-    box-shadow: $ag-shadow-workspace-active, $ag-shadow-workspace-pulse-origin;
-  }
-
-  55% {
-    box-shadow: $ag-shadow-workspace-active, $ag-shadow-workspace-pulse;
-  }
-
-  100% {
-    box-shadow: $ag-shadow-workspace-active, $ag-shadow-workspace-pulse-end;
   }
 }
 

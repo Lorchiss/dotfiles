@@ -23,15 +23,19 @@ export default function MaintenanceChip() {
           `Updates ${s.updatesCount ?? "--"} · AUR ${s.updatesAurCount ?? "--"} · News ${s.archNewsUnreadCount}`,
       )}
     >
-      <box spacing={6}>
-        <label class="maintenance-label" label="MT" />
-        <label
-          class="maintenance-inline"
-          label={system(
-            (s) =>
-              `U${s.updatesCount ?? "--"} A${s.updatesAurCount ?? "--"} N${s.archNewsUnreadCount}`,
-          )}
-        />
+      <box class="maintenance-content" spacing={6}>
+        <label class="maintenance-label" label="●" />
+        <box orientation={Gtk.Orientation.VERTICAL} spacing={0}>
+          <label class="chip-caption" label="Maintenance" xalign={0} />
+          <label
+            class="maintenance-inline"
+            label={system(
+              (s) =>
+                `U${s.updatesCount ?? "--"} A${s.updatesAurCount ?? "--"} N${s.archNewsUnreadCount}`,
+            )}
+            xalign={0}
+          />
+        </box>
       </box>
 
       <popover class="maintenance-popover-shell" hasArrow={false}>

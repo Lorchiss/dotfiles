@@ -66,7 +66,7 @@ export default function HealthChip() {
           resolveHealthState(c.cpu, c.ram, system().maxTemperatureC).detail,
       )}
     >
-      <box spacing={6}>
+      <box class="health-content" spacing={6}>
         <label
           class={compute((c) => {
             const health = resolveHealthState(
@@ -81,13 +81,17 @@ export default function HealthChip() {
               resolveHealthState(c.cpu, c.ram, system().maxTemperatureC).label,
           )}
         />
-        <label
-          class="health-inline"
-          label={compute(
-            (c) =>
-              `H ${c.cpu ?? "--"}/${c.ram ?? "--"}/${system().maxTemperatureC !== null ? system().maxTemperatureC?.toFixed(0) : "--"}`,
-          )}
-        />
+        <box orientation={Gtk.Orientation.VERTICAL} spacing={0}>
+          <label class="chip-caption" label="Health" xalign={0} />
+          <label
+            class="health-inline"
+            label={compute(
+              (c) =>
+                `${c.cpu ?? "--"}/${c.ram ?? "--"}/${system().maxTemperatureC !== null ? system().maxTemperatureC?.toFixed(0) : "--"}`,
+            )}
+            xalign={0}
+          />
+        </box>
       </box>
 
       <popover class="health-popover-shell" hasArrow={false}>
