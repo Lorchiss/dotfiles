@@ -3,7 +3,13 @@ import { Astal, Gdk, Gtk } from "ags/gtk4"
 import { execAsync } from "ags/process"
 import { createPoll } from "ags/time"
 import { extractSpotifyTrackId, shellQuoted } from "../lib/spotify"
-import { OVERLAY_LAYOUT, SPOTIFY_UI } from "../lib/uiTokens"
+import {
+  monitorFromLayout,
+  onOverlayVisibilityChanged,
+  overlayLayoutBinding,
+  registerOverlayWindow,
+} from "../lib/overlayOrchestrator"
+import { SPOTIFY_UI } from "../lib/uiTokens"
 import {
   readLikeStatus,
   resolveAccentClass,
@@ -32,10 +38,6 @@ const POPUP_LAYOUT: "horizontal" | "vertical" = "vertical"
 const COVER_WRAP_SIZE = SPOTIFY_UI.coverWrapSize
 const COVER_IMAGE_SIZE = SPOTIFY_UI.coverImageSize
 const POPUP_PADDING = SPOTIFY_UI.popupPadding
-const POPUP_WIDTH_REQUEST =
-  POPUP_LAYOUT === "vertical"
-    ? COVER_WRAP_SIZE + POPUP_PADDING * 2
-    : SPOTIFY_UI.popupHorizontalWidth
 
 const MARQUEE_TICK_MS = 110
 const POPUP_TITLE_WIDTH =
@@ -271,6 +273,7 @@ function readBindingValue<T>(binding: any, fallback: T): T {
 
 export default function SpotifyPopup() {
   let windowRef: any = null
+  const overlayLayout = overlayLayoutBinding()
 
   const closePopup = () => {
     if (!windowRef) return
@@ -493,12 +496,14 @@ printf "%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s" "$title" "$artist" "$length" "$art" 
       visible={false}
       layer={Astal.Layer.TOP}
       anchor={Astal.WindowAnchor.TOP | Astal.WindowAnchor.RIGHT}
-      marginTop={OVERLAY_LAYOUT.topOffset}
-      marginRight={OVERLAY_LAYOUT.edgeOffset}
+      gdkmonitor={overlayLayout((layout) => monitorFromLayout(layout))}
+      marginTop={overlayLayout((layout) => layout.spotify.marginTop)}
+      marginRight={overlayLayout((layout) => layout.spotify.marginRight)}
       exclusivity={Astal.Exclusivity.IGNORE}
       keymode={Astal.Keymode.ON_DEMAND}
       $={(window: any) => {
         windowRef = window
+        registerOverlayWindow("spotify", window)
 
         const keyController = new Gtk.EventControllerKey()
         keyController.connect("key-pressed", (_: any, keyval: number) => {
@@ -510,6 +515,9 @@ printf "%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s" "$title" "$artist" "$length" "$art" 
         })
 
         window.add_controller(keyController)
+        window.connect("notify::visible", () => {
+          onOverlayVisibilityChanged("spotify", Boolean(window.visible))
+        })
       }}
     >
       <box
@@ -521,7 +529,7 @@ printf "%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s" "$title" "$artist" "$length" "$art" 
         spacing={POPUP_LAYOUT === "vertical" ? 10 : 16}
         cssName="spotifyPopupCard"
         class={state((s) => buildPopupClass(s))}
-        widthRequest={POPUP_WIDTH_REQUEST}
+        widthRequest={overlayLayout((layout) => layout.spotify.width)}
       >
         <box
           cssName="spotifyCoverWrap"

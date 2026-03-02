@@ -9,7 +9,12 @@ import AudioSection from "./controlcenter/AudioSection"
 import SystemSection from "./controlcenter/SystemSection"
 import SessionSection from "./controlcenter/SessionSection"
 import { createMusicAccentClassState } from "../lib/musicAccent"
-import { CONTROL_CENTER_UI, OVERLAY_LAYOUT } from "../lib/uiTokens"
+import {
+  monitorFromLayout,
+  onOverlayVisibilityChanged,
+  overlayLayoutBinding,
+  registerOverlayWindow,
+} from "../lib/overlayOrchestrator"
 import {
   readLastControlCenterTab,
   writeLastControlCenterTab,
@@ -23,6 +28,7 @@ export default function ControlCenter() {
   let tabsApi: { setActiveTab: (tab: ControlCenterTab) => void } | null = null
   let pendingStoredTab: ControlCenterTab | null = null
   const accentClass = createMusicAccentClassState()
+  const overlayLayout = overlayLayoutBinding()
 
   const sectionRefs: Partial<Record<ControlCenterTab, any>> = {}
 
@@ -72,12 +78,15 @@ export default function ControlCenter() {
       visible={false}
       layer={Astal.Layer.TOP}
       anchor={Astal.WindowAnchor.TOP | Astal.WindowAnchor.RIGHT}
-      marginTop={OVERLAY_LAYOUT.topOffset}
-      marginRight={OVERLAY_LAYOUT.edgeOffset + 304}
+      gdkmonitor={overlayLayout((layout) => monitorFromLayout(layout))}
+      marginTop={overlayLayout((layout) => layout.controlCenter.marginTop)}
+      marginRight={overlayLayout((layout) => layout.controlCenter.marginRight)}
       exclusivity={Astal.Exclusivity.IGNORE}
       keymode={Astal.Keymode.ON_DEMAND}
       $={(window: any) => {
         windowRef = window
+        registerOverlayWindow("control-center", window)
+
         const keyController = new Gtk.EventControllerKey()
         keyController.connect("key-pressed", (_: any, keyval: number) => {
           if (keyval === Gdk.KEY_Escape) {
@@ -87,6 +96,10 @@ export default function ControlCenter() {
           return false
         })
         window.add_controller(keyController)
+
+        window.connect("notify::visible", () => {
+          onOverlayVisibilityChanged("control-center", Boolean(window.visible))
+        })
       }}
     >
       <box
@@ -96,7 +109,7 @@ export default function ControlCenter() {
         class={accentClass(
           (accent) => `cc-card popup-accent-surface ${accent}`,
         )}
-        widthRequest={CONTROL_CENTER_UI.width}
+        widthRequest={overlayLayout((layout) => layout.controlCenter.width)}
       >
         <box class="cc-header" spacing={8}>
           <label class="cc-title" label="Control Center" hexpand xalign={0} />
@@ -125,8 +138,18 @@ export default function ControlCenter() {
             sectionsScrollRef = scroll
             scroll.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC)
             scroll.set_propagate_natural_height(false)
-            scroll.set_min_content_height(CONTROL_CENTER_UI.contentHeight)
-            scroll.set_max_content_height(CONTROL_CENTER_UI.contentHeight)
+            const syncHeight = () => {
+              const layout = overlayLayout()
+              const contentHeight = layout.controlCenter.contentHeight
+              scroll.set_min_content_height(contentHeight)
+              scroll.set_max_content_height(contentHeight)
+            }
+
+            syncHeight()
+            const unsubscribe = (overlayLayout as any).subscribe?.(syncHeight)
+            if (typeof unsubscribe === "function") {
+              scroll.connect("destroy", () => unsubscribe())
+            }
           }}
         >
           <box

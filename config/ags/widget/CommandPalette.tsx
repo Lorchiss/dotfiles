@@ -3,8 +3,14 @@ import { Astal, Gdk, Gtk } from "ags/gtk4"
 import { execAsync } from "ags/process"
 import { runCommand } from "../lib/command"
 import { createMusicAccentClassState } from "../lib/musicAccent"
+import {
+  monitorFromLayout,
+  onOverlayVisibilityChanged,
+  overlayLayoutBinding,
+  registerOverlayWindow,
+} from "../lib/overlayOrchestrator"
 import { openInTerminal } from "../lib/terminal"
-import { COMMAND_PALETTE_UI, OVERLAY_LAYOUT } from "../lib/uiTokens"
+import { COMMAND_PALETTE_UI } from "../lib/uiTokens"
 
 type PaletteAction = {
   id: string
@@ -352,6 +358,7 @@ export default function CommandPalette() {
   let filteredActions: PaletteAction[] = [...ACTIONS]
   const itemRefs: any[] = []
   const accentClass = createMusicAccentClassState()
+  const overlayLayout = overlayLayoutBinding()
 
   const closePalette = () => {
     if (!windowRef) return
@@ -509,25 +516,28 @@ export default function CommandPalette() {
       class={accentClass((accent) => `CommandPalette ${accent}`)}
       application={app}
       visible={false}
-      layer={Astal.Layer.TOP}
+      layer={Astal.Layer.OVERLAY}
+      gdkmonitor={overlayLayout((layout) => monitorFromLayout(layout))}
       anchor={
         Astal.WindowAnchor.TOP |
         Astal.WindowAnchor.LEFT |
         Astal.WindowAnchor.RIGHT
       }
-      marginTop={OVERLAY_LAYOUT.topOffset + 8}
+      marginTop={overlayLayout((layout) => layout.commandPalette.marginTop)}
       marginLeft={0}
       marginRight={0}
       exclusivity={Astal.Exclusivity.IGNORE}
       keymode={Astal.Keymode.ON_DEMAND}
       $={(window: any) => {
         windowRef = window
+        registerOverlayWindow("command-palette", window)
 
         const keyController = new Gtk.EventControllerKey()
         keyController.connect("key-pressed", handleKeyPress)
         window.add_controller(keyController)
 
         window.connect("notify::visible", () => {
+          onOverlayVisibilityChanged("command-palette", Boolean(window.visible))
           if (window.visible) {
             resetAndFocus()
             return
@@ -543,7 +553,7 @@ export default function CommandPalette() {
           )}
           orientation={Gtk.Orientation.VERTICAL}
           spacing={10}
-          widthRequest={COMMAND_PALETTE_UI.width}
+          widthRequest={overlayLayout((layout) => layout.commandPalette.width)}
           halign={Gtk.Align.CENTER}
         >
           <box class="command-palette-header" spacing={10}>
