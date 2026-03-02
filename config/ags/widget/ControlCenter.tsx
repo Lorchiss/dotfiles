@@ -209,22 +209,13 @@ export default function ControlCenter() {
           class="cc-sections-scroll"
           hexpand
           vexpand
+          heightRequest={overlayLayout(
+            (layout) => layout.controlCenter.contentHeight,
+          )}
           $={(scroll: any) => {
             sectionsScrollRef = scroll
             scroll.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC)
             scroll.set_propagate_natural_height(false)
-            const syncHeight = () => {
-              const layout = overlayLayout()
-              const contentHeight = layout.controlCenter.contentHeight
-              scroll.set_min_content_height(contentHeight)
-              scroll.set_max_content_height(contentHeight)
-            }
-
-            syncHeight()
-            const unsubscribe = (overlayLayout as any).subscribe?.(syncHeight)
-            if (typeof unsubscribe === "function") {
-              scroll.connect("destroy", () => unsubscribe())
-            }
           }}
         >
           <box
