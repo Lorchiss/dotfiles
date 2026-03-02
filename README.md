@@ -10,6 +10,11 @@ Este repositorio configura un entorno de escritorio Linux centrado en **Hyprland
 - `config/kitty`, `config/rofi`: ajustes de terminal y launcher.
 - `config/systemd/user/ags.service`: servicio de usuario para arrancar AGS.
 
+## Workflow diario (2 monitores)
+
+- Guía práctica: `docs/workflow-diario.md`
+- Incluye: estrategia de workspaces por monitor, keymap diario, multimedia global con `playerctl`, Kitty `copy_on_select`, smoke test y rollback simple.
+
 ## Identidad visual AGS (Arctic Glass)
 
 Principios:
