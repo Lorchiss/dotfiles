@@ -205,60 +205,139 @@ El smoke test:
 - abre/cierra popup de Spotify
 - falla (`exit 1`) si detecta `JS ERROR`, `TypeError`, `Traceback`, `CRITICAL` o `ERROR` en logs recientes
 
-## QA dual obligatorio (Runtime + Visual)
+## Observabilidad barra AGS
 
-Comando único de aprobación:
+Feature flags por módulo (default `ON`):
+
+- `BAR_WS`
+- `BAR_ACTIVE_WINDOW`
+- `BAR_SPOTIFY`
+- `BAR_HEALTH`
+- `BAR_MAINTENANCE`
+- `BAR_CLOCK`
+- `BAR_AUDIO`
+- `BAR_CONNECTIVITY`
+
+Debug global:
+
+- `DEBUG_BAR=1` habilita logs por módulo con prefijo:
+  - `[BAR:WS]`
+  - `[BAR:ACTIVE_WINDOW]`
+  - `[BAR:SPOTIFY]`
+  - `[BAR:HEALTH]`
+  - `[BAR:MAINTENANCE]`
+  - `[BAR:CLOCK]`
+  - `[BAR:AUDIO]`
+  - `[BAR:CONNECTIVITY]`
+
+Ejemplo de uso manual:
+
+```bash
+systemctl --user set-environment DEBUG_BAR=1 BAR_SPOTIFY=0 BAR_HEALTH=0
+systemctl --user restart ags.service
+journalctl --user -u ags.service -n 120 --no-pager | rg "\\[BAR:"
+```
+
+Diagnóstico incremental automático:
+
+```bash
+bash bootstrap/bar-diagnose.sh
+```
+
+Secuencia recomendada de aislamiento:
+
+1. Todo OFF.
+2. Activar módulo 1.
+3. Revisar logs.
+4. Activar siguiente módulo.
+5. El primer módulo que rompe es el sospechoso.
+
+Arquitectura de módulos (bar + popups):
+
+- `docs/ags-modules-architecture.md`
+
+## QA estricto bloqueante (fail-fast)
+
+Comando único recomendado antes de commit/deploy:
 
 ```bash
 bash bootstrap/qa.sh
 ```
 
-Gates obligatorios:
+`bootstrap/qa.sh` ejecuta en orden:
 
-- `Runtime QA` (`bootstrap/qa-runtime.sh`):
-  - valida `ags.service` activo y estable
-  - ejecuta `bootstrap/ags-smoke.sh` (compatibilidad mantenida)
-  - marca FAIL ante `JS ERROR`, `TypeError`, `Traceback`, `CRITICAL`, errores Sass/compilación o restart loop
-- `Visual/UX QA` (`bootstrap/qa-visual.sh`):
-  - bloquea forbidden strings (`[object`, `undefined`, `null`, `instance wrapper`, `native@`)
-  - valida constraints de layout/hierarchy (máx 6 bloques, truncación, métricas agrupadas, foco único)
-  - valida policy de popups (prioridad, offsets dinámicos, binding multi-monitor)
-  - valida legibilidad básica (contraste dark + tamaño tipográfico mínimo)
+1. Restart limpio de `ags.service`.
+2. Smoke test operativo (`bootstrap/ags-smoke.sh`).
+3. Escaneo de logs recientes de `ags.service` con `journalctl`.
+4. Gate UX/static (`bootstrap/qa-visual.sh`) cuando está disponible.
 
-Criterio de aprobación:
+Patrones bloqueantes por defecto:
 
-- `PASS` solo si Runtime PASS **y** Visual PASS.
-- Si uno falla, el estado final es `FAIL` y se bloquea aprobación.
+- `No property named`
+- `assertion failed`
+- `instance wrapper`
+- `[object`
+- `Accessor`
+- `TypeError`
+- `Traceback`
+- `CRITICAL`
 
-Evidencia por corrida:
+Flags:
 
-- Carpeta: `/tmp/ags-qa/<timestamp>/`
-- Reporte consolidado: `qa-report.txt`
-- Runtime:
-  - `runtime/runtime.summary`
-  - `runtime/runtime.failures`
-  - `runtime/runtime.journal.log`
-- Visual:
-  - `visual/visual.summary`
-  - `visual/visual.failures`
-  - `visual/visual.details.log`
+- `--strict` habilita bloqueo por patrones (default).
+- `--no-strict` reporta patrones sin bloquear (solo diagnóstico).
+- `--logs N` ajusta cuántas líneas recientes de logs se escanean.
+- `--skip-visual` omite el gate UX/static.
 
-Ejemplo PASS (resumen):
+Ejemplo PASS:
 
 ```text
-[qa] runtime-qa PASS
-[qa] visual-qa PASS
-[qa] final status: PASS
+[qa] step 1/4: clean restart ags.service
+[qa] step 2/4: run smoke test
+[ags-smoke] PASS
+[qa] step 3/4: scan ags.service logs (last 300 lines)
+[qa] step 4/4: run UX/static visual gate
+[qa] PASS: runtime + UX gate clean
 ```
 
-Ejemplo FAIL (resumen):
+Ejemplo FAIL:
 
 ```text
-[qa] runtime-qa PASS
-[qa] visual-qa FAIL
-[qa]   P0 forbidden-activewindow-strings: Metadata de ventana activa contiene strings prohibidos
-[qa] final status: FAIL
+[qa] step 3/4: scan ags.service logs (last 300 lines)
+[qa] BLOCKER pattern detected: No property named (2 matches)
+[qa]   44:CSS Error :241:3 No property named "max-width"
+[qa]   45:CSS Error :1633:3 No property named "align-items"
+[qa] FAIL: prohibited runtime patterns detected (2 matches)
 ```
+
+Hook pre-commit opcional (no forzado):
+
+```bash
+cat > .git/hooks/pre-commit <<'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+bash bootstrap/qa.sh
+EOF
+chmod +x .git/hooks/pre-commit
+```
+
+Modo autofix loop (opcional):
+
+```bash
+bash bootstrap/qa-autofix.sh
+```
+
+El loop corre `bootstrap/qa.sh` como gate obligatorio y, si falla, intenta fixes mínimos por prioridad:
+
+1. `P0`: crash/assertion/TypeError
+2. `P1`: CSS GTK inválido (`No property named`)
+3. `P2`: texto basura visible (`[object`, `instance wrapper`)
+
+Política del loop:
+
+- máximo 5 iteraciones (configurable con `--max-iterations N`)
+- reintento con `bash bootstrap/qa.sh` después de cada patch
+- si el mismo patrón falla 2 veces, cambia de estrategia automáticamente
 
 ## Recuperación rápida de `ags.service`
 
