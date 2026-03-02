@@ -187,6 +187,8 @@ $ag-shadow-session-pending: inset 0 0 0 1px rgba($aa-pr-frost-300, 0.24);
 $ag-motion-fast: 110ms;
 $ag-motion-base: 170ms;
 $ag-motion-slow: 240ms;
+$ag-motion-overlay: 220ms;
+$ag-motion-bar-enter: 320ms;
 $ag-motion-pulse: 2000ms;
 $ag-curve-standard: cubic-bezier(0.2, 0, 0, 1);
 $ag-curve-emphasis: cubic-bezier(0.16, 0.84, 0.34, 1);
@@ -302,14 +304,17 @@ $bar-density: hero !default; // compact | balanced | hero
     border-color $ag-motion-fast $ag-curve-standard,
     box-shadow $ag-motion-fast $ag-curve-standard,
     color $ag-motion-fast $ag-curve-standard,
-    opacity $ag-motion-fast $ag-curve-standard;
+    opacity $ag-motion-fast $ag-curve-standard,
+    transform $ag-motion-fast $ag-curve-standard;
   box-shadow: $ag-state-control-inset;
+  transform: translateY(0);
 
   &:hover {
     background: $hover-bg;
     border-color: $hover-border;
     box-shadow:
       $ag-shadow-md, $ag-state-control-hover-ring, $ag-state-control-hover-inset;
+    transform: translateY(-1px);
   }
 
   &:active,
@@ -317,6 +322,7 @@ $bar-density: hero !default; // compact | balanced | hero
     background: $active-bg;
     border-color: $active-border;
     box-shadow: $ag-state-control-active-inset, $ag-state-control-active-shadow;
+    transform: translateY(0);
   }
 
   &:focus,
@@ -622,7 +628,9 @@ $ag-control-center-session-pending-bg: rgba(146, 214, 255, 0.12);
   @include popup-card-shell;
   transition:
     border-color $ag-motion-base $ag-curve-standard,
-    box-shadow $ag-motion-base $ag-curve-standard;
+    box-shadow $ag-motion-base $ag-curve-standard,
+    opacity $ag-motion-overlay $ag-curve-standard;
+  animation: popupEnter $ag-motion-overlay $ag-curve-emphasis;
 }
 
 @each $accent-name, $accent-token in $ag-accent-variants {
@@ -654,6 +662,7 @@ window.Bar {
       $ag-bar-shell-gradient;
     border: 1px solid $ag-bar-shell-border;
     box-shadow: $ag-shadow-bar-shell;
+    animation: barEnter $ag-motion-bar-enter $ag-curve-emphasis;
   }
 
   > centerbox > box {
@@ -729,7 +738,7 @@ window.Bar {
     border-color: $ag-bar-workspace-active-border;
     color: $ag-text-inverse;
     box-shadow: $ag-shadow-workspace-active;
-    animation: wsPulse 2800ms 1;
+    animation: wsPulse 2200ms 1;
   }
 
   .workspace-chip-active.workspace-chip-unfocused {
@@ -1117,6 +1126,10 @@ window.Bar {
 window.SpotifyPopup {
   background: transparent;
 
+  .spotifyPopupCardShell {
+    animation: popupEnter $ag-motion-overlay $ag-curve-emphasis;
+  }
+
   button {
     @include ag-interactive-control(
       $bg: $ag-spotify-button-bg,
@@ -1359,6 +1372,10 @@ window.SpotifyPopup {
 window.CommandPalette {
   background: transparent;
 
+  .command-palette-card {
+    animation: popupEnter $ag-motion-overlay $ag-curve-emphasis;
+  }
+
   .command-palette-shell {
     padding: 0 $ag-command-shell-padding-x;
   }
@@ -1484,6 +1501,10 @@ window.CommandPalette {
 
 window.ControlCenter {
   background: transparent;
+
+  > ccCard {
+    animation: popupEnter $ag-motion-overlay $ag-curve-emphasis;
+  }
 
   > ccCard {
     min-width: 560px;
@@ -1811,11 +1832,33 @@ window.ControlCenter {
     box-shadow: $ag-shadow-workspace-active, $ag-shadow-workspace-pulse-origin;
   }
 
-  65% {
+  55% {
     box-shadow: $ag-shadow-workspace-active, $ag-shadow-workspace-pulse;
   }
 
   100% {
     box-shadow: $ag-shadow-workspace-active, $ag-shadow-workspace-pulse-end;
+  }
+}
+
+@keyframes barEnter {
+  0% {
+    opacity: 0.3;
+    box-shadow: 0 6px 14px -14px rgba($aa-pr-black, 0.84);
+  }
+
+  100% {
+    opacity: 1;
+    box-shadow: $ag-shadow-bar-shell;
+  }
+}
+
+@keyframes popupEnter {
+  0% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 1;
   }
 }
