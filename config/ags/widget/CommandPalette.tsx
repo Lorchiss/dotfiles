@@ -514,7 +514,7 @@ export default function CommandPalette() {
         Astal.WindowAnchor.LEFT |
         Astal.WindowAnchor.RIGHT
       }
-      marginTop={76}
+      marginTop={92}
       marginLeft={0}
       marginRight={0}
       exclusivity={Astal.Exclusivity.IGNORE}

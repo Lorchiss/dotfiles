@@ -484,7 +484,7 @@ printf "%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s" "$title" "$artist" "$length" "$art" 
       visible={false}
       layer={Astal.Layer.TOP}
       anchor={Astal.WindowAnchor.TOP | Astal.WindowAnchor.RIGHT}
-      marginTop={68}
+      marginTop={80}
       marginRight={36}
       exclusivity={Astal.Exclusivity.IGNORE}
       keymode={Astal.Keymode.ON_DEMAND}

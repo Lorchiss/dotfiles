@@ -73,8 +73,8 @@ export default function ControlCenter() {
       visible={false}
       layer={Astal.Layer.TOP}
       anchor={Astal.WindowAnchor.TOP | Astal.WindowAnchor.RIGHT}
-      marginTop={68}
-      marginRight={36}
+      marginTop={80}
+      marginRight={332}
       exclusivity={Astal.Exclusivity.IGNORE}
       keymode={Astal.Keymode.ON_DEMAND}
       $={(window: any) => {
