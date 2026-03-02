@@ -5,6 +5,13 @@ if ! command -v hyprctl >/dev/null 2>&1; then
   exit 0
 fi
 
+# Workspace strategy:
+# - Primary monitor:   1(code) 2(build) 3(term) 4(test/git) 5(misc)
+# - Secondary monitor: 6(docs) 7(chat) 8(music) 9(misc)
+# Optional overrides:
+# - HYPR_PRIMARY_MONITOR=<name>
+# - HYPR_SECONDARY_MONITOR=<name>
+
 read_monitors() {
   if command -v jq >/dev/null 2>&1; then
     hyprctl -j monitors 2>/dev/null | jq -r 'sort_by(.x)[] | .name'
@@ -30,6 +37,34 @@ read_monitors() {
     cut -d'|' -f2
 }
 
+read_focused_monitor() {
+  if ! command -v jq >/dev/null 2>&1; then
+    return 1
+  fi
+
+  local focused
+  focused="$(hyprctl -j monitors 2>/dev/null | jq -r '.[] | select(.focused == true) | .name' | head -n1)"
+  if [ -z "${focused}" ] || [ "${focused}" = "null" ]; then
+    return 1
+  fi
+
+  printf '%s\n' "${focused}"
+}
+
+contains_monitor() {
+  local needle="$1"
+  shift
+
+  local monitor
+  for monitor in "$@"; do
+    if [ "${monitor}" = "${needle}" ]; then
+      return 0
+    fi
+  done
+
+  return 1
+}
+
 mapfile -t monitors < <(read_monitors)
 if [ "${#monitors[@]}" -eq 0 ]; then
   sleep 1
@@ -40,13 +75,48 @@ if [ "${#monitors[@]}" -eq 0 ]; then
   exit 0
 fi
 
-monitor_left="${monitors[0]}"
-monitor_right="${monitors[1]:-${monitor_left}}"
+primary_monitor=""
+secondary_monitor=""
 
-hyprctl dispatch moveworkspacetomonitor 1 "$monitor_left" >/dev/null 2>&1 || true
-hyprctl dispatch moveworkspacetomonitor 3 "$monitor_left" >/dev/null 2>&1 || true
-hyprctl dispatch moveworkspacetomonitor 2 "$monitor_right" >/dev/null 2>&1 || true
-hyprctl dispatch moveworkspacetomonitor 4 "$monitor_right" >/dev/null 2>&1 || true
+if [ -n "${HYPR_PRIMARY_MONITOR:-}" ] && contains_monitor "${HYPR_PRIMARY_MONITOR}" "${monitors[@]}"; then
+  primary_monitor="${HYPR_PRIMARY_MONITOR}"
+else
+  if focused_monitor="$(read_focused_monitor)"; then
+    if contains_monitor "${focused_monitor}" "${monitors[@]}"; then
+      primary_monitor="${focused_monitor}"
+    fi
+  fi
+fi
+
+if [ -z "${primary_monitor}" ]; then
+  primary_monitor="${monitors[0]}"
+fi
+
+if [ -n "${HYPR_SECONDARY_MONITOR:-}" ] &&
+  contains_monitor "${HYPR_SECONDARY_MONITOR}" "${monitors[@]}" &&
+  [ "${HYPR_SECONDARY_MONITOR}" != "${primary_monitor}" ]; then
+  secondary_monitor="${HYPR_SECONDARY_MONITOR}"
+else
+  monitor=""
+  for monitor in "${monitors[@]}"; do
+    if [ "${monitor}" != "${primary_monitor}" ]; then
+      secondary_monitor="${monitor}"
+      break
+    fi
+  done
+fi
+
+if [ -z "${secondary_monitor}" ]; then
+  secondary_monitor="${primary_monitor}"
+fi
+
+for workspace_id in 1 2 3 4 5; do
+  hyprctl dispatch moveworkspacetomonitor "${workspace_id}" "${primary_monitor}" >/dev/null 2>&1 || true
+done
+
+for workspace_id in 6 7 8 9; do
+  hyprctl dispatch moveworkspacetomonitor "${workspace_id}" "${secondary_monitor}" >/dev/null 2>&1 || true
+done
 
 launch_if_missing() {
   local command_name="$1"
@@ -65,18 +135,18 @@ launch_if_missing() {
   hyprctl dispatch exec "[workspace ${workspace_id} silent] ${launch_command}" >/dev/null 2>&1 || true
 }
 
-launch_if_missing "kitty" "kitty" "1" "kitty"
-launch_if_missing "firefox" "firefox" "2" "firefox"
-launch_if_missing "code" "code" "3" "code"
+launch_if_missing "code" "code" "1" "code"
+launch_if_missing "kitty" "kitty" "2" "kitty"
+launch_if_missing "firefox" "firefox" "6" "firefox"
 
 if pgrep -x spotify >/dev/null 2>&1; then
   exit 0
 fi
 
 if command -v spotify >/dev/null 2>&1; then
-  hyprctl dispatch exec "[workspace 4 silent] spotify" >/dev/null 2>&1 || true
+  hyprctl dispatch exec "[workspace 8 silent] spotify" >/dev/null 2>&1 || true
 elif command -v gtk-launch >/dev/null 2>&1; then
-  hyprctl dispatch exec "[workspace 4 silent] gtk-launch spotify" >/dev/null 2>&1 || true
+  hyprctl dispatch exec "[workspace 8 silent] gtk-launch spotify" >/dev/null 2>&1 || true
 elif command -v xdg-open >/dev/null 2>&1; then
-  hyprctl dispatch exec "[workspace 4 silent] xdg-open spotify:" >/dev/null 2>&1 || true
+  hyprctl dispatch exec "[workspace 8 silent] xdg-open spotify:" >/dev/null 2>&1 || true
 fi
