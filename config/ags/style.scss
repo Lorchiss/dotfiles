@@ -1,90 +1,111 @@
 // https://gitlab.gnome.org/GNOME/gtk/-/blob/gtk-3-24/gtk/theme/Adwaita/_colors-public.scss
 @use "sass:map";
 
-// Identity: Arctic Aurora Unified v1
-// Core tokens: surfaces
-$ag-surface-canvas: #08111d;
-$ag-surface-0: #0f1722;
-$ag-surface-1: #162131;
-$ag-surface-2: #1d2a3c;
-$ag-surface-elevated: rgba(255, 255, 255, 0.04);
-$ag-surface-elevated-strong: rgba(255, 255, 255, 0.08);
-$ag-surface-input: rgba(146, 214, 255, 0.08);
-$ag-surface-overlay-weak: rgba(255, 255, 255, 0.02);
-$ag-surface-overlay-soft: rgba(255, 255, 255, 0.03);
-$ag-surface-overlay-base: rgba(255, 255, 255, 0.04);
-$ag-surface-overlay-strong: rgba(255, 255, 255, 0.05);
-$ag-surface-overlay-stronger: rgba(255, 255, 255, 0.08);
-$ag-surface-danger-soft: rgba(255, 120, 120, 0.06);
-$ag-surface-danger-base: rgba(255, 120, 120, 0.12);
-$ag-surface-danger-strong: rgba(255, 120, 120, 0.18);
-$ag-surface-danger-tint: rgba(255, 110, 110, 0.08);
-$ag-surface-like-tint: rgba(255, 121, 142, 0.2);
-$ag-surface-cover: rgba(11, 16, 24, 0.98);
+// Identity: Arctic Aurora Pro v2
+// Primitives
+$aa-pr-ink-900: #070f1b;
+$aa-pr-ink-850: #0e1726;
+$aa-pr-ink-800: #151f31;
+$aa-pr-ink-760: #1b2940;
+$aa-pr-frost-300: #8fd8ff;
+$aa-pr-frost-250: #9cf2de;
+$aa-pr-frost-200: #bdd6ff;
+$aa-pr-danger-300: #ffa9ab;
+$aa-pr-rose-300: #f584a1;
+$aa-pr-white: #fff;
+$aa-pr-black: #000;
+
+// Semantic colors (state + meaning)
+$aa-sem-info: rgba(150, 216, 255, 0.96);
+$aa-sem-success: rgba(156, 247, 228, 0.96);
+$aa-sem-warn: rgba(248, 197, 108, 0.96);
+$aa-sem-error: rgba(255, 168, 168, 0.96);
+$aa-sem-active: rgba(189, 214, 255, 0.96);
+$aa-sem-like: rgba(245, 132, 161, 0.96);
+
+// Surface tokens
+$ag-surface-canvas: $aa-pr-ink-900;
+$ag-surface-0: $aa-pr-ink-850;
+$ag-surface-1: $aa-pr-ink-800;
+$ag-surface-2: $aa-pr-ink-760;
+$ag-surface-elevated: rgba($aa-pr-white, 0.04);
+$ag-surface-elevated-strong: rgba($aa-pr-white, 0.08);
+$ag-surface-input: rgba($aa-pr-frost-300, 0.1);
+$ag-surface-overlay-weak: rgba($aa-pr-white, 0.02);
+$ag-surface-overlay-soft: rgba($aa-pr-white, 0.03);
+$ag-surface-overlay-base: rgba($aa-pr-white, 0.045);
+$ag-surface-overlay-strong: rgba($aa-pr-white, 0.06);
+$ag-surface-overlay-stronger: rgba($aa-pr-white, 0.09);
+$ag-surface-danger-soft: rgba($aa-pr-danger-300, 0.08);
+$ag-surface-danger-base: rgba($aa-pr-danger-300, 0.14);
+$ag-surface-danger-strong: rgba($aa-pr-danger-300, 0.2);
+$ag-surface-danger-tint: rgba($aa-pr-danger-300, 0.1);
+$ag-surface-like-tint: rgba($aa-pr-rose-300, 0.2);
+$ag-surface-cover: rgba(10, 15, 24, 0.98);
 $ag-popup-base: linear-gradient(
-  165deg,
-  rgba(11, 18, 31, 0.96),
-  rgba(17, 29, 48, 0.96)
+  162deg,
+  rgba(8, 16, 28, 0.97),
+  rgba(18, 31, 52, 0.96)
 );
 
-// Core tokens: text
-$ag-text-primary: #e7edf5;
-$ag-text-secondary: rgba(205, 217, 232, 0.9);
-$ag-text-muted: rgba(177, 191, 210, 0.78);
-$ag-text-inverse: rgba(241, 248, 255, 0.99);
-$ag-text-connection: rgba(207, 233, 252, 0.96);
-$ag-text-success: rgba(170, 249, 234, 0.98);
-$ag-text-success-strong: rgba(172, 250, 235, 0.98);
-$ag-text-danger: rgba(255, 188, 188, 0.97);
-$ag-text-danger-strong: rgba(255, 168, 168, 0.95);
-$ag-text-danger-soft: rgba(255, 180, 180, 0.95);
-$ag-text-danger-muted: rgba(255, 200, 200, 0.95);
-$ag-text-like: rgba(255, 231, 237, 0.98);
-$ag-text-workspace-unfocused: rgba(205, 223, 242, 0.92);
+// Text + contrast tokens
+$ag-text-primary: #ebf3fc;
+$ag-text-secondary: rgba(209, 222, 238, 0.9);
+$ag-text-muted: rgba(178, 194, 215, 0.78);
+$ag-text-inverse: rgba(244, 250, 255, 0.99);
+$ag-text-connection: rgba(214, 241, 255, 0.98);
+$ag-text-success: rgba(180, 250, 236, 0.98);
+$ag-text-success-strong: rgba(188, 252, 240, 0.98);
+$ag-text-danger: rgba(255, 194, 194, 0.98);
+$ag-text-danger-strong: rgba(255, 176, 176, 0.96);
+$ag-text-danger-soft: rgba(255, 186, 186, 0.95);
+$ag-text-danger-muted: rgba(255, 205, 205, 0.95);
+$ag-text-like: rgba(255, 231, 239, 0.98);
+$ag-text-workspace-unfocused: rgba(205, 224, 244, 0.92);
 $ag-text-0: $ag-text-primary;
 $ag-text-1: $ag-text-secondary;
 
-// Core tokens: accents
-$ag-accent-primary: rgba(146, 214, 255, 0.97);
-$ag-accent-secondary: rgba(152, 245, 224, 0.97);
-$ag-accent-tertiary: rgba(189, 214, 255, 0.97);
-$ag-accent-primary-95: rgba(146, 214, 255, 0.95);
-$ag-accent-secondary-95: rgba(152, 245, 224, 0.95);
-$ag-accent-tertiary-95: rgba(189, 214, 255, 0.95);
+// Accent tokens
+$ag-accent-primary: $aa-sem-info;
+$ag-accent-secondary: $aa-sem-success;
+$ag-accent-tertiary: $aa-sem-active;
+$ag-accent-primary-95: rgba($aa-pr-frost-300, 0.95);
+$ag-accent-secondary-95: rgba($aa-pr-frost-250, 0.95);
+$ag-accent-tertiary-95: rgba($aa-pr-frost-200, 0.95);
 
-// Core tokens: borders
-$ag-border-subtle: rgba(255, 255, 255, 0.1);
-$ag-border-soft: rgba(255, 255, 255, 0.15);
-$ag-border-strong: rgba(157, 203, 244, 0.44);
-$ag-border-focus: rgba(168, 222, 255, 0.62);
-$ag-border-popup: rgba(163, 208, 255, 0.42);
-$ag-border-like: rgba(255, 121, 142, 0.46);
-$ag-border-danger-soft: rgba(255, 180, 180, 0.26);
-$ag-border-danger-muted: rgba(255, 180, 180, 0.32);
-$ag-border-danger: rgba(255, 168, 168, 0.45);
-$ag-border-danger-strong: rgba(255, 168, 168, 0.52);
-$ag-border-danger-box: rgba(255, 180, 180, 0.28);
+// Border tokens
+$ag-border-subtle: rgba($aa-pr-white, 0.1);
+$ag-border-soft: rgba($aa-pr-white, 0.15);
+$ag-border-strong: rgba(163, 208, 255, 0.5);
+$ag-border-focus: rgba(171, 227, 255, 0.68);
+$ag-border-popup: rgba(163, 208, 255, 0.44);
+$ag-border-like: rgba($aa-pr-rose-300, 0.48);
+$ag-border-danger-soft: rgba($aa-pr-danger-300, 0.3);
+$ag-border-danger-muted: rgba($aa-pr-danger-300, 0.36);
+$ag-border-danger: rgba($aa-pr-danger-300, 0.48);
+$ag-border-danger-strong: rgba($aa-pr-danger-300, 0.56);
+$ag-border-danger-box: rgba($aa-pr-danger-300, 0.3);
 
-// Core tokens: semantic states
-$ag-state-hover-bg: rgba(132, 203, 255, 0.2);
-$ag-state-hover-border: rgba(173, 221, 255, 0.58);
-$ag-state-active-bg: rgba(198, 228, 255, 0.22);
-$ag-state-active-border: rgba(170, 218, 255, 0.62);
+// Semantic state tokens
+$ag-state-hover-bg: rgba($aa-pr-frost-300, 0.2);
+$ag-state-hover-border: rgba(176, 226, 255, 0.6);
+$ag-state-active-bg: rgba($aa-pr-frost-200, 0.24);
+$ag-state-active-border: rgba(174, 222, 255, 0.66);
 $ag-state-control-bg: $ag-surface-overlay-strong;
-$ag-state-control-border: rgba(210, 228, 245, 0.18);
-$ag-state-control-inset: inset 0 1px 0 rgba(255, 255, 255, 0.05);
-$ag-state-control-hover-ring: 0 0 0 1px rgba(135, 216, 255, 0.22);
-$ag-state-control-hover-inset: inset 0 1px 0 rgba(233, 245, 255, 0.14);
-$ag-state-control-active-inset: inset 0 0 0 1px rgba(237, 247, 255, 0.2);
-$ag-state-control-active-shadow: 0 8px 16px -14px rgba(15, 45, 86, 0.72);
-$ag-state-focus-ring: 0 0 0 1px rgba(168, 222, 255, 0.2);
-$ag-state-focus-inset: inset 0 1px 0 rgba(233, 245, 255, 0.12);
-$ag-state-progress-track: rgba(255, 255, 255, 0.22);
-$ag-state-like-glow: 0 0 14px rgba(255, 121, 142, 0.18);
+$ag-state-control-border: rgba(210, 228, 245, 0.2);
+$ag-state-control-inset: inset 0 1px 0 rgba($aa-pr-white, 0.06);
+$ag-state-control-hover-ring: 0 0 0 1px rgba($aa-pr-frost-300, 0.24);
+$ag-state-control-hover-inset: inset 0 1px 0 rgba(233, 245, 255, 0.16);
+$ag-state-control-active-inset: inset 0 0 0 1px rgba(237, 247, 255, 0.22);
+$ag-state-control-active-shadow: 0 8px 18px -14px rgba(15, 45, 86, 0.72);
+$ag-state-focus-ring: 0 0 0 1px rgba($aa-pr-frost-300, 0.24);
+$ag-state-focus-inset: inset 0 1px 0 rgba(233, 245, 255, 0.14);
+$ag-state-progress-track: rgba($aa-pr-white, 0.22);
+$ag-state-like-glow: 0 0 14px rgba($aa-pr-rose-300, 0.2);
 
-// Core tokens: radius
-$ag-radius-xs: 10px;
-$ag-radius-sm-tight: 11px;
+// Radius scale
+$ag-radius-xs: 8px;
+$ag-radius-sm-tight: 10px;
 $ag-radius-sm: 12px;
 $ag-radius-md: 14px;
 $ag-radius-md-soft: 15px;
@@ -95,7 +116,7 @@ $ag-radius-chip: $ag-radius-md;
 $ag-radius-control: $ag-radius-lg;
 $ag-radius-card: $ag-radius-xl;
 
-// Core tokens: spacing
+// Spacing scale
 $ag-space-0: 0;
 $ag-space-2: 2px;
 $ag-space-3: 3px;
@@ -109,18 +130,21 @@ $ag-space-10: 10px;
 $ag-space-12: 12px;
 $ag-space-13: 13px;
 $ag-space-14: 14px;
+$ag-space-16: 16px;
+$ag-space-20: 20px;
 $ag-space-24: 24px;
+$ag-space-32: 32px;
 
-// Core tokens: typography
+// Type scale
 $ag-font-label-2xs: 10.8px;
 $ag-font-label-xs: 11.4px;
 $ag-font-label-sm-soft: 11.5px;
-$ag-font-label-md: 11.6px;
-$ag-font-label-sm: 11.8px;
+$ag-font-label-md: 11.7px;
+$ag-font-label-sm: 11.9px;
 $ag-font-body-xs: 11px;
 $ag-font-body-sm: 12px;
-$ag-font-body-sm-soft: 12.3px;
-$ag-font-body-md-soft: 12.8px;
+$ag-font-body-sm-soft: 12.4px;
+$ag-font-body-md-soft: 12.9px;
 $ag-font-body-md: 13px;
 $ag-font-body-lg-soft: 13.2px;
 $ag-font-body-lg: 14px;
@@ -129,42 +153,43 @@ $ag-font-title-md: 15px;
 $ag-font-title-lg: 16px;
 $ag-font-display: 52px;
 
-// Core tokens: shadows
-$ag-shadow-color: rgba(0, 0, 0, 0.55);
+// Elevation/shadow scale
+$ag-shadow-color: rgba($aa-pr-black, 0.58);
 $ag-shadow: $ag-shadow-color;
-$ag-shadow-xs: 0 10px 16px -14px rgba(0, 0, 0, 0.7);
-$ag-shadow-sm: 0 12px 18px -16px rgba(0, 0, 0, 0.72);
-$ag-shadow-md: 0 14px 20px -14px rgba(0, 0, 0, 0.72);
-$ag-shadow-lg: 0 24px 42px -12px rgba(0, 0, 0, 0.68);
+$ag-shadow-xs: 0 10px 18px -15px rgba($aa-pr-black, 0.72);
+$ag-shadow-sm: 0 12px 20px -16px rgba($aa-pr-black, 0.74);
+$ag-shadow-md: 0 16px 24px -16px rgba($aa-pr-black, 0.74);
+$ag-shadow-lg: 0 28px 48px -14px rgba($aa-pr-black, 0.68);
 $ag-shadow-focus-ring: $ag-state-focus-ring;
 $ag-shadow-bar-shell:
-  0 28px 42px -20px rgba(0, 0, 0, 0.82),
-  0 10px 24px -16px rgba(28, 94, 180, 0.42),
-  inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+  0 30px 46px -22px rgba($aa-pr-black, 0.84),
+  0 10px 28px -18px rgba(28, 94, 180, 0.42),
+  inset 0 0 0 1px rgba($aa-pr-white, 0.08);
 $ag-shadow-workspace-active:
-  0 0 0 1px rgba(196, 227, 255, 0.38),
+  0 0 0 1px rgba(198, 229, 255, 0.4),
   0 0 20px rgba(121, 174, 255, 0.34),
-  inset 0 1px 0 rgba(255, 255, 255, 0.18);
-$ag-shadow-workspace-pulse: 0 0 0 8px rgba(162, 212, 255, 0.04);
+  inset 0 1px 0 rgba($aa-pr-white, 0.2);
+$ag-shadow-workspace-pulse: 0 0 0 8px rgba(162, 212, 255, 0.05);
 $ag-shadow-workspace-pulse-origin: 0 0 0 0 rgba(162, 212, 255, 0.46);
 $ag-shadow-workspace-pulse-end: 0 0 0 0 rgba(162, 212, 255, 0);
-$ag-shadow-workspace-unfocused: inset 0 1px 0 rgba(255, 255, 255, 0.1);
+$ag-shadow-workspace-unfocused: inset 0 1px 0 rgba($aa-pr-white, 0.1);
 $ag-shadow-spotify-active:
-  0 0 16px rgba(152, 245, 224, 0.24),
-  inset 0 1px 0 rgba(236, 255, 248, 0.2);
-$ag-shadow-play-glow: 0 0 18px rgba(152, 245, 224, 0.2);
-$ag-shadow-action-active: 0 0 14px rgba(152, 245, 224, 0.18);
+  0 0 18px rgba($aa-pr-frost-250, 0.24),
+  inset 0 1px 0 rgba(236, 255, 248, 0.22);
+$ag-shadow-play-glow: 0 0 20px rgba($aa-pr-frost-250, 0.2);
+$ag-shadow-action-active: 0 0 14px rgba($aa-pr-frost-250, 0.2);
 $ag-shadow-command-active:
-  0 0 0 1px rgba(196, 227, 255, 0.25),
-  0 0 16px rgba(121, 174, 255, 0.2);
-$ag-shadow-session-pending: inset 0 0 0 1px rgba(146, 214, 255, 0.22);
+  0 0 0 1px rgba(196, 227, 255, 0.26),
+  0 0 18px rgba(121, 174, 255, 0.22);
+$ag-shadow-session-pending: inset 0 0 0 1px rgba($aa-pr-frost-300, 0.24);
 
-// Core tokens: motion
-$ag-motion-fast: 120ms;
-$ag-motion-base: 180ms;
+// Motion tokens
+$ag-motion-fast: 110ms;
+$ag-motion-base: 170ms;
 $ag-motion-slow: 240ms;
 $ag-motion-pulse: 2000ms;
 $ag-curve-standard: cubic-bezier(0.2, 0, 0, 1);
+$ag-curve-emphasis: cubic-bezier(0.16, 0.84, 0.34, 1);
 
 $ag-popup-border: $ag-border-popup;
 $ag-popup-shadow: $ag-shadow-lg;
@@ -313,6 +338,41 @@ $bar-density: hero !default; // compact | balanced | hero
   transition: all $ag-motion-slow $ag-curve-standard;
 }
 
+* {
+  font-family: "IBM Plex Sans", "Iosevka Aile", "Cantarell", sans-serif;
+}
+
+label {
+  color: $ag-text-0;
+}
+
+entry,
+button,
+scale,
+menubutton {
+  transition-timing-function: $ag-curve-standard;
+}
+
+window.CommandPalette,
+window.ControlCenter,
+window.SpotifyPopup {
+  .status-info {
+    color: $aa-sem-info;
+  }
+
+  .status-success {
+    color: $aa-sem-success;
+  }
+
+  .status-warn {
+    color: $aa-sem-warn;
+  }
+
+  .status-error {
+    color: $aa-sem-error;
+  }
+}
+
 $bar-presets: (
   compact: (
     bar-height: 40px,
@@ -379,10 +439,10 @@ $ag-bar-shell-gradient: linear-gradient(
   rgba(18, 30, 49, 0.97)
 );
 $ag-bar-shell-border: rgba(171, 216, 255, 0.32);
-$ag-bar-shell-margin-top: $ag-space-8;
+$ag-bar-shell-margin-top: $ag-space-10;
 $ag-bar-shell-padding-y: $ag-space-4;
-$ag-bar-button-padding-y: $ag-space-7;
-$ag-bar-button-padding-x: $ag-space-14;
+$ag-bar-button-padding-y: $ag-space-6;
+$ag-bar-button-padding-x: $ag-space-12;
 $ag-bar-monitor-lane-bg: $ag-surface-overlay-base;
 $ag-bar-monitor-lane-border: rgba(189, 214, 255, 0.24);
 $ag-bar-monitor-lane-padding-y: $ag-space-4;
@@ -403,18 +463,18 @@ $ag-bar-workspace-active-border: rgba(208, 232, 255, 0.78);
 $ag-bar-workspace-unfocused-bg: rgba(189, 214, 255, 0.24);
 $ag-bar-workspace-unfocused-border: rgba(189, 214, 255, 0.52);
 $ag-bar-workspace-fallback-border: rgba(189, 214, 255, 0.2);
-$ag-bar-connectivity-bg: rgba(146, 214, 255, 0.12);
-$ag-bar-connectivity-border: rgba(146, 214, 255, 0.4);
-$ag-bar-connectivity-hover-bg: rgba(146, 214, 255, 0.2);
-$ag-bar-connectivity-hover-border: rgba(146, 214, 255, 0.55);
-$ag-bar-connectivity-active-bg: rgba(146, 214, 255, 0.28);
-$ag-bar-connectivity-active-border: rgba(146, 214, 255, 0.66);
-$ag-bar-spotify-bg: rgba(152, 245, 224, 0.08);
-$ag-bar-spotify-border: rgba(152, 245, 224, 0.38);
-$ag-bar-spotify-hover-bg: rgba(152, 245, 224, 0.2);
-$ag-bar-spotify-hover-border: rgba(152, 245, 224, 0.56);
-$ag-bar-spotify-active-bg-soft: rgba(152, 245, 224, 0.24);
-$ag-bar-spotify-active-border-soft: rgba(175, 251, 234, 0.62);
+$ag-bar-connectivity-bg: rgba($aa-pr-frost-300, 0.14);
+$ag-bar-connectivity-border: rgba($aa-pr-frost-300, 0.44);
+$ag-bar-connectivity-hover-bg: rgba($aa-pr-frost-300, 0.22);
+$ag-bar-connectivity-hover-border: rgba($aa-pr-frost-300, 0.6);
+$ag-bar-connectivity-active-bg: rgba($aa-pr-frost-300, 0.3);
+$ag-bar-connectivity-active-border: rgba($aa-pr-frost-300, 0.68);
+$ag-bar-spotify-bg: rgba($aa-pr-frost-250, 0.1);
+$ag-bar-spotify-border: rgba($aa-pr-frost-250, 0.4);
+$ag-bar-spotify-hover-bg: rgba($aa-pr-frost-250, 0.22);
+$ag-bar-spotify-hover-border: rgba($aa-pr-frost-250, 0.6);
+$ag-bar-spotify-active-bg-soft: rgba($aa-pr-frost-250, 0.26);
+$ag-bar-spotify-active-border-soft: rgba(175, 251, 234, 0.66);
 $ag-bar-spotify-active-bg: linear-gradient(
   146deg,
   rgba(152, 245, 224, 0.26),
@@ -428,46 +488,46 @@ $ag-bar-clock-hover-bg: rgba(189, 214, 255, 0.2);
 $ag-bar-clock-hover-border: rgba(189, 214, 255, 0.56);
 $ag-bar-clock-active-bg: rgba(189, 214, 255, 0.28);
 $ag-bar-clock-active-border: rgba(189, 214, 255, 0.66);
-$ag-bar-card-padding: $ag-space-12;
+$ag-bar-card-padding: $ag-space-14;
 $ag-bar-calendar-padding: $ag-space-6;
-$ag-bar-volume-padding-y: $ag-space-7;
-$ag-bar-volume-padding-x: $ag-space-13;
-$ag-bar-volume-bg: rgba(146, 214, 255, 0.12);
-$ag-bar-volume-border: rgba(146, 214, 255, 0.42);
-$ag-bar-volume-hover-bg: rgba(146, 214, 255, 0.22);
-$ag-bar-volume-hover-border: rgba(146, 214, 255, 0.58);
-$ag-bar-volume-active-bg: rgba(146, 214, 255, 0.3);
-$ag-bar-volume-active-border: rgba(146, 214, 255, 0.68);
-$ag-bar-volume-mute-bg: rgba(146, 214, 255, 0.06);
-$ag-bar-volume-mute-border: rgba(146, 214, 255, 0.26);
-$ag-bar-volume-mute-hover-bg: rgba(146, 214, 255, 0.11);
-$ag-bar-volume-mute-hover-border: rgba(146, 214, 255, 0.38);
-$ag-bar-volume-mute-active-bg: rgba(146, 214, 255, 0.16);
-$ag-bar-volume-mute-active-border: rgba(146, 214, 255, 0.48);
-$ag-bar-volume-popover-padding: $ag-space-14;
+$ag-bar-volume-padding-y: $ag-space-6;
+$ag-bar-volume-padding-x: $ag-space-12;
+$ag-bar-volume-bg: rgba($aa-pr-frost-300, 0.14);
+$ag-bar-volume-border: rgba($aa-pr-frost-300, 0.44);
+$ag-bar-volume-hover-bg: rgba($aa-pr-frost-300, 0.24);
+$ag-bar-volume-hover-border: rgba($aa-pr-frost-300, 0.62);
+$ag-bar-volume-active-bg: rgba($aa-pr-frost-300, 0.32);
+$ag-bar-volume-active-border: rgba($aa-pr-frost-300, 0.7);
+$ag-bar-volume-mute-bg: rgba($aa-pr-frost-300, 0.08);
+$ag-bar-volume-mute-border: rgba($aa-pr-frost-300, 0.28);
+$ag-bar-volume-mute-hover-bg: rgba($aa-pr-frost-300, 0.12);
+$ag-bar-volume-mute-hover-border: rgba($aa-pr-frost-300, 0.4);
+$ag-bar-volume-mute-active-bg: rgba($aa-pr-frost-300, 0.18);
+$ag-bar-volume-mute-active-border: rgba($aa-pr-frost-300, 0.5);
+$ag-bar-volume-popover-padding: $ag-space-16;
 
 // Component tokens: Spotify popup
-$ag-spotify-card-padding: $ag-space-14;
+$ag-spotify-card-padding: $ag-space-16;
 $ag-spotify-button-bg: rgba(24, 33, 47, 0.96);
-$ag-spotify-button-border: rgba(255, 255, 255, 0.18);
+$ag-spotify-button-border: rgba(255, 255, 255, 0.2);
 $ag-spotify-button-hover-bg: rgba(34, 45, 63, 0.98);
 $ag-spotify-button-active-bg: rgba(46, 59, 82, 0.99);
 $ag-spotify-api-chip-bg: $ag-surface-overlay-strong;
 $ag-spotify-api-chip-border: rgba(255, 255, 255, 0.12);
-$ag-spotify-status-bg: rgba(152, 245, 224, 0.16);
-$ag-spotify-status-border: rgba(152, 245, 224, 0.4);
+$ag-spotify-status-bg: rgba($aa-pr-frost-250, 0.16);
+$ag-spotify-status-border: rgba($aa-pr-frost-250, 0.42);
 $ag-spotify-status-padding-y: $ag-space-2;
 $ag-spotify-status-padding-x: $ag-space-9;
-$ag-spotify-control-padding-y: $ag-space-6;
+$ag-spotify-control-padding-y: $ag-space-7;
 $ag-spotify-control-padding-x: $ag-space-10;
 $ag-spotify-action-padding-y: $ag-space-5;
 $ag-spotify-action-padding-x: $ag-space-10;
-$ag-spotify-play-bg: rgba(152, 245, 224, 0.24);
-$ag-spotify-play-border: rgba(152, 245, 224, 0.48);
-$ag-spotify-play-hover-bg: rgba(152, 245, 224, 0.3);
-$ag-spotify-play-hover-border: rgba(175, 251, 234, 0.62);
-$ag-spotify-play-active-bg: rgba(152, 245, 224, 0.36);
-$ag-spotify-play-active-border: rgba(175, 251, 234, 0.72);
+$ag-spotify-play-bg: rgba($aa-pr-frost-250, 0.24);
+$ag-spotify-play-border: rgba($aa-pr-frost-250, 0.5);
+$ag-spotify-play-hover-bg: rgba($aa-pr-frost-250, 0.32);
+$ag-spotify-play-hover-border: rgba(175, 251, 234, 0.66);
+$ag-spotify-play-active-bg: rgba($aa-pr-frost-250, 0.38);
+$ag-spotify-play-active-border: rgba(175, 251, 234, 0.74);
 $ag-spotify-action-bg: $ag-surface-overlay-strong;
 $ag-spotify-action-border: rgba(255, 255, 255, 0.16);
 $ag-spotify-action-hover-bg: $ag-surface-overlay-stronger;
@@ -483,10 +543,10 @@ $ag-spotify-connect-active-bg: rgba(146, 214, 255, 0.3);
 $ag-spotify-connect-active-border: rgba(146, 214, 255, 0.7);
 
 // Component tokens: Command palette
-$ag-command-shell-padding-x: $ag-space-24;
-$ag-command-card-padding: $ag-space-14;
+$ag-command-shell-padding-x: $ag-space-32;
+$ag-command-card-padding: $ag-space-16;
 $ag-command-input-bg: $ag-surface-input;
-$ag-command-input-border: rgba(146, 214, 255, 0.34);
+$ag-command-input-border: rgba($aa-pr-frost-300, 0.36);
 $ag-command-input-focus-bg: rgba(146, 214, 255, 0.14);
 $ag-command-input-focus-shadow: 0 10px 18px -14px rgba(0, 0, 0, 0.72);
 $ag-command-item-bg: $ag-surface-overlay-soft;
@@ -503,7 +563,7 @@ $ag-command-category-bg: rgba(146, 214, 255, 0.13);
 $ag-command-category-border: rgba(146, 214, 255, 0.34);
 
 // Component tokens: Control center
-$ag-control-center-card-padding: $ag-space-14;
+$ag-control-center-card-padding: $ag-space-16;
 $ag-control-center-button-bg: $ag-surface-overlay-base;
 $ag-control-center-button-border: $ag-border-subtle;
 $ag-control-center-button-hover-bg: $ag-surface-overlay-stronger;
@@ -511,7 +571,7 @@ $ag-control-center-button-active-bg: rgba(255, 255, 255, 0.12);
 $ag-control-center-tab-active-bg: rgba(146, 214, 255, 0.14);
 $ag-control-center-tab-active-border: rgba(146, 214, 255, 0.38);
 $ag-control-center-tab-active-shadow: inset 0 0 0 1px rgba(146, 214, 255, 0.18);
-$ag-control-center-section-padding: $ag-space-12;
+$ag-control-center-section-padding: $ag-space-14;
 $ag-control-center-password-padding-y: $ag-space-4;
 $ag-control-center-password-padding-x: $ag-space-10;
 $ag-control-center-password-bg: $ag-surface-overlay-base;

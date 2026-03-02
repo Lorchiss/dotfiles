@@ -3,6 +3,7 @@ import { Astal, Gdk, Gtk } from "ags/gtk4"
 import { execAsync } from "ags/process"
 import { createPoll } from "ags/time"
 import { extractSpotifyTrackId, shellQuoted } from "../lib/spotify"
+import { OVERLAY_LAYOUT, SPOTIFY_UI } from "../lib/uiTokens"
 import {
   readLikeStatus,
   resolveAccentClass,
@@ -28,15 +29,23 @@ type SpotifyState = {
 }
 
 const POPUP_LAYOUT: "horizontal" | "vertical" = "vertical"
-const COVER_WRAP_SIZE = 188
-const COVER_IMAGE_SIZE = 184
-const POPUP_PADDING = 14
+const COVER_WRAP_SIZE = SPOTIFY_UI.coverWrapSize
+const COVER_IMAGE_SIZE = SPOTIFY_UI.coverImageSize
+const POPUP_PADDING = SPOTIFY_UI.popupPadding
 const POPUP_WIDTH_REQUEST =
-  POPUP_LAYOUT === "vertical" ? COVER_WRAP_SIZE + POPUP_PADDING * 2 : 520
+  POPUP_LAYOUT === "vertical"
+    ? COVER_WRAP_SIZE + POPUP_PADDING * 2
+    : SPOTIFY_UI.popupHorizontalWidth
 
 const MARQUEE_TICK_MS = 110
-const POPUP_TITLE_WIDTH = POPUP_LAYOUT === "vertical" ? 24 : 34
-const POPUP_ARTIST_WIDTH = POPUP_LAYOUT === "vertical" ? 26 : 38
+const POPUP_TITLE_WIDTH =
+  POPUP_LAYOUT === "vertical"
+    ? SPOTIFY_UI.popupVerticalTitleChars
+    : SPOTIFY_UI.popupHorizontalTitleChars
+const POPUP_ARTIST_WIDTH =
+  POPUP_LAYOUT === "vertical"
+    ? SPOTIFY_UI.popupVerticalArtistChars
+    : SPOTIFY_UI.popupHorizontalArtistChars
 const LIKE_REFRESH_MS = 4500
 const MANUAL_MESSAGE_TTL_MS = 4200
 const LIKE_OVERRIDE_TTL_MS = 7000
@@ -484,8 +493,8 @@ printf "%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s" "$title" "$artist" "$length" "$art" 
       visible={false}
       layer={Astal.Layer.TOP}
       anchor={Astal.WindowAnchor.TOP | Astal.WindowAnchor.RIGHT}
-      marginTop={80}
-      marginRight={36}
+      marginTop={OVERLAY_LAYOUT.topOffset}
+      marginRight={OVERLAY_LAYOUT.edgeOffset}
       exclusivity={Astal.Exclusivity.IGNORE}
       keymode={Astal.Keymode.ON_DEMAND}
       $={(window: any) => {

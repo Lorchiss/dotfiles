@@ -9,6 +9,7 @@ import AudioSection from "./controlcenter/AudioSection"
 import SystemSection from "./controlcenter/SystemSection"
 import SessionSection from "./controlcenter/SessionSection"
 import { createMusicAccentClassState } from "../lib/musicAccent"
+import { CONTROL_CENTER_UI, OVERLAY_LAYOUT } from "../lib/uiTokens"
 import {
   readLastControlCenterTab,
   writeLastControlCenterTab,
@@ -22,8 +23,6 @@ export default function ControlCenter() {
   let tabsApi: { setActiveTab: (tab: ControlCenterTab) => void } | null = null
   let pendingStoredTab: ControlCenterTab | null = null
   const accentClass = createMusicAccentClassState()
-  const CONTROL_CENTER_WIDTH = 560
-  const CONTROL_CENTER_CONTENT_HEIGHT = 410
 
   const sectionRefs: Partial<Record<ControlCenterTab, any>> = {}
 
@@ -73,8 +72,8 @@ export default function ControlCenter() {
       visible={false}
       layer={Astal.Layer.TOP}
       anchor={Astal.WindowAnchor.TOP | Astal.WindowAnchor.RIGHT}
-      marginTop={80}
-      marginRight={332}
+      marginTop={OVERLAY_LAYOUT.topOffset}
+      marginRight={OVERLAY_LAYOUT.edgeOffset + 304}
       exclusivity={Astal.Exclusivity.IGNORE}
       keymode={Astal.Keymode.ON_DEMAND}
       $={(window: any) => {
@@ -97,7 +96,7 @@ export default function ControlCenter() {
         class={accentClass(
           (accent) => `cc-card popup-accent-surface ${accent}`,
         )}
-        widthRequest={CONTROL_CENTER_WIDTH}
+        widthRequest={CONTROL_CENTER_UI.width}
       >
         <box class="cc-header" spacing={8}>
           <label class="cc-title" label="Control Center" hexpand xalign={0} />
@@ -126,8 +125,8 @@ export default function ControlCenter() {
             sectionsScrollRef = scroll
             scroll.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC)
             scroll.set_propagate_natural_height(false)
-            scroll.set_min_content_height(CONTROL_CENTER_CONTENT_HEIGHT)
-            scroll.set_max_content_height(CONTROL_CENTER_CONTENT_HEIGHT)
+            scroll.set_min_content_height(CONTROL_CENTER_UI.contentHeight)
+            scroll.set_max_content_height(CONTROL_CENTER_UI.contentHeight)
           }}
         >
           <box

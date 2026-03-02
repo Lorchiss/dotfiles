@@ -4,6 +4,7 @@ import { execAsync } from "ags/process"
 import { runCommand } from "../lib/command"
 import { createMusicAccentClassState } from "../lib/musicAccent"
 import { openInTerminal } from "../lib/terminal"
+import { COMMAND_PALETTE_UI, OVERLAY_LAYOUT } from "../lib/uiTokens"
 
 type PaletteAction = {
   id: string
@@ -514,7 +515,7 @@ export default function CommandPalette() {
         Astal.WindowAnchor.LEFT |
         Astal.WindowAnchor.RIGHT
       }
-      marginTop={92}
+      marginTop={OVERLAY_LAYOUT.topOffset + 8}
       marginLeft={0}
       marginRight={0}
       exclusivity={Astal.Exclusivity.IGNORE}
@@ -542,7 +543,7 @@ export default function CommandPalette() {
           )}
           orientation={Gtk.Orientation.VERTICAL}
           spacing={10}
-          widthRequest={740}
+          widthRequest={COMMAND_PALETTE_UI.width}
           halign={Gtk.Align.CENTER}
         >
           <box class="command-palette-header" spacing={10}>
@@ -580,7 +581,7 @@ export default function CommandPalette() {
                 Gtk.PolicyType.NEVER,
                 Gtk.PolicyType.AUTOMATIC,
               )
-              scroll.set_min_content_height?.(276)
+              scroll.set_min_content_height?.(COMMAND_PALETTE_UI.minListHeight)
             }}
           >
             <box
