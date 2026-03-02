@@ -197,35 +197,35 @@ $ag-popup-border: $ag-border-popup;
 $ag-popup-shadow: $ag-shadow-lg;
 
 $ag-accent-variants: (
-  emerald: (
+  "emerald": (
     border: rgba(138, 242, 196, 0.44),
     text: rgba(211, 255, 240, 0.98),
     tint: rgba(138, 242, 196, 0.2),
     fill-start: rgba(138, 242, 196, 0.95),
     fill-end: rgba(93, 227, 166, 0.95),
   ),
-  cyan: (
+  "cyan": (
     border: rgba(123, 230, 247, 0.44),
     text: rgba(218, 250, 255, 0.98),
     tint: rgba(123, 230, 247, 0.2),
     fill-start: rgba(123, 230, 247, 0.96),
     fill-end: rgba(99, 195, 240, 0.95),
   ),
-  blue: (
+  "blue": (
     border: rgba(121, 174, 255, 0.46),
     text: rgba(224, 236, 255, 0.98),
     tint: rgba(121, 174, 255, 0.2),
     fill-start: rgba(121, 174, 255, 0.96),
     fill-end: rgba(91, 141, 238, 0.95),
   ),
-  amber: (
+  "amber": (
     border: rgba(248, 197, 108, 0.48),
     text: rgba(255, 241, 214, 0.98),
     tint: rgba(248, 197, 108, 0.22),
     fill-start: rgba(248, 197, 108, 0.96),
     fill-end: rgba(241, 162, 61, 0.95),
   ),
-  rose: (
+  "rose": (
     border: rgba(245, 132, 161, 0.46),
     text: rgba(255, 225, 234, 0.98),
     tint: rgba(245, 132, 161, 0.22),
@@ -242,11 +242,11 @@ $ag-accent-variants: (
   @return map.get($variant, $token);
 }
 
-$ag-accent-emerald-border: ag-accent(emerald, border);
-$ag-accent-cyan-border: ag-accent(cyan, border);
-$ag-accent-blue-border: ag-accent(blue, border);
-$ag-accent-amber-border: ag-accent(amber, border);
-$ag-accent-rose-border: ag-accent(rose, border);
+$ag-accent-emerald-border: ag-accent("emerald", border);
+$ag-accent-cyan-border: ag-accent("cyan", border);
+$ag-accent-blue-border: ag-accent("blue", border);
+$ag-accent-amber-border: ag-accent("amber", border);
+$ag-accent-rose-border: ag-accent("rose", border);
 
 $fg-color: #{"@theme_fg_color"};
 $bg-color: #{"@theme_bg_color"};
@@ -617,8 +617,10 @@ $ag-control-center-session-pending-bg: rgba(146, 214, 255, 0.12);
 }
 
 @each $accent-name, $accent-token in $ag-accent-variants {
-  .popup-accent-surface.spotify-accent-#{$accent-name},
-  window.SpotifyPopup .spotifyPopupCardShell.spotify-accent-#{$accent-name} {
+  .popup-accent-surface.spotify-accent-#{"" + $accent-name},
+  window.SpotifyPopup
+    .spotifyPopupCardShell.spotify-accent-#{""
+    + $accent-name} {
     border-color: map.get($accent-token, border);
   }
 }
@@ -795,7 +797,6 @@ window.Bar {
 
   .active-window-chip {
     min-width: 220px;
-    max-width: 390px;
     padding: $ag-space-4 $ag-space-8;
     border-radius: $ag-bar-block-radius;
     background: $ag-bar-active-window-bg;
@@ -1041,7 +1042,9 @@ window.Bar {
   }
 
   @each $accent-name, $accent-token in $ag-accent-variants {
-    .clock-popover-card.spotify-accent-#{$accent-name} .clock-popover-heading {
+    .clock-popover-card.spotify-accent-#{""
+      + $accent-name}
+      .clock-popover-heading {
       color: map.get($accent-token, text);
     }
   }
@@ -1124,7 +1127,7 @@ window.Bar {
     }
 
     @each $accent-name, $accent-token in $ag-accent-variants {
-      volPopover.spotify-accent-#{$accent-name} .vol-scale highlight {
+      volPopover.spotify-accent-#{"" + $accent-name} .vol-scale highlight {
         @include ag-progress-fill(
           map.get($accent-token, fill-start),
           map.get($accent-token, fill-end)
@@ -1367,7 +1370,8 @@ window.SpotifyPopup {
   }
 
   @each $accent-name, $accent-token in $ag-accent-variants {
-    .spotifyPopupCardShell.spotify-accent-#{$accent-name}
+    .spotifyPopupCardShell.spotify-accent-#{""
+      + $accent-name}
       .spotifyProgressBar
       progress {
       @include ag-progress-fill(
@@ -1376,8 +1380,11 @@ window.SpotifyPopup {
       );
     }
 
-    .spotifyPopupCardShell.spotify-accent-#{$accent-name} .spotifyPopupStatus,
-    .spotifyPopupCardShell.spotify-accent-#{$accent-name}
+    .spotifyPopupCardShell.spotify-accent-#{""
+      + $accent-name}
+      .spotifyPopupStatus,
+    .spotifyPopupCardShell.spotify-accent-#{""
+      + $accent-name}
       .spotify-action-btn.spotify-action-active {
       color: map.get($accent-token, text);
       background: map.get($accent-token, tint);
@@ -1601,7 +1608,7 @@ window.ControlCenter {
   }
 
   @each $accent-name, $accent-token in $ag-accent-variants {
-    > ccCard.spotify-accent-#{$accent-name} .cc-tab-btn-active {
+    > ccCard.spotify-accent-#{"" + $accent-name} .cc-tab-btn-active {
       background: map.get($accent-token, tint);
       border-color: map.get($accent-token, border);
       color: map.get($accent-token, text);
@@ -1698,7 +1705,7 @@ window.ControlCenter {
   }
 
   @each $accent-name, $accent-token in $ag-accent-variants {
-    > ccCard.spotify-accent-#{$accent-name} .cc-audio-scale highlight {
+    > ccCard.spotify-accent-#{"" + $accent-name} .cc-audio-scale highlight {
       @include ag-progress-fill(
         map.get($accent-token, fill-start),
         map.get($accent-token, fill-end)
@@ -1831,7 +1838,6 @@ window.ControlCenter {
 
   .cc-session-confirm-box {
     padding: $ag-space-9;
-    align-items: center;
   }
 
   .cc-session-confirm-title {
