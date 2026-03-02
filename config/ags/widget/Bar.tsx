@@ -4,8 +4,11 @@ import { execAsync } from "ags/process"
 import SpotifyButton from "./bar/SpotifyButton"
 import ClockMenu from "./bar/ClockMenu"
 import WorkspaceLanes from "./bar/WorkspaceLanes"
-import SystemTray from "./bar/SystemTray"
-import SystemMetrics from "./bar/SystemMetrics"
+import VolumeControl from "./bar/VolumeControl"
+import ActiveWindowChip from "./bar/ActiveWindowChip"
+import CriticalAlertChip from "./bar/CriticalAlertChip"
+import ModeChip from "./bar/ModeChip"
+import ObservabilityHub from "./bar/ObservabilityHub"
 
 export default function Bar(gdkmonitor: any) {
   const { TOP, LEFT, RIGHT } = Astal.WindowAnchor
@@ -25,12 +28,14 @@ export default function Bar(gdkmonitor: any) {
         <box
           $type="start"
           class="bar-section-start"
-          spacing={12}
+          spacing={10}
           valign={Gtk.Align.CENTER}
           hexpand
           halign={Gtk.Align.START}
         >
           <WorkspaceLanes />
+          <ActiveWindowChip />
+          <CriticalAlertChip />
         </box>
 
         <box
@@ -52,8 +57,8 @@ export default function Bar(gdkmonitor: any) {
           hexpand
           halign={Gtk.Align.END}
         >
-          <SystemTray />
-          <SystemMetrics />
+          <ModeChip />
+          <VolumeControl />
           <button
             class="connectivity-chip"
             onClicked={() =>
@@ -66,6 +71,7 @@ export default function Bar(gdkmonitor: any) {
               <label label="Centro" />
             </box>
           </button>
+          <ObservabilityHub />
           <ClockMenu />
         </box>
       </centerbox>
