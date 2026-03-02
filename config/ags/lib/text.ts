@@ -74,14 +74,6 @@ export function safeText(
 
   const text = normalize(value)
   if (!text) {
-    if (!fallbackText) return ""
-    debugSanitizerWarning(
-      moduleName,
-      fieldName,
-      "empty",
-      value,
-      fallbackText || "<empty>",
-    )
     return fallbackText
   }
   if (hasForbiddenTechText(text)) {
