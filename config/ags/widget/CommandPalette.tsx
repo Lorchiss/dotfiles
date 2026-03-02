@@ -18,6 +18,7 @@ type PaletteAction = {
   subtitle: string
   keywords: string[]
   category: "Apps" | "Sistema" | "Mantenimiento"
+  priority: number
   run: () => Promise<void>
   searchText?: string
 }
@@ -246,6 +247,7 @@ const ACTIONS: PaletteAction[] = [
     subtitle: "Lanza una terminal interactiva",
     category: "Apps",
     keywords: ["app", "shell", "kitty", "foot", "terminal"],
+    priority: 100,
     run: () => openInTerminal(`exec "\${SHELL:-bash}"`),
   },
   {
@@ -254,6 +256,7 @@ const ACTIONS: PaletteAction[] = [
     subtitle: "Abre Firefox/Chromium o navegador por defecto",
     category: "Apps",
     keywords: ["app", "web", "internet", "firefox", "browser"],
+    priority: 80,
     run: openBrowserAction,
   },
   {
@@ -262,6 +265,7 @@ const ACTIONS: PaletteAction[] = [
     subtitle: "Prioriza Obsidian y fallback a editor",
     category: "Apps",
     keywords: ["app", "editor", "obsidian", "code", "codium", "zed"],
+    priority: 85,
     run: openEditorAction,
   },
   {
@@ -270,6 +274,7 @@ const ACTIONS: PaletteAction[] = [
     subtitle: "Bloquea la sesión actual",
     category: "Sistema",
     keywords: ["system", "screen", "lock", "seguridad", "hyprlock"],
+    priority: 98,
     run: lockScreenAction,
   },
   {
@@ -278,6 +283,7 @@ const ACTIONS: PaletteAction[] = [
     subtitle: "Captura área seleccionada",
     category: "Sistema",
     keywords: ["system", "capture", "screenshot", "grim", "slurp"],
+    priority: 70,
     run: screenshotAction,
   },
   {
@@ -286,6 +292,7 @@ const ACTIONS: PaletteAction[] = [
     subtitle: "Reinicia ags.service (usuario)",
     category: "Sistema",
     keywords: ["system", "ags", "restart", "service"],
+    priority: 75,
     run: async () => {
       await runCommand(
         `systemctl --user restart ags.service && systemctl --user is-active --quiet ags.service`,
@@ -302,8 +309,20 @@ const ACTIONS: PaletteAction[] = [
     subtitle: "Toggle del panel de control",
     category: "Sistema",
     keywords: ["system", "control", "center", "wifi", "bluetooth", "audio"],
+    priority: 90,
     run: async () => {
       await runCommand(`ags toggle control-center`, { timeoutMs: 2000 })
+    },
+  },
+  {
+    id: "sys-spotify-popup",
+    title: "Abrir Spotify popup",
+    subtitle: "Toggle del panel de Spotify",
+    category: "Sistema",
+    keywords: ["system", "spotify", "music", "popup", "media"],
+    priority: 92,
+    run: async () => {
+      await runCommand(`ags toggle spotify`, { timeoutMs: 2000 })
     },
   },
   {
@@ -312,6 +331,7 @@ const ACTIONS: PaletteAction[] = [
     subtitle: "Ejecuta system_update.sh --dry-run en terminal",
     category: "Mantenimiento",
     keywords: ["maintenance", "update", "dry-run", "pacman", "paru"],
+    priority: 72,
     run: openUpdateDryRunAction,
   },
   {
@@ -320,6 +340,7 @@ const ACTIONS: PaletteAction[] = [
     subtitle: "Sigue logs de ags.service con journalctl",
     category: "Mantenimiento",
     keywords: ["maintenance", "logs", "journalctl", "debug", "ags"],
+    priority: 78,
     run: openAgsLogsAction,
   },
   {
@@ -328,6 +349,7 @@ const ACTIONS: PaletteAction[] = [
     subtitle: "Ejecuta bootstrap/ags-smoke.sh",
     category: "Mantenimiento",
     keywords: ["maintenance", "smoke", "test", "qa", "ags-smoke"],
+    priority: 76,
     run: runSmokeTestAction,
   },
 ]
@@ -340,12 +362,34 @@ for (const action of ACTIONS) {
 
 function filterActions(query: string): PaletteAction[] {
   const normalized = normalizeText(query)
-  if (!normalized) return ACTIONS
-
   const terms = normalized.split(" ").filter(Boolean)
-  return ACTIONS.filter((action) =>
-    terms.every((term) => (action.searchText ?? "").includes(term)),
-  )
+
+  const scoreAction = (action: PaletteAction): number => {
+    if (!terms.length) return action.priority
+
+    const title = normalizeText(action.title)
+    const subtitle = normalizeText(action.subtitle)
+    const category = normalizeText(action.category)
+    const searchText = action.searchText ?? ""
+
+    let score = action.priority
+    for (const term of terms) {
+      if (!searchText.includes(term)) return -1
+
+      if (title.startsWith(term)) score += 80
+      else if (title.includes(term)) score += 46
+      else if (subtitle.includes(term)) score += 24
+      else if (category.includes(term)) score += 18
+      else score += 10
+    }
+
+    return score
+  }
+
+  return ACTIONS.map((action) => ({ action, score: scoreAction(action) }))
+    .filter((entry) => entry.score >= 0)
+    .sort((a, b) => b.score - a.score)
+    .map((entry) => entry.action)
 }
 
 export default function CommandPalette() {
@@ -494,19 +538,59 @@ export default function CommandPalette() {
     }
   }
 
-  const handleKeyPress = (_: any, keyval: number) => {
+  const handleKeyPress = (
+    _: any,
+    keyval: number,
+    _keycode: number,
+    state: number,
+  ) => {
+    const hasCtrl = Boolean(state & Gdk.ModifierType.CONTROL_MASK)
+    const hasShift = Boolean(state & Gdk.ModifierType.SHIFT_MASK)
+
     if (keyval === Gdk.KEY_Escape) {
       closePalette()
       return true
     }
+
+    if (keyval === Gdk.KEY_Return || keyval === Gdk.KEY_KP_Enter) {
+      void executeSelectedAction()
+      return true
+    }
+
     if (keyval === Gdk.KEY_Down || keyval === Gdk.KEY_KP_Down) {
       moveSelection(1)
       return true
     }
+
     if (keyval === Gdk.KEY_Up || keyval === Gdk.KEY_KP_Up) {
       moveSelection(-1)
       return true
     }
+
+    if (
+      keyval === Gdk.KEY_Tab ||
+      keyval === Gdk.KEY_ISO_Left_Tab ||
+      (hasCtrl && (keyval === Gdk.KEY_j || keyval === Gdk.KEY_J)) ||
+      (hasCtrl && (keyval === Gdk.KEY_k || keyval === Gdk.KEY_K))
+    ) {
+      if (keyval === Gdk.KEY_ISO_Left_Tab || hasShift || keyval === Gdk.KEY_k)
+        moveSelection(-1)
+      else moveSelection(1)
+      return true
+    }
+
+    if (keyval === Gdk.KEY_Home) {
+      selectedIndex = 0
+      syncActiveItemClasses()
+      return true
+    }
+
+    if (keyval === Gdk.KEY_End && filteredActions.length > 0) {
+      selectedIndex = filteredActions.length - 1
+      syncActiveItemClasses()
+      return true
+    }
+
     return false
   }
 
@@ -563,7 +647,10 @@ export default function CommandPalette() {
               hexpand
               xalign={0}
             />
-            <label class="command-palette-hint" label="Esc cerrar" />
+            <label
+              class="command-palette-hint"
+              label="Esc cerrar · Tab navegar"
+            />
           </box>
 
           <Gtk.Entry
@@ -571,7 +658,7 @@ export default function CommandPalette() {
             $={(entry: any) => {
               inputRef = entry
               entry.set_placeholder_text?.(
-                "Buscar acción (terminal, lock, logs, update, smoke...)",
+                "Buscar acción (terminal, spotify, lock, logs, update, smoke...)",
               )
               entry.connect("changed", () => {
                 query = String(entry.get_text?.() ?? "")
@@ -617,7 +704,7 @@ export default function CommandPalette() {
             />
             <label
               class="command-palette-hint"
-              label="↑/↓ mover · Enter ejecutar"
+              label="↑/↓/Tab mover · Enter ejecutar · Ctrl+J/K"
             />
           </box>
         </box>

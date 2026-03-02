@@ -7,11 +7,21 @@ export type ControlCenterTab =
   | "system"
   | "session"
 
+export const CONTROL_CENTER_TAB_ORDER: ControlCenterTab[] = [
+  "wifi",
+  "bluetooth",
+  "audio",
+  "system",
+  "session",
+]
+
 type ControlCenterTabsProps = {
   initialTab?: ControlCenterTab
   onSelect: (tab: ControlCenterTab) => void
   onReady?: (controls: {
     setActiveTab: (tab: ControlCenterTab) => void
+    selectRelativeTab: (delta: number) => void
+    getActiveTab: () => ControlCenterTab
   }) => void
 }
 
@@ -42,12 +52,25 @@ export default function ControlCenterTabs({
     onSelect(tab)
   }
 
+  const selectRelativeTab = (delta: number) => {
+    const index = CONTROL_CENTER_TAB_ORDER.indexOf(activeTab)
+    const currentIndex = index < 0 ? 0 : index
+    const nextIndex =
+      (currentIndex + delta + CONTROL_CENTER_TAB_ORDER.length) %
+      CONTROL_CENTER_TAB_ORDER.length
+    selectTab(CONTROL_CENTER_TAB_ORDER[nextIndex])
+  }
+
   onReady?.({
     setActiveTab: (tab) => {
       activeTab = tab
       syncButtonClasses()
       onSelect(tab)
     },
+    selectRelativeTab: (delta) => {
+      selectRelativeTab(delta)
+    },
+    getActiveTab: () => activeTab,
   })
 
   const registerButton = (tab: ControlCenterTab) => (button: any) => {

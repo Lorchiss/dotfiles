@@ -1,6 +1,7 @@
 import app from "ags/gtk4/app"
 import { Astal, Gdk, Gtk } from "ags/gtk4"
 import ControlCenterTabs, {
+  CONTROL_CENTER_TAB_ORDER,
   type ControlCenterTab,
 } from "./controlcenter/ControlCenterTabs"
 import WifiSection from "./controlcenter/WifiSection"
@@ -25,7 +26,11 @@ export default function ControlCenter() {
   let activeTab: ControlCenterTab = "wifi"
   let windowRef: any = null
   let sectionsScrollRef: any = null
-  let tabsApi: { setActiveTab: (tab: ControlCenterTab) => void } | null = null
+  let tabsApi: {
+    setActiveTab: (tab: ControlCenterTab) => void
+    selectRelativeTab: (delta: number) => void
+    getActiveTab: () => ControlCenterTab
+  } | null = null
   let pendingStoredTab: ControlCenterTab | null = null
   const accentClass = createMusicAccentClassState()
   const overlayLayout = overlayLayoutBinding()
@@ -62,6 +67,13 @@ export default function ControlCenter() {
     windowRef.visible = false
   }
 
+  const selectTabByIndex = (index: number) => {
+    const tab = CONTROL_CENTER_TAB_ORDER[index]
+    if (!tab) return false
+    tabsApi?.setActiveTab(tab)
+    return true
+  }
+
   void readLastControlCenterTab().then((storedTab) => {
     if (!storedTab) return
     activeTab = storedTab
@@ -88,13 +100,59 @@ export default function ControlCenter() {
         registerOverlayWindow("control-center", window)
 
         const keyController = new Gtk.EventControllerKey()
-        keyController.connect("key-pressed", (_: any, keyval: number) => {
-          if (keyval === Gdk.KEY_Escape) {
-            closePanel()
-            return true
-          }
-          return false
-        })
+        keyController.connect(
+          "key-pressed",
+          (_: any, keyval: number, _keycode: number, state: number) => {
+            const hasCtrl = Boolean(state & Gdk.ModifierType.CONTROL_MASK)
+
+            if (keyval === Gdk.KEY_Escape) {
+              closePanel()
+              return true
+            }
+
+            if (
+              keyval === Gdk.KEY_Right ||
+              keyval === Gdk.KEY_KP_Right ||
+              (hasCtrl && keyval === Gdk.KEY_Tab)
+            ) {
+              tabsApi?.selectRelativeTab(1)
+              return true
+            }
+
+            if (
+              keyval === Gdk.KEY_Left ||
+              keyval === Gdk.KEY_KP_Left ||
+              (hasCtrl && keyval === Gdk.KEY_ISO_Left_Tab)
+            ) {
+              tabsApi?.selectRelativeTab(-1)
+              return true
+            }
+
+            if (keyval === Gdk.KEY_1 || keyval === Gdk.KEY_KP_1)
+              return selectTabByIndex(0)
+            if (keyval === Gdk.KEY_2 || keyval === Gdk.KEY_KP_2)
+              return selectTabByIndex(1)
+            if (keyval === Gdk.KEY_3 || keyval === Gdk.KEY_KP_3)
+              return selectTabByIndex(2)
+            if (keyval === Gdk.KEY_4 || keyval === Gdk.KEY_KP_4)
+              return selectTabByIndex(3)
+            if (keyval === Gdk.KEY_5 || keyval === Gdk.KEY_KP_5)
+              return selectTabByIndex(4)
+
+            if (keyval === Gdk.KEY_w || keyval === Gdk.KEY_W)
+              return selectTabByIndex(0)
+            if (keyval === Gdk.KEY_b || keyval === Gdk.KEY_B)
+              return selectTabByIndex(1)
+            if (keyval === Gdk.KEY_a || keyval === Gdk.KEY_A)
+              return selectTabByIndex(2)
+            if (keyval === Gdk.KEY_s || keyval === Gdk.KEY_S)
+              return selectTabByIndex(3)
+            if (keyval === Gdk.KEY_e || keyval === Gdk.KEY_E)
+              return selectTabByIndex(4)
+
+            return false
+          },
+        )
         window.add_controller(keyController)
 
         window.connect("notify::visible", () => {
@@ -113,6 +171,7 @@ export default function ControlCenter() {
       >
         <box class="cc-header" spacing={8}>
           <label class="cc-title" label="Control Center" hexpand xalign={0} />
+          <label class="cc-header-hint" label="←/→ tabs · 1-5 · Esc" />
           <button class="cc-close-btn" onClicked={closePanel}>
             <label label="×" />
           </button>

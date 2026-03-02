@@ -488,6 +488,14 @@ printf "%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s" "$title" "$artist" "$length" "$art" 
     })
   }
 
+  const playPause = () =>
+    execAsync("playerctl -p spotify play-pause").catch(() => {})
+
+  const previousTrack = () =>
+    execAsync("playerctl -p spotify previous").catch(() => {})
+
+  const nextTrack = () => execAsync("playerctl -p spotify next").catch(() => {})
+
   return (
     <window
       name="spotify"
@@ -511,6 +519,46 @@ printf "%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s" "$title" "$artist" "$length" "$art" 
             closePopup()
             return true
           }
+
+          if (
+            keyval === Gdk.KEY_space ||
+            keyval === Gdk.KEY_Return ||
+            keyval === Gdk.KEY_KP_Enter
+          ) {
+            playPause()
+            return true
+          }
+
+          if (keyval === Gdk.KEY_Left || keyval === Gdk.KEY_KP_Left) {
+            previousTrack()
+            return true
+          }
+
+          if (keyval === Gdk.KEY_Right || keyval === Gdk.KEY_KP_Right) {
+            nextTrack()
+            return true
+          }
+
+          if (keyval === Gdk.KEY_s || keyval === Gdk.KEY_S) {
+            void toggleShuffle()
+            return true
+          }
+
+          if (keyval === Gdk.KEY_l || keyval === Gdk.KEY_L) {
+            const current = readBindingValue(state, EMPTY_STATE)
+            if (current.apiAuthorized) {
+              void toggleLikeTrack()
+            } else {
+              void connectSpotifyApi()
+            }
+            return true
+          }
+
+          if (keyval === Gdk.KEY_c || keyval === Gdk.KEY_C) {
+            void connectSpotifyApi()
+            return true
+          }
+
           return false
         })
 
@@ -633,28 +681,18 @@ printf "%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s" "$title" "$artist" "$length" "$art" 
             <button
               class="spotify-primary-btn"
               hexpand
-              onClicked={() =>
-                execAsync("playerctl -p spotify previous").catch(() => {})
-              }
+              onClicked={previousTrack}
             >
               <label label="⏮" />
             </button>
             <button
               class="spotify-primary-btn spotifyPlayButton"
               hexpand
-              onClicked={() =>
-                execAsync("playerctl -p spotify play-pause").catch(() => {})
-              }
+              onClicked={playPause}
             >
               <label label="⏯" />
             </button>
-            <button
-              class="spotify-primary-btn"
-              hexpand
-              onClicked={() =>
-                execAsync("playerctl -p spotify next").catch(() => {})
-              }
-            >
+            <button class="spotify-primary-btn" hexpand onClicked={nextTrack}>
               <label label="⏭" />
             </button>
           </box>
@@ -697,6 +735,12 @@ printf "%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s" "$title" "$artist" "$length" "$art" 
               <label label="Conectar" />
             </button>
           </box>
+
+          <label
+            class="spotifyHotkeyHint"
+            label="Esc cerrar · Space play/pause · ←/→ track · S shuffle · L like"
+            xalign={0}
+          />
         </box>
       </box>
     </window>

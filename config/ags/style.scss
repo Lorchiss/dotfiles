@@ -300,7 +300,9 @@ $bar-density: hero !default; // compact | balanced | hero
   transition:
     background-color $ag-motion-fast $ag-curve-standard,
     border-color $ag-motion-fast $ag-curve-standard,
-    box-shadow $ag-motion-fast $ag-curve-standard;
+    box-shadow $ag-motion-fast $ag-curve-standard,
+    color $ag-motion-fast $ag-curve-standard,
+    opacity $ag-motion-fast $ag-curve-standard;
   box-shadow: $ag-state-control-inset;
 
   &:hover {
@@ -322,6 +324,13 @@ $bar-density: hero !default; // compact | balanced | hero
     border-color: $ag-border-focus;
     box-shadow: $ag-shadow-focus-ring, $ag-state-focus-inset;
     outline: none;
+  }
+
+  &:disabled {
+    opacity: 0.56;
+    border-color: rgba($aa-pr-white, 0.1);
+    background: rgba($aa-pr-white, 0.03);
+    box-shadow: none;
   }
 }
 
@@ -1103,6 +1112,11 @@ window.SpotifyPopup {
     @include ag-type($ag-font-label-sm, 600, 0.12px, $ag-text-1);
   }
 
+  .spotifyHotkeyHint {
+    @include ag-type($ag-font-label-xs, 600, 0.12px, $ag-text-muted);
+    margin-top: $ag-space-2;
+  }
+
   .spotifyUtilityControls {
     min-height: 32px;
   }
@@ -1324,6 +1338,10 @@ window.ControlCenter {
 
   .cc-title {
     @include ag-type($ag-font-title-lg, 700, 0.2px, $ag-text-0);
+  }
+
+  .cc-header-hint {
+    @include ag-type($ag-font-label-xs, 600, 0.12px, $ag-text-muted);
   }
 
   .cc-close-btn {
