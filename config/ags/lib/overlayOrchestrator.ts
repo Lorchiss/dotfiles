@@ -236,7 +236,7 @@ function buildLayout(
 
 const overlayLayoutState = createPoll<OverlayLayoutSnapshot>(
   FALLBACK_LAYOUT,
-  650,
+  900,
   async () => {
     const monitor = await readFocusedMonitor()
     return buildLayout(monitor.monitorIndex, monitor.width, monitor.height)

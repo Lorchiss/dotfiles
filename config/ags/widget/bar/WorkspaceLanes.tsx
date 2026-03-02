@@ -8,7 +8,7 @@ import {
   workspaceChipState,
 } from "../../lib/hypr"
 
-const HYPR_POLL_MS = 600
+const HYPR_POLL_MS = 900
 
 function chipClassFor(lane: MonitorLaneState, workspaceId: number): string {
   const chipState = workspaceChipState(lane, workspaceId)

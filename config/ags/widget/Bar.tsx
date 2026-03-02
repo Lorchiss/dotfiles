@@ -4,6 +4,8 @@ import { execAsync } from "ags/process"
 import SpotifyButton from "./bar/SpotifyButton"
 import ClockMenu from "./bar/ClockMenu"
 import WorkspaceLanes from "./bar/WorkspaceLanes"
+import SystemTray from "./bar/SystemTray"
+import SystemMetrics from "./bar/SystemMetrics"
 
 export default function Bar(gdkmonitor: any) {
   const { TOP, LEFT, RIGHT } = Astal.WindowAnchor
@@ -45,17 +47,19 @@ export default function Bar(gdkmonitor: any) {
         <box
           $type="end"
           class="bar-section-end"
-          spacing={12}
+          spacing={10}
           valign={Gtk.Align.CENTER}
           hexpand
           halign={Gtk.Align.END}
         >
+          <SystemTray />
+          <SystemMetrics />
           <button
             class="connectivity-chip"
             onClicked={() =>
               execAsync("ags toggle control-center").catch(() => {})
             }
-            tooltipText="Abrir Control Center"
+            tooltipText="Abrir Control Center (SUPER+C)"
           >
             <box spacing={6}>
               <label label="󰖩" />

@@ -2,7 +2,7 @@ import { execAsync } from "ags/process"
 import { createPoll } from "ags/time"
 import { openSpotifyApp } from "../../lib/spotify"
 
-const MARQUEE_TICK_MS = 110
+const MARQUEE_TICK_MS = 140
 const CHIP_TITLE_WIDTH = 16
 
 let lastClickMs = 0

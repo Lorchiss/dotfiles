@@ -26,6 +26,11 @@ ags toggle control-center
 sleep 1
 ags toggle control-center
 
+echo "[ags-smoke] toggling command-palette"
+ags toggle command-palette
+sleep 1
+ags toggle command-palette
+
 if [[ -x "$UPDATE_SCRIPT" ]]; then
   echo "[ags-smoke] system update dry-run script"
   if command -v timeout >/dev/null 2>&1; then
@@ -62,6 +67,15 @@ echo "[ags-smoke] toggling spotify popup"
 ags toggle spotify
 sleep 1
 ags toggle spotify
+
+if command -v hyprctl >/dev/null 2>&1; then
+  monitor_count="$(hyprctl -j monitors 2>/dev/null | grep -o '"name"' | wc -l | tr -d ' ')"
+  if [[ "${monitor_count:-0}" -ge 2 ]]; then
+    echo "[ags-smoke] multi-monitor check: detected $monitor_count monitors"
+  else
+    echo "[ags-smoke] multi-monitor check: detected $monitor_count monitor (no fail)"
+  fi
+fi
 
 sleep 1
 

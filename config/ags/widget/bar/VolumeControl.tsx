@@ -5,6 +5,7 @@ import { createMusicAccentClassState } from "../../lib/musicAccent"
 
 const volumeStep = 5
 const keepVolumePopoverOpen = false
+const VOLUME_POLL_MS = 700
 
 type VolumeState = {
   value: number
@@ -29,7 +30,7 @@ export default function VolumeControl() {
 
   const state = createPoll<VolumeState>(
     { value: 0, muted: false },
-    500,
+    VOLUME_POLL_MS,
     async (prev) => {
       try {
         const wpLine = (

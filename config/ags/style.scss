@@ -417,8 +417,8 @@ $bar-presets: (
     bar-padding-x: 30px,
     workspace-chip-min: 88px,
     window-title-chip-min: 356px,
-    spotify-chip-min: 226px,
-    metrics-row-min: 330px,
+    spotify-chip-min: 182px,
+    metrics-row-min: 246px,
     cpu-chip-min: 84px,
     ram-chip-min: 84px,
     net-chip-min: 114px,
@@ -711,7 +711,7 @@ window.Bar {
     border-color: $ag-bar-workspace-active-border;
     color: $ag-text-inverse;
     box-shadow: $ag-shadow-workspace-active;
-    animation: wsPulse $ag-motion-pulse infinite;
+    animation: wsPulse 2800ms 1;
   }
 
   .workspace-chip-active.workspace-chip-unfocused {
@@ -1207,7 +1207,7 @@ window.CommandPalette {
   }
 
   .command-palette-card {
-    min-width: 640px;
+    min-width: 700px;
     padding: $ag-command-card-padding;
   }
 
@@ -1244,7 +1244,7 @@ window.CommandPalette {
   }
 
   .command-palette-scroll {
-    min-height: 276px;
+    min-height: 284px;
   }
 
   .command-palette-scroll viewport {
@@ -1321,6 +1321,7 @@ window.CommandPalette {
 
   .command-palette-status-error {
     color: $ag-text-danger;
+    font-weight: 700;
   }
 }
 
@@ -1429,19 +1430,26 @@ window.ControlCenter {
   }
 
   .cc-section-subtle {
-    @include ag-type($ag-font-body-sm, 600, 0.12px, $ag-text-1);
+    @include ag-type($ag-font-body-sm, 600, 0.12px, $ag-text-muted);
   }
 
   .cc-inline-message {
     @include ag-type($ag-font-body-sm, 600, 0.2px, $ag-text-1);
+    padding: $ag-space-6 $ag-space-8;
+    border-radius: $ag-radius-sm;
+    border: 1px solid transparent;
   }
 
   .cc-inline-message-success {
     color: $ag-accent-secondary;
+    border-color: rgba($aa-pr-frost-250, 0.3);
+    background: rgba($aa-pr-frost-250, 0.08);
   }
 
   .cc-inline-message-error {
     color: $ag-text-danger-strong;
+    border-color: rgba($aa-pr-danger-300, 0.32);
+    background: rgba($aa-pr-danger-300, 0.1);
   }
 
   .cc-password-entry {

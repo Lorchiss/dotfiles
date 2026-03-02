@@ -39,7 +39,7 @@ const COVER_WRAP_SIZE = SPOTIFY_UI.coverWrapSize
 const COVER_IMAGE_SIZE = SPOTIFY_UI.coverImageSize
 const POPUP_PADDING = SPOTIFY_UI.popupPadding
 
-const MARQUEE_TICK_MS = 110
+const MARQUEE_TICK_MS = 140
 const POPUP_TITLE_WIDTH =
   POPUP_LAYOUT === "vertical"
     ? SPOTIFY_UI.popupVerticalTitleChars
@@ -280,7 +280,7 @@ export default function SpotifyPopup() {
     windowRef.visible = false
   }
 
-  const state = createPoll<SpotifyState>(EMPTY_STATE, 1200, async () => {
+  const state = createPoll<SpotifyState>(EMPTY_STATE, 1500, async () => {
     try {
       const snapshot = await execAsync(`bash -lc '
 title=$(playerctl -p spotify metadata --format "{{title}}" 2>/dev/null || echo "")
