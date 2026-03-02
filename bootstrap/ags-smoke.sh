@@ -9,6 +9,7 @@ CC_STATE_PATH="/tmp/ags-cc-state.json"
 since="$(date '+%F %T')"
 
 echo "[ags-smoke] restarting ags.service"
+systemctl --user reset-failed ags.service >/dev/null 2>&1 || true
 systemctl --user restart ags.service
 sleep 2
 

@@ -26,6 +26,7 @@ COMMAND_PALETTE_FILE="$REPO_DIR/config/ags/widget/CommandPalette.tsx"
 
 timestamp="$(date +%Y%m%d-%H%M%S)"
 evidence_dir="/tmp/ags-qa/$timestamp/visual"
+script_start_human="$(date '+%F %T')"
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
@@ -123,7 +124,7 @@ log "evidence dir: $evidence_dir"
 
 # 1) Forbidden strings in runtime logs and active-window metadata
 if systemctl --user is-active --quiet ags.service; then
-  journalctl --user -u ags.service --since "-20 minutes" --no-pager >"$journal_file" \
+  journalctl --user -u ags.service --since "$script_start_human" --no-pager >"$journal_file" \
     || true
 else
   : >"$journal_file"
@@ -281,7 +282,7 @@ else
     "Bar expone métricas secundarias fuera de los bloques agrupados esperados."
 fi
 
-primary_status_count="$(count_regex '<PrimaryStatusBlock\s*/>' "$BAR_FILE")"
+primary_status_count="$(count_regex '<PrimaryStatusBlock\b' "$BAR_FILE")"
 focus_rule_count="$(count_regex 'overlay-focused' "$STYLE_FILE")"
 if [[ "$primary_status_count" -eq 1 && "$count_primary_zone" -eq 1 && "$focus_rule_count" -ge 1 ]]; then
   record_pass "hierarchy-single-focus-source" "Existe una sola fuente primaria de foco visual y política overlay-focused."
