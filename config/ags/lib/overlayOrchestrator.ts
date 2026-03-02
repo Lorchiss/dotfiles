@@ -9,6 +9,7 @@ import {
 } from "./uiTokens"
 
 export type OverlayId = "spotify" | "control-center" | "command-palette"
+type OverlayFocus = OverlayId | null
 
 type HyprMonitorRaw = {
   id?: number
@@ -30,6 +31,7 @@ export type OverlayLayoutSnapshot = {
   monitorWidth: number
   monitorHeight: number
   mode: "solo" | "side" | "stack"
+  focus: OverlayFocus
   commandPalette: OverlayBox
   controlCenter: OverlayBox & {
     contentHeight: number
@@ -43,6 +45,7 @@ const overlayVisibility: OverlayVisibility = {
   "control-center": false,
   "command-palette": false,
 }
+let activeOverlay: OverlayFocus = null
 
 const suppressedSync = new Set<OverlayId>()
 
@@ -51,6 +54,7 @@ const FALLBACK_LAYOUT: OverlayLayoutSnapshot = {
   monitorWidth: 1920,
   monitorHeight: 1080,
   mode: "solo",
+  focus: null,
   commandPalette: {
     marginTop: OVERLAY_LAYOUT.topOffset + 8,
     marginRight: 0,
@@ -122,6 +126,17 @@ function setOverlayVisible(id: OverlayId, visible: boolean) {
   ref.visible = visible
 }
 
+function computeActiveOverlay(): OverlayFocus {
+  if (overlayVisibility["command-palette"]) return "command-palette"
+  if (overlayVisibility["control-center"] && overlayVisibility.spotify) {
+    if (activeOverlay === "spotify") return "spotify"
+    return "control-center"
+  }
+  if (overlayVisibility["control-center"]) return "control-center"
+  if (overlayVisibility.spotify) return "spotify"
+  return null
+}
+
 function applyVisibilityPolicy(activeOverlay: OverlayId, visible: boolean) {
   if (!visible) return
 
@@ -148,6 +163,11 @@ export function onOverlayVisibilityChanged(id: OverlayId, visible: boolean) {
   }
 
   overlayVisibility[id] = visible
+  if (visible) {
+    activeOverlay = id
+  } else if (activeOverlay === id) {
+    activeOverlay = null
+  }
   applyVisibilityPolicy(id, visible)
 }
 
@@ -162,12 +182,12 @@ function buildLayout(
 
   const controlWidth = clamp(
     Math.floor(monitorWidth * 0.34),
-    560,
+    monitorWidth < 1480 ? 500 : 560,
     CONTROL_CENTER_UI.width,
   )
   const spotifyWidth = clamp(
     SPOTIFY_UI.coverWrapSize + SPOTIFY_UI.popupPadding * 2,
-    220,
+    monitorWidth < 1280 ? 206 : 220,
     320,
   )
   const paletteWidth = clamp(
@@ -182,22 +202,23 @@ function buildLayout(
 
   const bothRightPanelsVisible =
     overlayVisibility.spotify && overlayVisibility["control-center"]
+  const reservedTop = topOffset + (overlayVisibility["command-palette"] ? 6 : 0)
 
   const sideBySideRequired =
-    controlWidth + spotifyWidth + sidePadding * 2 + gap + 120
+    controlWidth + spotifyWidth + sidePadding * 2 + gap + 140
   const canSideBySide = monitorWidth >= sideBySideRequired
 
   let mode: OverlayLayoutSnapshot["mode"] = "solo"
 
   const controlCenter: OverlayLayoutSnapshot["controlCenter"] = {
-    marginTop: topOffset,
+    marginTop: reservedTop,
     marginRight: sidePadding,
     width: controlWidth,
     contentHeight: controlContentHeight,
   }
 
   const spotify: OverlayLayoutSnapshot["spotify"] = {
-    marginTop: topOffset,
+    marginTop: reservedTop,
     marginRight: sidePadding,
     width: spotifyWidth,
   }
@@ -206,12 +227,12 @@ function buildLayout(
     if (canSideBySide) {
       mode = "side"
       spotify.marginRight = sidePadding + controlWidth + gap
-      spotify.marginTop = topOffset
+      spotify.marginTop = reservedTop
     } else {
       mode = "stack"
-      spotify.marginTop = topOffset + controlEstimatedHeight + gap
+      spotify.marginTop = reservedTop + controlEstimatedHeight + gap
       const maxTop = Math.max(
-        topOffset,
+        reservedTop,
         monitorHeight - spotifyEstimatedHeight - sidePadding,
       )
       spotify.marginTop = Math.min(spotify.marginTop, maxTop)
@@ -224,8 +245,9 @@ function buildLayout(
     monitorWidth,
     monitorHeight,
     mode,
+    focus: computeActiveOverlay(),
     commandPalette: {
-      marginTop: topOffset + 8,
+      marginTop: topOffset + 8 + (bothRightPanelsVisible ? 4 : 0),
       marginRight: 0,
       width: paletteWidth,
     },

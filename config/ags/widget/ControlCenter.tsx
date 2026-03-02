@@ -85,7 +85,23 @@ export default function ControlCenter() {
   return (
     <window
       name="control-center"
-      class={accentClass((accent) => `ControlCenter cc-window ${accent}`)}
+      class={overlayLayout((layout) =>
+        [
+          "ControlCenter",
+          "cc-window",
+          `overlay-layout-${layout.mode}`,
+          layout.focus === "control-center"
+            ? "overlay-focused"
+            : layout.focus
+              ? "overlay-muted"
+              : "",
+          layout.focus && layout.focus !== "control-center"
+            ? "overlay-secondary"
+            : "",
+        ]
+          .filter(Boolean)
+          .join(" "),
+      )}
       application={app}
       visible={false}
       layer={Astal.Layer.TOP}

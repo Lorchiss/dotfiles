@@ -640,6 +640,24 @@ $ag-control-center-session-pending-bg: rgba(146, 214, 255, 0.12);
   }
 }
 
+window.CommandPalette.overlay-muted,
+window.ControlCenter.overlay-muted,
+window.SpotifyPopup.overlay-muted {
+  opacity: 0.9;
+}
+
+window.CommandPalette.overlay-focused .command-palette-card,
+window.ControlCenter.overlay-focused > ccCard,
+window.SpotifyPopup.overlay-focused .spotifyPopupCardShell {
+  box-shadow:
+    $ag-popup-shadow,
+    0 0 0 1px rgba($aa-pr-frost-300, 0.28);
+}
+
+window.SpotifyPopup.overlay-secondary .spotifyPopupCardShell {
+  box-shadow: $ag-shadow-md;
+}
+
 window.Bar {
   background: transparent;
 

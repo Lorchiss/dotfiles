@@ -597,7 +597,19 @@ export default function CommandPalette() {
   return (
     <window
       name="command-palette"
-      class={accentClass((accent) => `CommandPalette ${accent}`)}
+      class={overlayLayout((layout) =>
+        [
+          "CommandPalette",
+          `overlay-layout-${layout.mode}`,
+          layout.focus === "command-palette"
+            ? "overlay-focused"
+            : layout.focus
+              ? "overlay-muted"
+              : "",
+        ]
+          .filter(Boolean)
+          .join(" "),
+      )}
       application={app}
       visible={false}
       layer={Astal.Layer.OVERLAY}

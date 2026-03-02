@@ -499,7 +499,20 @@ printf "%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s" "$title" "$artist" "$length" "$art" 
   return (
     <window
       name="spotify"
-      class="SpotifyPopup"
+      class={overlayLayout((layout) =>
+        [
+          "SpotifyPopup",
+          `overlay-layout-${layout.mode}`,
+          layout.focus === "spotify"
+            ? "overlay-focused"
+            : layout.focus
+              ? "overlay-muted"
+              : "",
+          layout.focus && layout.focus !== "spotify" ? "overlay-secondary" : "",
+        ]
+          .filter(Boolean)
+          .join(" "),
+      )}
       application={app}
       visible={false}
       layer={Astal.Layer.TOP}
