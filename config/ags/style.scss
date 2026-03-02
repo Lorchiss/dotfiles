@@ -124,12 +124,7 @@ $bg-color: #{"@theme_bg_color"};
 $radius-bar: $ag-radius-card;
 $bar-density: hero !default; // compact | balanced | hero
 
-@mixin ag-type(
-  $size,
-  $weight: 600,
-  $spacing: 0.2px,
-  $color: $ag-text-0
-) {
+@mixin ag-type($size, $weight: 600, $spacing: 0.2px, $color: $ag-text-0) {
   font-size: $size;
   font-weight: $weight;
   letter-spacing: $spacing;
@@ -303,16 +298,16 @@ window.Bar {
     background-image:
       radial-gradient(
         circle at 16% 18%,
-        rgba(177, 228, 255, 0.2),
+        rgba(177, 228, 255, 0.19),
         transparent 40%
       ),
       radial-gradient(
         circle at 84% 130%,
-        rgba(84, 153, 255, 0.22),
+        rgba(84, 153, 255, 0.21),
         transparent 52%
       ),
       linear-gradient(156deg, rgba(8, 17, 30, 0.96), rgba(18, 30, 49, 0.97));
-    border: 1px solid rgba(171, 216, 255, 0.33);
+    border: 1px solid rgba(171, 216, 255, 0.32);
     box-shadow:
       0 28px 42px -20px rgba(0, 0, 0, 0.82),
       0 10px 24px -16px rgba(28, 94, 180, 0.42),
@@ -331,46 +326,15 @@ window.Bar {
   }
 
   label {
-    font-size: 13px;
-    letter-spacing: 0.42px;
-    color: $ag-text-0;
+    @include ag-type($ag-font-body-md, 600, 0.42px, $ag-text-0);
   }
 
   button,
   menubutton > button {
     border-radius: $ag-radius-chip;
     padding: 7px 14px;
-    font-weight: 600;
-    letter-spacing: 0.25px;
-    transition:
-      background-color $ag-motion-fast $ag-curve-standard,
-      border-color $ag-motion-fast $ag-curve-standard,
-      box-shadow $ag-motion-fast $ag-curve-standard;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(210, 228, 245, 0.18);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
-    color: $ag-text-0;
-  }
-
-  button:hover,
-  menubutton > button:hover {
-    background: rgba(132, 203, 255, 0.2);
-    border-color: rgba(173, 221, 255, 0.58);
-    box-shadow:
-      0 14px 20px -14px rgba(0, 0, 0, 0.72),
-      0 0 0 1px rgba(135, 216, 255, 0.22),
-      inset 0 1px 0 rgba(233, 245, 255, 0.14);
-  }
-
-  button:active,
-  button:checked,
-  menubutton > button:active,
-  menubutton > button:checked {
-    background: rgba(198, 228, 255, 0.22);
-    border-color: rgba(170, 218, 255, 0.62);
-    box-shadow:
-      inset 0 0 0 1px rgba(237, 247, 255, 0.2),
-      0 8px 16px -14px rgba(15, 45, 86, 0.72);
+    @include ag-type($ag-font-body-sm, 600, 0.25px, $ag-text-0);
+    @include ag-interactive-control();
   }
 
   .workspace-lanes {
@@ -378,40 +342,44 @@ window.Bar {
   }
 
   .workspace-monitor-lane {
-    background: rgba(255, 255, 255, 0.04);
-    border: 1px solid rgba(189, 214, 255, 0.24);
-    border-radius: $ag-radius-chip;
+    @include ag-surface-subtle(
+      $ag-radius-chip,
+      rgba(255, 255, 255, 0.04),
+      rgba(189, 214, 255, 0.24)
+    );
     padding: 4px 9px;
   }
 
   .workspace-monitor-badge {
-    color: $ag-accent-tertiary;
-    font-size: 11.4px;
-    font-weight: 700;
-    letter-spacing: 0.38px;
+    @include ag-type($ag-font-label-xs, 700, 0.38px, $ag-accent-tertiary);
   }
 
   .workspace-chip {
     min-width: 34px;
     padding: 4px 10px;
-    border-radius: 12px;
-    font-size: 12px;
-    font-weight: 700;
-    border: 1px solid rgba(255, 255, 255, 0.14);
-    background: rgba(255, 255, 255, 0.03);
+    @include ag-surface-subtle(
+      $ag-radius-sm,
+      rgba(255, 255, 255, 0.03),
+      rgba(255, 255, 255, 0.14)
+    );
+    @include ag-type($ag-font-body-sm, 700, 0.15px, $ag-text-0);
+    transition:
+      background-color $ag-motion-fast $ag-curve-standard,
+      border-color $ag-motion-fast $ag-curve-standard,
+      box-shadow $ag-motion-fast $ag-curve-standard;
     font-variant-numeric: tabular-nums;
   }
 
   .workspace-chip-occupied {
-    background: rgba(255, 255, 255, 0.06);
+    background: $ag-surface-elevated-strong;
     border-color: rgba(225, 235, 246, 0.16);
     color: $ag-text-1;
   }
 
   .workspace-chip:hover {
-    background: rgba(146, 214, 255, 0.16);
+    background: rgba(146, 214, 255, 0.15);
     border-color: rgba(184, 225, 255, 0.4);
-    box-shadow: 0 12px 16px -16px rgba(0, 0, 0, 0.68);
+    box-shadow: $ag-shadow-sm;
   }
 
   .workspace-chip-active.workspace-chip-focused {
@@ -440,8 +408,11 @@ window.Bar {
     min-width: bar-size(workspace-chip-min);
     color: $ag-accent-tertiary;
     font-weight: 700;
-    border: 1px solid rgba(189, 214, 255, 0.2);
-    background: rgba(255, 255, 255, 0.04);
+    @include ag-surface-subtle(
+      $ag-radius-chip,
+      rgba(255, 255, 255, 0.04),
+      rgba(189, 214, 255, 0.2)
+    );
   }
 
   .window-title-chip {
@@ -450,26 +421,27 @@ window.Bar {
   }
 
   .connectivity-chip {
-    border-color: rgba(146, 214, 255, 0.4);
-    background: rgba(146, 214, 255, 0.12);
-    color: $ag-accent-primary;
-  }
-
-  .connectivity-chip:hover {
-    background: rgba(146, 214, 255, 0.2);
-    border-color: rgba(146, 214, 255, 0.55);
-  }
-
-  .connectivity-chip:active,
-  .connectivity-chip:checked {
-    background: rgba(146, 214, 255, 0.28);
-    border-color: rgba(146, 214, 255, 0.66);
+    @include ag-interactive-control(
+      $bg: rgba(146, 214, 255, 0.12),
+      $border: rgba(146, 214, 255, 0.4),
+      $color: $ag-accent-primary,
+      $hover-bg: rgba(146, 214, 255, 0.2),
+      $hover-border: rgba(146, 214, 255, 0.55),
+      $active-bg: rgba(146, 214, 255, 0.28),
+      $active-border: rgba(146, 214, 255, 0.66)
+    );
   }
 
   .spotify-chip {
     min-width: bar-size(spotify-chip-min);
-    border-color: rgba(152, 245, 224, 0.38);
-    background: rgba(152, 245, 224, 0.08);
+    @include ag-interactive-control(
+      $bg: rgba(152, 245, 224, 0.08),
+      $border: rgba(152, 245, 224, 0.38),
+      $hover-bg: rgba(152, 245, 224, 0.2),
+      $hover-border: rgba(152, 245, 224, 0.56),
+      $active-bg: rgba(152, 245, 224, 0.24),
+      $active-border: rgba(175, 251, 234, 0.62)
+    );
   }
 
   .spotify-chip-content {
@@ -482,11 +454,6 @@ window.Bar {
 
   .spotify-chip-title {
     min-width: 0;
-  }
-
-  .spotify-chip:hover {
-    background: rgba(152, 245, 224, 0.2);
-    border-color: rgba(152, 245, 224, 0.56);
   }
 
   .spotify-chip.spotify-active {
@@ -507,9 +474,7 @@ window.Bar {
 
   .metric-chip {
     font-variant-numeric: tabular-nums;
-    color: $ag-text-1;
-    font-size: 12.3px;
-    font-weight: 600;
+    @include ag-type(12.3px, 600, 0.15px, $ag-text-1);
   }
 
   .aur-chip,
@@ -523,10 +488,12 @@ window.Bar {
   }
 
   .system-tray-chip {
-    border-radius: $ag-radius-chip;
+    @include ag-surface-subtle(
+      $ag-radius-chip,
+      rgba(255, 255, 255, 0.03),
+      $ag-border-subtle
+    );
     padding: 4px 8px;
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.1);
   }
 
   .cpu-chip,
@@ -540,13 +507,14 @@ window.Bar {
 
   .clock-chip > button {
     min-width: bar-size(clock-chip-min);
-    border-color: rgba(189, 214, 255, 0.36);
-    background: rgba(189, 214, 255, 0.09);
-  }
-
-  .clock-chip > button:hover {
-    background: rgba(189, 214, 255, 0.2);
-    border-color: rgba(189, 214, 255, 0.56);
+    @include ag-interactive-control(
+      $bg: rgba(189, 214, 255, 0.09),
+      $border: rgba(189, 214, 255, 0.36),
+      $hover-bg: rgba(189, 214, 255, 0.2),
+      $hover-border: rgba(189, 214, 255, 0.56),
+      $active-bg: rgba(189, 214, 255, 0.28),
+      $active-border: rgba(189, 214, 255, 0.66)
+    );
   }
 
   .clock-popover-shell {
@@ -566,37 +534,22 @@ window.Bar {
   }
 
   .clock-popover-heading {
-    font-size: 14px;
-    font-weight: 700;
-    letter-spacing: 0.2px;
-    color: $ag-text-0;
+    @include ag-type($ag-font-title-sm, 700, 0.2px, $ag-text-0);
   }
 
   .clock-popover-calendar {
-    border-radius: 14px;
+    @include ag-surface-subtle(
+      $ag-radius-md,
+      rgba(255, 255, 255, 0.03),
+      $ag-border-subtle
+    );
     padding: 6px;
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.1);
   }
 
-  .clock-popover-card.spotify-accent-emerald .clock-popover-heading {
-    color: rgba(211, 255, 240, 0.98);
-  }
-
-  .clock-popover-card.spotify-accent-cyan .clock-popover-heading {
-    color: rgba(218, 250, 255, 0.98);
-  }
-
-  .clock-popover-card.spotify-accent-blue .clock-popover-heading {
-    color: rgba(224, 236, 255, 0.98);
-  }
-
-  .clock-popover-card.spotify-accent-amber .clock-popover-heading {
-    color: rgba(255, 241, 214, 0.98);
-  }
-
-  .clock-popover-card.spotify-accent-rose .clock-popover-heading {
-    color: rgba(255, 225, 234, 0.98);
+  @each $accent-name, $accent-token in $ag-accent-variants {
+    .clock-popover-card.spotify-accent-#{$accent-name} .clock-popover-heading {
+      color: map.get($accent-token, text);
+    }
   }
 
   .vol-control {
@@ -604,19 +557,15 @@ window.Bar {
       min-width: bar-size(vol-button-min);
       padding: 7px 13px;
       border-radius: $ag-radius-control;
-      background: rgba(146, 214, 255, 0.12);
-      border-color: rgba(146, 214, 255, 0.42);
-    }
-
-    > button:hover {
-      background: rgba(146, 214, 255, 0.22);
-      border-color: rgba(146, 214, 255, 0.58);
-    }
-
-    > button:active,
-    > button:checked {
-      background: rgba(146, 214, 255, 0.3);
-      border-color: rgba(146, 214, 255, 0.68);
+      @include ag-interactive-control(
+        $bg: rgba(146, 214, 255, 0.12),
+        $border: rgba(146, 214, 255, 0.42),
+        $color: $ag-accent-primary,
+        $hover-bg: rgba(146, 214, 255, 0.22),
+        $hover-border: rgba(146, 214, 255, 0.58),
+        $active-bg: rgba(146, 214, 255, 0.3),
+        $active-border: rgba(146, 214, 255, 0.68)
+      );
     }
 
     .vol-trigger-icon {
@@ -625,10 +574,8 @@ window.Bar {
     }
 
     .vol-trigger-label {
-      font-weight: 600;
-      letter-spacing: 0.35px;
+      @include ag-type($ag-font-body-md, 600, 0.35px, $ag-accent-primary);
       min-width: 72px;
-      color: $ag-accent-primary;
     }
 
     popover {
@@ -650,25 +597,16 @@ window.Bar {
     .vol-mute-btn {
       min-width: 40px;
       min-height: 40px;
-      border-radius: 12px;
+      border-radius: $ag-radius-sm;
       padding: 4px;
-      background: rgba(146, 214, 255, 0.06);
-      border: 1px solid rgba(146, 214, 255, 0.26);
-      transition:
-        background-color $ag-motion-base $ag-curve-standard,
-        border-color $ag-motion-base $ag-curve-standard,
-        box-shadow $ag-motion-base $ag-curve-standard;
-    }
-
-    .vol-mute-btn:hover {
-      background: rgba(146, 214, 255, 0.08);
-      border-color: rgba(146, 214, 255, 0.34);
-    }
-
-    .vol-mute-btn:active,
-    .vol-mute-btn:checked {
-      background: rgba(146, 214, 255, 0.12);
-      border-color: rgba(146, 214, 255, 0.42);
+      @include ag-interactive-control(
+        $bg: rgba(146, 214, 255, 0.06),
+        $border: rgba(146, 214, 255, 0.26),
+        $hover-bg: rgba(146, 214, 255, 0.11),
+        $hover-border: rgba(146, 214, 255, 0.38),
+        $active-bg: rgba(146, 214, 255, 0.16),
+        $active-border: rgba(146, 214, 255, 0.48)
+      );
     }
 
     .vol-popup-icon {
@@ -676,10 +614,7 @@ window.Bar {
     }
 
     .vol-popup-heading {
-      font-size: 15px;
-      font-weight: 700;
-      letter-spacing: 0.2px;
-      color: $ag-text-0;
+      @include ag-type($ag-font-title-md, 700, 0.2px, $ag-text-0);
     }
 
     .vol-scale {
@@ -687,67 +622,28 @@ window.Bar {
     }
 
     .vol-scale trough {
-      min-height: 8px;
-      border-radius: $ag-radius-pill;
-      background: rgba(255, 255, 255, 0.22);
+      @include ag-progress-track;
     }
 
     .vol-scale highlight {
-      min-height: 8px;
-      border-radius: $ag-radius-pill;
-      background: linear-gradient(
-        90deg,
+      @include ag-progress-fill(
         rgba(146, 214, 255, 0.95),
         rgba(189, 214, 255, 0.95)
       );
-      transition: all $ag-motion-slow $ag-curve-standard;
     }
 
-    volPopover.spotify-accent-emerald .vol-scale highlight {
-      background: linear-gradient(
-        90deg,
-        rgba(138, 242, 196, 0.95),
-        rgba(93, 227, 166, 0.95)
-      );
-    }
-
-    volPopover.spotify-accent-cyan .vol-scale highlight {
-      background: linear-gradient(
-        90deg,
-        rgba(123, 230, 247, 0.96),
-        rgba(99, 195, 240, 0.95)
-      );
-    }
-
-    volPopover.spotify-accent-blue .vol-scale highlight {
-      background: linear-gradient(
-        90deg,
-        rgba(121, 174, 255, 0.96),
-        rgba(91, 141, 238, 0.95)
-      );
-    }
-
-    volPopover.spotify-accent-amber .vol-scale highlight {
-      background: linear-gradient(
-        90deg,
-        rgba(248, 197, 108, 0.96),
-        rgba(241, 162, 61, 0.95)
-      );
-    }
-
-    volPopover.spotify-accent-rose .vol-scale highlight {
-      background: linear-gradient(
-        90deg,
-        rgba(245, 132, 161, 0.96),
-        rgba(233, 103, 141, 0.95)
-      );
+    @each $accent-name, $accent-token in $ag-accent-variants {
+      volPopover.spotify-accent-#{$accent-name} .vol-scale highlight {
+        @include ag-progress-fill(
+          map.get($accent-token, fill-start),
+          map.get($accent-token, fill-end)
+        );
+      }
     }
 
     .vol-percent-label {
       min-width: 58px;
-      font-size: 14px;
-      font-weight: 700;
-      color: $ag-text-1;
+      @include ag-type($ag-font-body-lg, 700, 0.16px, $ag-text-1);
       font-variant-numeric: tabular-nums;
     }
   }
