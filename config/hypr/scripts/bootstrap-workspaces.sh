@@ -138,18 +138,6 @@ if [ -z "${secondary_monitor}" ]; then
   secondary_monitor="${primary_monitor}"
 fi
 
-for workspace_id in 1 2 3 4 5; do
-  hyprctl dispatch moveworkspacetomonitor "${workspace_id}" "${primary_monitor}" >/dev/null 2>&1 || true
-done
-
-for workspace_id in 6 7 8 9; do
-  hyprctl dispatch moveworkspacetomonitor "${workspace_id}" "${secondary_monitor}" >/dev/null 2>&1 || true
-done
-
-if [ "${layout_only}" -eq 1 ]; then
-  exit 0
-fi
-
 restore_last_session() {
   if [ "${skip_restore}" -eq 1 ]; then
     return 1
@@ -184,7 +172,19 @@ restore_last_session() {
   return 1
 }
 
-if restore_last_session; then
+if [ "${layout_only}" -eq 0 ] && restore_last_session; then
+  exit 0
+fi
+
+for workspace_id in 1 2 3 4 5; do
+  hyprctl dispatch moveworkspacetomonitor "${workspace_id}" "${primary_monitor}" >/dev/null 2>&1 || true
+done
+
+for workspace_id in 6 7 8 9; do
+  hyprctl dispatch moveworkspacetomonitor "${workspace_id}" "${secondary_monitor}" >/dev/null 2>&1 || true
+done
+
+if [ "${layout_only}" -eq 1 ]; then
   exit 0
 fi
 

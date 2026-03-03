@@ -223,6 +223,9 @@ def save_snapshot(snapshot_path: pathlib.Path, skip_empty: bool = False) -> int:
             "workspace": workspace_id,
             "class": class_name,
         }
+        monitor_name = client.get("monitor")
+        if isinstance(monitor_name, str) and monitor_name:
+            entry["monitor"] = monitor_name
         if command:
             entry["cmd"] = command
 
@@ -359,6 +362,23 @@ def restore_snapshot(
                 "moveworkspacetomonitor",
                 f"{workspace_id} {monitor_name}",
             )
+
+    # Per-window monitor mapping has priority over generic workspace_layout.
+    for window in windows:
+        if not isinstance(window, dict):
+            continue
+        workspace_id = int_from_unknown(window.get("workspace"), -1)
+        if workspace_id <= 0:
+            continue
+        monitor_name = window.get("monitor")
+        if not isinstance(monitor_name, str) or not monitor_name:
+            continue
+        if monitor_name not in current_monitors:
+            continue
+        run_hyprctl_dispatch(
+            "moveworkspacetomonitor",
+            f"{workspace_id} {monitor_name}",
+        )
 
     restored = 0
     launched_singletons: set[str] = set()
