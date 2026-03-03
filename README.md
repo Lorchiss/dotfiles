@@ -6,6 +6,7 @@ Este repositorio configura un entorno de escritorio Linux centrado en **Hyprland
 
 - `bootstrap/deploy.sh`: despliega symlinks de `config/*` a `~/.config/*`, hace backup y habilita `ags.service` de systemd usuario.
 - `config/hypr`: configuración modular de Hyprland en `conf.d/*`.
+- `config/hypr/scripts/window-session.py`: snapshot/restore de ventanas por workspace persistente entre sesiones.
 - `config/ags`: barra/popup escritos en TypeScript + SCSS para AGS (clock, red, volumen, controles Spotify).
 - `config/kitty`, `config/rofi`: ajustes de terminal y launcher.
 - `config/systemd/user/ags.service`: servicio de usuario para arrancar AGS.
@@ -14,6 +15,22 @@ Este repositorio configura un entorno de escritorio Linux centrado en **Hyprland
 
 - Guía práctica: `docs/workflow-diario.md`
 - Incluye: estrategia de workspaces por monitor, keymap diario, multimedia global con `playerctl`, Kitty `copy_on_select`, smoke test y rollback simple.
+
+## Persistencia de ventanas (Hyprland)
+
+Implementado:
+
+- Snapshot automático cada `20s` y save final al cerrar sesión (`window-session-daemon.sh`).
+- Restore automático al login desde `~/.local/state/hypr/window-session.json`.
+- Restaura cantidad de ventanas, app y workspace.
+- Fallback: si no hay snapshot válido, aplica bootstrap base (`code`, `kitty`, `firefox`, `spotify`).
+
+Comandos manuales:
+
+```bash
+python3 ~/.config/hypr/scripts/window-session.py save
+python3 ~/.config/hypr/scripts/window-session.py restore
+```
 
 ## Identidad visual AGS (Arctic Glass)
 

@@ -9,11 +9,14 @@ const SESSION_ACTION_LABELS: Record<SessionAction, string> = {
   shutdown: "Apagar",
 }
 
+const SESSION_SNAPSHOT_COMMAND =
+  `$HOME/.config/hypr/scripts/window-session.py save >/dev/null 2>&1 || true`
+
 const SESSION_ACTION_COMMANDS: Record<SessionAction, string> = {
-  logout: `hyprctl dispatch exit`,
-  suspend: `systemctl suspend`,
-  reboot: `systemctl reboot`,
-  shutdown: `systemctl poweroff`,
+  logout: `${SESSION_SNAPSHOT_COMMAND}; hyprctl dispatch exit`,
+  suspend: `${SESSION_SNAPSHOT_COMMAND}; systemctl suspend`,
+  reboot: `${SESSION_SNAPSHOT_COMMAND}; systemctl reboot`,
+  shutdown: `${SESSION_SNAPSHOT_COMMAND}; systemctl poweroff`,
 }
 
 export function sessionActionLabel(action: SessionAction): string {

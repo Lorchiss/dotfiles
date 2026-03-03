@@ -5,6 +5,34 @@ if ! command -v hyprctl >/dev/null 2>&1; then
   exit 0
 fi
 
+layout_only=0
+skip_restore=0
+
+while [ "$#" -gt 0 ]; do
+  case "$1" in
+    --layout-only)
+      layout_only=1
+      skip_restore=1
+      ;;
+    --skip-restore)
+      skip_restore=1
+      ;;
+    -h|--help)
+      cat <<'HELP'
+Usage: bootstrap-workspaces.sh [options]
+  --layout-only   Solo reubica workspaces por monitor (no restaura ni abre apps)
+  --skip-restore  No restaurar snapshot; usa bootstrap por defecto
+HELP
+      exit 0
+      ;;
+    *)
+      echo "[bootstrap-workspaces] unknown arg: $1" >&2
+      exit 2
+      ;;
+  esac
+  shift
+done
+
 # Workspace strategy:
 # - Primary monitor:   1(code) 2(build) 3(term) 4(test/git) 5(misc)
 # - Secondary monitor: 6(docs) 7(chat) 8(music) 9(misc)
@@ -117,6 +145,35 @@ done
 for workspace_id in 6 7 8 9; do
   hyprctl dispatch moveworkspacetomonitor "${workspace_id}" "${secondary_monitor}" >/dev/null 2>&1 || true
 done
+
+if [ "${layout_only}" -eq 1 ]; then
+  exit 0
+fi
+
+restore_last_session() {
+  if [ "${skip_restore}" -eq 1 ]; then
+    return 1
+  fi
+
+  if [ "${HYPR_DISABLE_WINDOW_SESSION_RESTORE:-0}" = "1" ]; then
+    return 1
+  fi
+
+  if ! command -v python3 >/dev/null 2>&1; then
+    return 1
+  fi
+
+  local restore_script="${HOME}/.config/hypr/scripts/window-session.py"
+  if [ ! -x "${restore_script}" ]; then
+    return 1
+  fi
+
+  python3 "${restore_script}" restore >/dev/null 2>&1
+}
+
+if restore_last_session; then
+  exit 0
+fi
 
 launch_if_missing() {
   local command_name="$1"

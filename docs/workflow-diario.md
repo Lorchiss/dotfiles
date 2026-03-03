@@ -19,6 +19,8 @@ Guia corta para operar sin pensar demasiado.
 Bootstrap automatico en login:
 
 - `~/.config/hypr/scripts/bootstrap-workspaces.sh`
+- Si existe snapshot en `~/.local/state/hypr/window-session.json`, restaura apps y cantidad de ventanas por workspace.
+- Si no existe snapshot, usa fallback base (`code`, `kitty`, `firefox`, `spotify`).
 
 Override opcional de monitores (por nombre de salida Hyprland):
 
@@ -38,7 +40,7 @@ Override opcional de monitores (por nombre de salida Hyprland):
   - `SUPER + SHIFT + Q`: salir de Hyprland
 - Monitores/workspaces:
   - `SUPER + TAB`: cambiar foco al siguiente monitor
-  - `SUPER + SHIFT + TAB`: re-aplicar layout de workspaces por monitor
+  - `SUPER + SHIFT + TAB`: re-aplicar solo layout de workspaces por monitor
   - `SUPER + 1..9`: ir a workspace
   - `SUPER + SHIFT + 1..9`: mover ventana a workspace
 - Multimedia (global, via `playerctl`):
@@ -66,12 +68,15 @@ Resultado:
 1. Recargar Hyprland:
    - `hyprctl reload`
 2. Reaplicar layout manual (si conectaste/desconectaste monitor):
-   - `~/.config/hypr/scripts/bootstrap-workspaces.sh`
-3. Verificar AGS:
+   - `~/.config/hypr/scripts/bootstrap-workspaces.sh --layout-only`
+3. Guardado/restauración manual de snapshot:
+   - `python3 ~/.config/hypr/scripts/window-session.py save`
+   - `python3 ~/.config/hypr/scripts/window-session.py restore`
+4. Verificar AGS:
    - `systemctl --user status ags.service`
-4. Smoke completo AGS:
+5. Smoke completo AGS:
    - `bash bootstrap/ags-smoke.sh`
-5. Probar multimedia:
+6. Probar multimedia:
    - `playerctl play-pause`
    - luego teclas multimedia fisicas
 
