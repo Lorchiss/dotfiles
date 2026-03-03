@@ -27,9 +27,21 @@ CLASS_COMMAND_HINTS: dict[str, list[str]] = {
     "code": ["code"],
     "firefox": ["firefox"],
     "google-chrome": ["google-chrome-stable"],
+    "chromium": ["chromium"],
     "kitty": ["kitty"],
     "org.wezfurlong.wezterm": ["wezterm"],
     "spotify": ["spotify"],
+}
+
+RESTORE_COMMAND_HINTS: dict[str, list[str]] = {
+    "code": ["code", "--new-window"],
+    "firefox": ["firefox", "--new-window", "about:blank"],
+    "google-chrome": ["google-chrome-stable", "--new-window", "about:blank"],
+    "chromium": ["chromium", "--new-window", "about:blank"],
+}
+
+SINGLE_INSTANCE_CLASSES = {
+    "spotify",
 }
 
 NON_RESTORABLE_BINARIES = {
@@ -170,7 +182,7 @@ def should_skip_client(client: dict[str, Any]) -> bool:
     return False
 
 
-def save_snapshot(snapshot_path: pathlib.Path) -> int:
+def save_snapshot(snapshot_path: pathlib.Path, skip_empty: bool = False) -> int:
     try:
         clients = run_hyprctl_json("clients")
         workspaces = run_hyprctl_json("workspaces")
@@ -223,6 +235,10 @@ def save_snapshot(snapshot_path: pathlib.Path) -> int:
         )
     )
 
+    if skip_empty and not windows:
+        print("[window-session] skip empty snapshot")
+        return 0
+
     workspace_layout: dict[str, str] = {}
     for item in workspaces:
         if not isinstance(item, dict):
@@ -268,7 +284,24 @@ def int_from_unknown(value: Any, default: int) -> int:
         return default
 
 
-def normalize_command(command: Any, class_name: str) -> str:
+def restore_command_for_class(class_name: str) -> list[str]:
+    key = class_name.strip().lower()
+    if not key:
+        return []
+
+    hinted = RESTORE_COMMAND_HINTS.get(key)
+    if hinted and hinted[0] and shutil.which(hinted[0]):
+        return hinted
+
+    return command_for_class(class_name)
+
+
+def normalize_command(command: Any, class_name: str, use_restore_hints: bool) -> str:
+    if use_restore_hints:
+        hinted = restore_command_for_class(class_name)
+        if hinted:
+            return " ".join(shlex.quote(part) for part in hinted)
+
     if isinstance(command, list):
         args = [str(item) for item in command if str(item).strip()]
         if args:
@@ -328,6 +361,7 @@ def restore_snapshot(
             )
 
     restored = 0
+    launched_singletons: set[str] = set()
     for window in windows[:max_windows]:
         if not isinstance(window, dict):
             continue
@@ -337,7 +371,17 @@ def restore_snapshot(
             continue
 
         class_name = str(window.get("class", ""))
-        command = normalize_command(window.get("cmd"), class_name)
+        class_key = class_name.strip().lower()
+        if class_key in SINGLE_INSTANCE_CLASSES:
+            if class_key in launched_singletons:
+                continue
+            launched_singletons.add(class_key)
+
+        command = normalize_command(
+            window.get("cmd"),
+            class_name,
+            use_restore_hints=True,
+        )
         if not command:
             continue
 
@@ -373,7 +417,12 @@ def build_parser() -> argparse.ArgumentParser:
     )
 
     subparsers = parser.add_subparsers(dest="command", required=True)
-    subparsers.add_parser("save", help="Save current Hyprland windows to snapshot")
+    save = subparsers.add_parser("save", help="Save current Hyprland windows to snapshot")
+    save.add_argument(
+        "--skip-empty",
+        action="store_true",
+        help="Do not overwrite snapshot when there are no restorable windows",
+    )
 
     restore = subparsers.add_parser(
         "restore",
@@ -404,7 +453,7 @@ def main() -> int:
         return 1
 
     if args.command == "save":
-        return save_snapshot(snapshot_path)
+        return save_snapshot(snapshot_path, skip_empty=bool(args.skip_empty))
     if args.command == "restore":
         return restore_snapshot(snapshot_path, args.delay, args.max_windows)
     parser.error(f"unsupported command: {args.command}")

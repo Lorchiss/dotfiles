@@ -26,8 +26,13 @@ if ! [ "${interval}" -ge 5 ] 2>/dev/null; then
   interval=20
 fi
 
+startup_grace="${HYPR_WINDOW_SESSION_STARTUP_GRACE:-25}"
+if ! [ "${startup_grace}" -ge 0 ] 2>/dev/null; then
+  startup_grace=25
+fi
+
 save_now() {
-  python3 "${session_script}" save >/dev/null 2>&1 || true
+  python3 "${session_script}" save --skip-empty >/dev/null 2>&1 || true
 }
 
 cleanup() {
@@ -35,6 +40,10 @@ cleanup() {
 }
 
 trap cleanup EXIT INT TERM HUP
+
+if [ "${startup_grace}" -gt 0 ]; then
+  sleep "${startup_grace}" || true
+fi
 
 while true; do
   save_now
