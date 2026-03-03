@@ -42,6 +42,22 @@ log() {
   echo "[qa] $*"
 }
 
+wait_for_ags_ready() {
+  local timeout_s="${1:-12}"
+  local elapsed=0
+
+  while (( elapsed < timeout_s * 2 )); do
+    if systemctl --user is-active --quiet ags.service \
+      && ags list 2>/dev/null | grep -qx 'ags'; then
+      return 0
+    fi
+    sleep 0.5
+    elapsed=$((elapsed + 1))
+  done
+
+  return 1
+}
+
 is_positive_int() {
   [[ "$1" =~ ^[0-9]+$ ]] && (( "$1" > 0 ))
 }
@@ -92,13 +108,15 @@ fi
 since="$(date '+%F %T')"
 
 log "step 1/4: clean restart ags.service"
+systemctl --user daemon-reload >/dev/null 2>&1 || true
 systemctl --user reset-failed ags.service >/dev/null 2>&1 || true
 systemctl --user restart ags.service
-sleep 2
 
-if ! systemctl --user is-active --quiet ags.service; then
-  log "FAIL: ags.service is not active after restart"
+if ! wait_for_ags_ready 16; then
+  log "FAIL: AGS runtime did not become ready after restart"
   systemctl --user status ags.service --no-pager -n 60 || true
+  log "ags list:"
+  ags list 2>/dev/null || true
   exit 1
 fi
 

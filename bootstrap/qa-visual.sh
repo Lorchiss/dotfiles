@@ -110,7 +110,7 @@ selectors = [
     ".primary-status-zone",
     ".right-controls-zone",
     ".active-window-title",
-    ".spotify-chip-content",
+    ".network-chip-label",
 ]
 
 for selector in selectors:
@@ -227,8 +227,8 @@ else
   record_pass "layout-min-width-guards" "Guardas de min-width:0 presentes en contenedores críticos."
 fi
 
-if rg -q "widthChars=\\{TITLE_MAX_CHARS\\}" "$ACTIVE_WINDOW_FILE" \
-  && rg -q "maxWidthChars=\\{TITLE_MAX_CHARS\\}" "$ACTIVE_WINDOW_FILE" \
+if rg -q "widthChars=\\{BAR_UI\\.text\\.activeWindowMinChars\\}" "$ACTIVE_WINDOW_FILE" \
+  && rg -q "maxWidthChars=\\{BAR_UI\\.text\\.activeWindowMaxChars\\}" "$ACTIVE_WINDOW_FILE" \
   && rg -q "singleLineMode" "$ACTIVE_WINDOW_FILE"; then
   record_pass "layout-active-window-truncation" "ActiveWindowChip aplica truncación/una línea para títulos largos."
 else
@@ -251,46 +251,51 @@ else
 fi
 
 # 3) Hierarchy constraints
+count_launcher="$(count_regex '<LauncherButton\s*/>' "$BAR_FILE")"
 count_work_context="$(count_regex 'class="work-context-block"' "$BAR_FILE")"
 count_primary_zone="$(count_regex 'class="bar-section-center primary-status-zone"' "$BAR_FILE")"
-count_quick_cluster="$(count_regex 'class="quick-controls-cluster"' "$BAR_FILE")"
+count_active_window="$(count_regex '<ActiveWindowChip\s*/>' "$BAR_FILE")"
+count_audio="$(count_regex '<VolumeControl\s*/>' "$BAR_FILE")"
+count_network="$(count_regex '<NetworkChip\s*/>' "$BAR_FILE")"
+count_spotify="$(count_regex '<SpotifyButton\s*/>' "$BAR_FILE")"
 count_health="$(count_regex '<HealthChip\s*/>' "$BAR_FILE")"
-count_maintenance="$(count_regex '<MaintenanceChip\s*/>' "$BAR_FILE")"
 count_clock="$(count_regex '<ClockMenu\s*/>' "$BAR_FILE")"
-visible_blocks="$((count_work_context + count_primary_zone + count_quick_cluster + count_health + count_maintenance + count_clock))"
+count_maintenance="$(count_regex '<MaintenanceChip\s*/>' "$BAR_FILE")"
+visible_blocks="$((count_launcher + count_work_context + count_primary_zone + count_audio + count_network + count_spotify + count_health + count_clock))"
 
-if [[ "$count_work_context" -eq 1 && "$count_primary_zone" -eq 1 \
-  && "$count_quick_cluster" -eq 1 && "$count_health" -eq 1 \
-  && "$count_maintenance" -eq 1 && "$count_clock" -eq 1 \
-  && "$visible_blocks" -le 6 ]]; then
-  record_pass "hierarchy-max-visible-blocks" "Bar base mantiene 6 bloques visibles (<=6)."
+if [[ "$count_launcher" -eq 1 && "$count_work_context" -eq 1 \
+  && "$count_primary_zone" -eq 1 \
+  && "$count_active_window" -le 1 \
+  && "$count_audio" -le 1 && "$count_network" -le 1 \
+  && "$count_spotify" -le 1 && "$count_health" -le 1 && "$count_clock" -le 1 \
+  && "$count_maintenance" -eq 0 && "$visible_blocks" -le 8 ]]; then
+  record_pass "hierarchy-max-visible-blocks" "Bar base cumple jerarquía compacta (bloques críticos únicos y secundarios opcionales)."
 else
   record_fail \
     "P1" \
     "hierarchy-max-visible-blocks" \
-    "Estructura de bloques inválida: work=$count_work_context primary=$count_primary_zone quick=$count_quick_cluster health=$count_health maintenance=$count_maintenance clock=$count_clock total=$visible_blocks"
+    "Estructura de bloques inválida: launcher=$count_launcher work=$count_work_context primary=$count_primary_zone active_window=$count_active_window audio=$count_audio network=$count_network spotify=$count_spotify health=$count_health clock=$count_clock maintenance=$count_maintenance total=$visible_blocks"
 fi
 
-if rg -q '<HealthChip\s*/>' "$BAR_FILE" \
-  && rg -q '<MaintenanceChip\s*/>' "$BAR_FILE" \
-  && ! rg -qi 'CPU|RAM|TEMP|AUR|NEWS' "$BAR_FILE"; then
-  record_pass "hierarchy-grouped-secondary-metrics" "Métricas secundarias agrupadas en Health/Maintenance chips."
+if ! rg -q '<MaintenanceChip\s*/>' "$BAR_FILE" \
+  && ! rg -qi 'CPU|RAM|TEMP|AUR|NEWS|Updates|Arch News' "$BAR_FILE"; then
+  record_pass "hierarchy-grouped-secondary-metrics" "Métricas secundarias no se exponen como texto crudo en la barra principal."
 else
   record_fail \
     "P1" \
     "hierarchy-grouped-secondary-metrics" \
-    "Bar expone métricas secundarias fuera de los bloques agrupados esperados."
+    "Bar expone métricas secundarias fuera de la jerarquía compacta esperada."
 fi
 
-primary_status_count="$(count_regex '<PrimaryStatusBlock\b' "$BAR_FILE")"
+primary_status_count="$count_active_window"
 focus_rule_count="$(count_regex 'overlay-focused' "$STYLE_FILE")"
-if [[ "$primary_status_count" -eq 1 && "$count_primary_zone" -eq 1 && "$focus_rule_count" -ge 1 ]]; then
-  record_pass "hierarchy-single-focus-source" "Existe una sola fuente primaria de foco visual y política overlay-focused."
+if [[ "$primary_status_count" -le 1 && "$count_primary_zone" -eq 1 && "$focus_rule_count" -ge 1 ]]; then
+  record_pass "hierarchy-single-focus-source" "Existe a lo sumo una fuente primaria de foco visual y política overlay-focused."
 else
   record_fail \
     "P1" \
     "hierarchy-single-focus-source" \
-    "No se cumple política de foco único (primary_status_count=$primary_status_count focus_rule_count=$focus_rule_count)."
+    "No se cumple política de foco único (active_window_count=$primary_status_count focus_rule_count=$focus_rule_count)."
 fi
 
 # 4) Popups: no overlap policy and multi-monitor coherence

@@ -6,16 +6,34 @@ UPDATE_SCRIPT="$REPO_DIR/config/ags/scripts/system_update.sh"
 ROLLBACK_SCRIPT="$REPO_DIR/config/ags/scripts/snapper_rollback.sh"
 CC_STATE_PATH="/tmp/ags-cc-state.json"
 
+wait_for_ags_ready() {
+  local timeout_s="${1:-12}"
+  local elapsed=0
+
+  while (( elapsed < timeout_s * 2 )); do
+    if systemctl --user is-active --quiet ags.service \
+      && ags list 2>/dev/null | grep -qx 'ags'; then
+      return 0
+    fi
+    sleep 0.5
+    elapsed=$((elapsed + 1))
+  done
+
+  return 1
+}
+
 since="$(date '+%F %T')"
 
 echo "[ags-smoke] restarting ags.service"
+systemctl --user daemon-reload >/dev/null 2>&1 || true
 systemctl --user reset-failed ags.service >/dev/null 2>&1 || true
 systemctl --user restart ags.service
-sleep 2
 
-if ! systemctl --user is-active --quiet ags.service; then
-  echo "[ags-smoke] FAIL: ags.service is not active"
+if ! wait_for_ags_ready 16; then
+  echo "[ags-smoke] FAIL: AGS runtime did not become ready"
   systemctl --user status ags.service --no-pager -n 60 || true
+  echo "[ags-smoke] ags list:"
+  ags list 2>/dev/null || true
   exit 1
 fi
 

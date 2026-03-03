@@ -23,3 +23,6 @@ config/ags/private/*
 # Python cache
 **/__pycache__/
 **/*.pyc
+
+# Local systemd user links (machine-specific)
+config/systemd/user/default.target.wants/
