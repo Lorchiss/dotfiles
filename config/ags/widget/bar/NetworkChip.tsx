@@ -83,7 +83,7 @@ function resolveNetworkState(
   }
 }
 
-export default function NetworkChip() {
+export default function NetworkChip({ compact = false }: { compact?: boolean } = {}) {
   barLog("CONNECTIVITY", "mounting NetworkChip")
   const state = createPoll<NetworkState>(
     {
@@ -112,7 +112,11 @@ export default function NetworkChip() {
 
   return (
     <button
-      class={state((s) => `network-chip network-${s.mode}`)}
+      class={state((s) =>
+        compact
+          ? `network-chip network-chip-compact network-${s.mode}`
+          : `network-chip network-${s.mode}`
+      )}
       tooltipText={state((s) =>
         safeText(s.detail, "Sin conexión de red", "NETWORK", "chip-tooltip"),
       )}
@@ -125,14 +129,16 @@ export default function NetworkChip() {
           iconName={state((s) => s.iconName)}
           pixelSize={BAR_UI.size.networkIcon}
         />
-        <label
-          class="network-chip-label"
-          label={state((s) =>
-            safeText(s.label, "Sin red", "NETWORK", "chip-label"),
-          )}
-          maxWidthChars={BAR_UI.text.networkLabelChars}
-          singleLineMode
-        />
+        {!compact ? (
+          <label
+            class="network-chip-label"
+            label={state((s) =>
+              safeText(s.label, "Sin red", "NETWORK", "chip-label"),
+            )}
+            maxWidthChars={BAR_UI.text.networkLabelChars}
+            singleLineMode
+          />
+        ) : null}
       </box>
     </button>
   )

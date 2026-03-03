@@ -252,7 +252,7 @@ $fg-color: #{"@theme_fg_color"};
 $bg-color: #{"@theme_bg_color"};
 
 $radius-bar: $ag-radius-card;
-$bar-density: hero !default; // compact | balanced | hero
+$bar-density: balanced !default; // compact | balanced | hero
 
 @mixin ag-type($size, $weight: 600, $spacing: 0.2px, $color: $ag-text-0) {
   font-size: $size;
@@ -693,12 +693,58 @@ window.Bar {
 
   .right-controls-zone {
     min-width: 0;
+    padding-right: $ag-space-2;
   }
 
   .quick-controls-cluster {
     padding: $ag-space-3 $ag-space-5;
     border-radius: $ag-radius-chip;
     background: rgba($aa-pr-white, 0.03);
+  }
+
+  .quick-status-box {
+    padding: 0;
+    border-radius: 0;
+    background: transparent;
+    border: none;
+  }
+
+  .right-controls-zone .vol-control > button,
+  .right-controls-zone .network-chip,
+  .right-controls-zone .health-chip > button {
+    min-width: 0;
+    min-height: $ag-bar-block-height;
+    padding: $ag-space-4;
+    border-radius: $ag-radius-sm;
+    border: 1px solid transparent;
+    background: transparent;
+    background-image: none;
+    box-shadow: none;
+  }
+
+  .right-controls-zone .vol-control > button:hover,
+  .right-controls-zone .vol-control > button:active,
+  .right-controls-zone .network-chip:hover,
+  .right-controls-zone .network-chip:active,
+  .right-controls-zone .health-chip > button:hover,
+  .right-controls-zone .health-chip > button:active {
+    background: transparent;
+    background-image: none;
+    border-color: transparent;
+    box-shadow: none;
+  }
+
+  .right-controls-zone .vol-control:focus-within > button,
+  .right-controls-zone .network-chip:focus-visible,
+  .right-controls-zone .network-chip:focus,
+  .right-controls-zone .health-chip:focus-within > button {
+    border-color: rgba($aa-pr-frost-250, 0.42);
+  }
+
+  .right-controls-zone .vol-trigger-label,
+  .right-controls-zone .network-chip-label,
+  .right-controls-zone .health-metric-value {
+    display: none;
   }
 
   label {
@@ -885,17 +931,13 @@ window.Bar {
   }
 
   .health-chip > button {
-    padding: $ag-space-5 $ag-space-6;
-    min-width: 186px;
-    border-radius: $ag-bar-block-radius;
-    @include ag-interactive-control(
-      $bg: $ag-bar-health-bg,
-      $border: $ag-bar-health-border,
-      $hover-bg: $ag-bar-volume-hover-bg,
-      $hover-border: $ag-bar-volume-hover-border,
-      $active-bg: $ag-bar-volume-active-bg,
-      $active-border: $ag-bar-volume-active-border
-    );
+    min-width: 0;
+    min-height: $ag-bar-block-height;
+    padding: $ag-space-4;
+    border-radius: $ag-radius-sm;
+    border: 1px solid transparent;
+    background: transparent;
+    box-shadow: none;
   }
 
   .health-dot {
@@ -920,6 +962,10 @@ window.Bar {
     padding-bottom: 0;
   }
 
+  .health-content-icononly {
+    min-width: 0;
+  }
+
   .health-content > * {
     margin-top: 0;
     margin-bottom: 0;
@@ -939,9 +985,40 @@ window.Bar {
     padding-top: 0;
   }
 
+  .health-usage-inline {
+    min-width: 30px;
+    @include ag-type($ag-font-label-xs, 700, 0.08px, $ag-text-1);
+    font-variant-numeric: tabular-nums;
+  }
+
   .health-icon {
     color: $ag-text-1;
     margin-top: 0;
+  }
+
+  .health-state-icon {
+    min-width: 0;
+    margin: 0;
+  }
+
+  .health-state-dot {
+    min-width: 5px;
+    min-height: 5px;
+    border-radius: 999px;
+    background: rgba($aa-pr-frost-250, 0.85);
+    opacity: 0.85;
+  }
+
+  .health-state-dot.health-dot-ok {
+    background: rgba($aa-pr-frost-250, 0.9);
+  }
+
+  .health-state-dot.health-dot-warn {
+    background: rgba(248, 197, 108, 0.96);
+  }
+
+  .health-state-dot.health-dot-critical {
+    background: rgba($aa-pr-danger-300, 0.96);
   }
 
   .health-metric-icon {
@@ -1003,7 +1080,7 @@ window.Bar {
 
   .health-popover-row,
   .maintenance-popover-row {
-    padding: $ag-space-5 $ag-space-6;
+    padding: $ag-space-4 $ag-space-5;
     border-radius: $ag-radius-sm-tight;
     background: rgba($aa-pr-white, 0.03);
     border: 1px solid rgba($aa-pr-white, 0.1);
@@ -1043,19 +1120,22 @@ window.Bar {
   }
 
   .network-chip {
-    @include ag-interactive-control(
-      $bg: $ag-bar-connectivity-bg,
-      $border: $ag-bar-connectivity-border,
-      $color: $ag-accent-primary,
-      $hover-bg: $ag-bar-connectivity-hover-bg,
-      $hover-border: $ag-bar-connectivity-hover-border,
-      $active-bg: $ag-bar-connectivity-active-bg,
-      $active-border: $ag-bar-connectivity-active-border
-    );
+    color: $ag-accent-primary;
+  }
+
+  .network-chip.network-chip-compact {
+    min-height: $ag-bar-block-height;
+    padding: $ag-space-4;
+    min-width: 0;
+    border-radius: $ag-radius-sm;
+    border: 1px solid transparent;
+    background: transparent;
+    box-shadow: none;
   }
 
   .network-chip-icon {
     color: $ag-accent-primary;
+    font-size: 12px;
   }
 
   .network-chip-label {
@@ -1080,6 +1160,11 @@ window.Bar {
     );
   }
 
+  .spotify-chip.spotify-chip-compact {
+    min-width: 0;
+    padding: $ag-space-4 $ag-space-5;
+  }
+
   .spotify-chip-content {
     min-width: 0;
   }
@@ -1092,6 +1177,15 @@ window.Bar {
     min-width: 0;
   }
 
+  .spotify-compact-state {
+    @include ag-type($ag-font-label-xs, 700, 0.08px, $ag-text-muted);
+    min-width: 8px;
+  }
+
+  .spotify-compact-state.is-playing {
+    color: $ag-accent-secondary;
+  }
+
   .spotify-chip.spotify-active {
     background: $ag-bar-spotify-active-bg;
     border-color: $ag-bar-spotify-active-border;
@@ -1100,7 +1194,7 @@ window.Bar {
 
   .clock-chip > button {
     min-width: 106px;
-    padding: $ag-space-5 $ag-space-6;
+    padding: $ag-space-4 $ag-space-5;
     @include ag-interactive-control(
       $bg: rgba($aa-pr-frost-300, 0.08),
       $border: rgba($aa-pr-frost-300, 0.26),
@@ -1255,6 +1349,60 @@ window.Bar {
       @include ag-type($ag-font-body-lg, 700, 0.16px, $ag-text-1);
       font-variant-numeric: tabular-nums;
     }
+  }
+
+  .vol-control.vol-control-compact {
+    > button {
+      min-width: 0;
+      min-height: $ag-bar-block-height;
+      padding: $ag-space-4;
+      border-radius: $ag-radius-sm;
+      border: 1px solid transparent;
+      background: transparent;
+      box-shadow: none;
+    }
+
+    .vol-trigger-icon {
+      margin-right: 0;
+    }
+  }
+
+  .vol-control.vol-control-compact > button:hover,
+  .vol-control.vol-control-compact > button:active,
+  .network-chip.network-chip-compact:hover,
+  .network-chip.network-chip-compact:active,
+  .health-chip > button:hover,
+  .health-chip > button:active {
+    background: transparent;
+    border-color: transparent;
+    box-shadow: none;
+  }
+
+  .vol-control.vol-control-compact:focus-within > button,
+  .network-chip.network-chip-compact:focus-visible,
+  .network-chip.network-chip-compact:focus,
+  .health-chip:focus-within > button {
+    border-color: rgba($aa-pr-frost-250, 0.42);
+  }
+
+  .vol-control.vol-control-compact .vol-trigger-icon,
+  .network-chip.network-chip-compact .network-chip-icon,
+  .health-chip .health-state-icon,
+  .health-chip .health-state-dot {
+    opacity: 0.84;
+    transition: opacity $ag-motion-fast $ag-curve-standard;
+  }
+
+  .vol-control.vol-control-compact:hover .vol-trigger-icon,
+  .network-chip.network-chip-compact:hover .network-chip-icon,
+  .health-chip:hover .health-state-icon,
+  .health-chip:hover .health-state-dot,
+  .vol-control.vol-control-compact:focus-within .vol-trigger-icon,
+  .network-chip.network-chip-compact:focus-visible .network-chip-icon,
+  .network-chip.network-chip-compact:focus .network-chip-icon,
+  .health-chip:focus-within .health-state-icon,
+  .health-chip:focus-within .health-state-dot {
+    opacity: 1;
   }
 }
 
@@ -1752,7 +1900,7 @@ window.ControlCenter {
 
   .cc-inline-message {
     @include ag-type($ag-font-body-sm, 600, 0.2px, $ag-text-1);
-    padding: $ag-space-5 $ag-space-6;
+    padding: $ag-space-4 $ag-space-5;
     border-radius: $ag-radius-sm;
     border: 1px solid transparent;
   }

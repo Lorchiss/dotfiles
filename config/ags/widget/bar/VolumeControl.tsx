@@ -27,7 +27,7 @@ function volumeIconName(value: number, muted: boolean) {
   return "audio-volume-high-symbolic"
 }
 
-export default function VolumeControl() {
+export default function VolumeControl({ compact = false }: { compact?: boolean } = {}) {
   barLog("AUDIO", "mounting VolumeControl")
   let syncingScale = false
   let ignoreStateSyncUntil = 0
@@ -99,26 +99,28 @@ printf "%s\n%s" "$vol" "$mute"
     ).catch(() => {})
 
   return (
-    <menubutton class="vol-control" tooltipText="Volumen">
+    <menubutton class={compact ? "vol-control vol-control-compact" : "vol-control"} tooltipText="Volumen">
       <box spacing={BAR_UI.spacing.tight}>
         <image
           class="vol-trigger-icon"
           iconName={state((s) => volumeIconName(s.value, s.muted))}
           pixelSize={BAR_UI.size.volumeIcon}
         />
-        <label
-          class="vol-trigger-label"
-          label={state((s) =>
-            safeText(
-              `${clampVolume(s.value)}%`,
-              "--%",
-              "AUDIO",
-              "trigger-label",
-            ),
-          )}
-          maxWidthChars={BAR_UI.text.volumeLabelChars}
-          singleLineMode
-        />
+        {!compact ? (
+          <label
+            class="vol-trigger-label"
+            label={state((s) =>
+              safeText(
+                `${clampVolume(s.value)}%`,
+                "--%",
+                "AUDIO",
+                "trigger-label",
+              ),
+            )}
+            maxWidthChars={BAR_UI.text.volumeLabelChars}
+            singleLineMode
+          />
+        ) : null}
       </box>
 
       <popover

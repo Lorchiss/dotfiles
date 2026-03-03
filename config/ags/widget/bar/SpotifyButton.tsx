@@ -45,7 +45,7 @@ function marqueeText(text: string, tick: number, width: number) {
   return out
 }
 
-export default function SpotifyButton() {
+export default function SpotifyButton({ compact = false }: { compact?: boolean } = {}) {
   barLog("SPOTIFY", "mounting SpotifyButton")
   const spotify = createPoll<SpotifyChipState>(
     { available: false, playing: false, track: "" },
@@ -102,21 +102,36 @@ export default function SpotifyButton() {
       visible={spotify((state) => state.available)}
       onClicked={onSpotifyButtonClick}
       class={spotify((state) =>
-        state.playing ? "spotify-chip spotify-active" : "spotify-chip",
+        state.playing
+          ? compact
+            ? "spotify-chip spotify-chip-compact spotify-active"
+            : "spotify-chip spotify-active"
+          : compact
+            ? "spotify-chip spotify-chip-compact"
+            : "spotify-chip",
       )}
       tooltipText="Spotify"
     >
       <box class="spotify-chip-content" spacing={6}>
         <label class="spotify-chip-icon" label="" />
-        <label
-          class="spotify-chip-title"
-          label={title}
-          widthChars={CHIP_TITLE_WIDTH}
-          maxWidthChars={CHIP_TITLE_WIDTH}
-          singleLineMode
-          ellipsize={0}
-          xalign={0}
-        />
+        {compact ? (
+          <label
+            class={spotify((state) =>
+              state.playing ? "spotify-compact-state is-playing" : "spotify-compact-state",
+            )}
+            label="●"
+          />
+        ) : (
+          <label
+            class="spotify-chip-title"
+            label={title}
+            widthChars={CHIP_TITLE_WIDTH}
+            maxWidthChars={CHIP_TITLE_WIDTH}
+            singleLineMode
+            ellipsize={0}
+            xalign={0}
+          />
+        )}
       </box>
     </button>
   )

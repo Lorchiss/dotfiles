@@ -119,7 +119,11 @@ export default function HealthChip() {
         ),
       )}
     >
-      <box class="health-content" spacing={BAR_UI.spacing.tight} valign={Gtk.Align.CENTER}>
+      <box
+        class="health-content health-content-icononly"
+        spacing={3}
+        valign={Gtk.Align.CENTER}
+      >
         <image
           class={compute((c) => {
             const health = resolveHealthState(
@@ -128,7 +132,7 @@ export default function HealthChip() {
               c.gpu,
               system().maxTemperatureC,
             )
-            return `health-icon health-dot-${health.level}`
+            return `health-icon health-state-icon health-dot-${health.level}`
           })}
           iconName={compute((c) => {
             const health = resolveHealthState(
@@ -139,93 +143,93 @@ export default function HealthChip() {
             )
             return healthIconName(health.level)
           })}
-          pixelSize={14}
+          pixelSize={BAR_UI.size.networkIcon}
           valign={Gtk.Align.CENTER}
         />
-        <box class="health-metric-group" spacing={4} valign={Gtk.Align.CENTER}>
-          <image
-            class="health-metric-icon"
-            iconName="utilities-system-monitor-symbolic"
-            pixelSize={11}
-            valign={Gtk.Align.CENTER}
-          />
-          <label
-            class="health-metric health-metric-value"
-            label={compute((c) =>
-              safeText(
-                `${metricText(c.cpu)}%`,
-                "--%",
-                "HEALTH",
-                "chip-cpu-inline",
-              ),
-            )}
-            xalign={0}
-            valign={Gtk.Align.CENTER}
-          />
-        </box>
-        <box class="health-metric-group" spacing={4} valign={Gtk.Align.CENTER}>
-          <image
-            class="health-metric-icon"
-            iconName="drive-harddisk-symbolic"
-            pixelSize={12}
-            valign={Gtk.Align.CENTER}
-          />
-          <label
-            class="health-metric health-metric-value"
-            label={compute((c) =>
-              safeText(
-                `${metricText(c.ram)}%`,
-                "--%",
-                "HEALTH",
-                "chip-ram-inline",
-              ),
-            )}
-            xalign={0}
-            valign={Gtk.Align.CENTER}
-          />
-        </box>
-        <box class="health-metric-group" spacing={4} valign={Gtk.Align.CENTER}>
-          <image
-            class="health-metric-icon"
-            iconName="video-display-symbolic"
-            pixelSize={12}
-            valign={Gtk.Align.CENTER}
-          />
-          <label
-            class="health-metric health-metric-value"
-            label={compute((c) =>
-              safeText(
-                `${metricText(c.gpu)}%`,
-                "--%",
-                "HEALTH",
-                "chip-gpu-inline",
-              ),
-            )}
-            xalign={0}
-            valign={Gtk.Align.CENTER}
-          />
-        </box>
-        <box class="health-metric-group" spacing={4} valign={Gtk.Align.CENTER}>
-          <image
-            class="health-metric-icon"
-            iconName="weather-clear-symbolic"
-            pixelSize={12}
-            valign={Gtk.Align.CENTER}
-          />
-          <label
-            class="health-metric health-metric-value"
-            label={system((s) =>
-              safeText(
-                `${temperatureText(s.maxTemperatureC, 0)}°`,
-                "--°",
-                "HEALTH",
-                "chip-temp-inline",
-              ),
-            )}
-            xalign={0}
-            valign={Gtk.Align.CENTER}
-          />
-        </box>
+        <box
+          class={compute((c) => {
+            const health = resolveHealthState(
+              c.cpu,
+              c.ram,
+              c.gpu,
+              system().maxTemperatureC,
+            )
+            return `health-state-dot health-dot-${health.level}`
+          })}
+          valign={Gtk.Align.CENTER}
+        />
+        <image
+          class="health-metric-icon"
+          iconName="utilities-system-monitor-symbolic"
+          pixelSize={11}
+          valign={Gtk.Align.CENTER}
+        />
+        <label
+          class="health-usage-inline"
+          label={compute((c) =>
+            safeText(
+              `${metricText(c.cpu)}%`,
+              "--%",
+              "HEALTH",
+              "chip-cpu-inline",
+            ),
+          )}
+          valign={Gtk.Align.CENTER}
+        />
+        <image
+          class="health-metric-icon"
+          iconName="drive-harddisk-symbolic"
+          pixelSize={12}
+          valign={Gtk.Align.CENTER}
+        />
+        <label
+          class="health-usage-inline"
+          label={compute((c) =>
+            safeText(
+              `${metricText(c.ram)}%`,
+              "--%",
+              "HEALTH",
+              "chip-ram-inline",
+            ),
+          )}
+          valign={Gtk.Align.CENTER}
+        />
+        <image
+          class="health-metric-icon"
+          iconName="video-display-symbolic"
+          pixelSize={12}
+          valign={Gtk.Align.CENTER}
+        />
+        <label
+          class="health-usage-inline"
+          label={compute((c) =>
+            safeText(
+              `${metricText(c.gpu)}%`,
+              "--%",
+              "HEALTH",
+              "chip-gpu-inline",
+            ),
+          )}
+          valign={Gtk.Align.CENTER}
+        />
+        <image
+          class="health-metric-icon"
+          iconName="weather-clear-symbolic"
+          pixelSize={12}
+          valign={Gtk.Align.CENTER}
+        />
+        <label
+          class="health-usage-inline"
+          label={system((s) =>
+            safeText(
+              `${temperatureText(s.maxTemperatureC, 0)}°`,
+              "--°",
+              "HEALTH",
+              "chip-temp-inline",
+            ),
+          )}
+          valign={Gtk.Align.CENTER}
+        />
       </box>
 
       <popover class="health-popover-shell" hasArrow={false}>

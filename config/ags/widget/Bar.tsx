@@ -2,11 +2,10 @@ import app from "ags/gtk4/app"
 import { Astal, Gtk } from "ags/gtk4"
 import ClockMenu from "./bar/ClockMenu"
 import WorkspaceLanes from "./bar/WorkspaceLanes"
-import VolumeControl from "./bar/VolumeControl"
 import ActiveWindowChip from "./bar/ActiveWindowChip"
 import HealthChip from "./bar/HealthChip"
 import LauncherButton from "./bar/LauncherButton"
-import NetworkChip from "./bar/NetworkChip"
+import QuickStatusBox from "./bar/QuickStatusBox"
 import SpotifyButton from "./bar/SpotifyButton"
 import { BAR_UI } from "../lib/uiTokens"
 import { barLog, isBarModuleEnabled } from "../lib/barObservability"
@@ -84,9 +83,11 @@ export default function Bar(gdkmonitor: any) {
           hexpand
           halign={Gtk.Align.END}
         >
-          {audioEnabled ? <VolumeControl /> : null}
-          {connectivityEnabled ? <NetworkChip /> : null}
-          {spotifyEnabled ? <SpotifyButton /> : null}
+          {spotifyEnabled ? <SpotifyButton compact /> : null}
+          <QuickStatusBox
+            audioEnabled={audioEnabled}
+            connectivityEnabled={connectivityEnabled}
+          />
           {healthEnabled ? <HealthChip /> : null}
           {clockEnabled ? <ClockMenu /> : null}
         </box>
