@@ -670,6 +670,7 @@ window.Bar {
 
   > centerbox > box {
     min-height: $bar-height - $ag-space-8;
+    min-width: 0;
   }
 
   .bar-section-start,
@@ -720,6 +721,18 @@ window.Bar {
     );
   }
 
+  .launcher-chip {
+    min-width: 86px;
+  }
+
+  .launcher-icon {
+    color: $ag-accent-primary;
+  }
+
+  .launcher-label {
+    @include ag-type($ag-font-label-sm, 700, 0.16px, $ag-text-0);
+  }
+
   .workspace-lanes {
     min-width: bar-size(workspace-chip-min);
   }
@@ -750,6 +763,23 @@ window.Bar {
       background-color $ag-motion-fast $ag-curve-standard,
       border-color $ag-motion-fast $ag-curve-standard,
       box-shadow $ag-motion-fast $ag-curve-standard;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .workspace-chip-icon {
+    color: rgba(214, 233, 252, 0.94);
+  }
+
+  .workspace-chip-badge {
+    min-width: 11px;
+    min-height: 11px;
+    padding: 0 $ag-space-2;
+    margin-top: -$ag-space-2;
+    margin-right: -$ag-space-2;
+    border-radius: $ag-radius-pill;
+    border: 1px solid rgba(240, 248, 255, 0.28);
+    background: rgba(240, 248, 255, 0.18);
+    @include ag-type($ag-font-label-2xs, 700, 0.05px, rgba(240, 248, 255, 0.94));
     font-variant-numeric: tabular-nums;
   }
 
@@ -814,6 +844,14 @@ window.Bar {
   .active-window-title {
     min-width: 0;
     @include ag-type($ag-font-body-sm-soft, 600, 0.15px, $ag-text-0);
+  }
+
+  .active-window-icon {
+    color: $ag-accent-primary;
+  }
+
+  .active-window-fallback {
+    @include ag-type($ag-font-body-sm-soft, 600, 0.15px, $ag-text-muted);
   }
 
   .chip-caption {
@@ -952,7 +990,7 @@ window.Bar {
     font-variant-numeric: tabular-nums;
   }
 
-  .connectivity-chip {
+  .network-chip {
     @include ag-interactive-control(
       $bg: $ag-bar-connectivity-bg,
       $border: $ag-bar-connectivity-border,
@@ -962,6 +1000,20 @@ window.Bar {
       $active-bg: $ag-bar-connectivity-active-bg,
       $active-border: $ag-bar-connectivity-active-border
     );
+  }
+
+  .network-chip-icon {
+    color: $ag-accent-primary;
+  }
+
+  .network-chip-label {
+    min-width: 0;
+    @include ag-type($ag-font-label-sm, 600, 0.14px, $ag-text-1);
+  }
+
+  .network-offline .network-chip-icon,
+  .network-offline .network-chip-label {
+    color: $ag-text-muted;
   }
 
   .spotify-chip {
