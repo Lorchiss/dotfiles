@@ -8,7 +8,11 @@ import ActiveWindowChip from "./bar/ActiveWindowChip"
 import HealthChip from "./bar/HealthChip"
 import MaintenanceChip from "./bar/MaintenanceChip"
 import PrimaryStatusBlock from "./bar/PrimaryStatusBlock"
-import { barLog, isBarModuleEnabled } from "../lib/barObservability"
+import {
+  BAR_PRIMARY_STATUS_V2,
+  barLog,
+  isBarModuleEnabled,
+} from "../lib/barObservability"
 
 export default function Bar(gdkmonitor: any) {
   const { TOP, LEFT, RIGHT } = Astal.WindowAnchor
@@ -37,6 +41,10 @@ export default function Bar(gdkmonitor: any) {
   barLog(
     "CONNECTIVITY",
     connectivityEnabled ? "enabled" : "disabled by BAR_CONNECTIVITY=0",
+  )
+  barLog(
+    "PRIMARY_STATUS_V2",
+    BAR_PRIMARY_STATUS_V2 ? "enabled" : "disabled by BAR_PRIMARY_STATUS_V2=0",
   )
 
   return (

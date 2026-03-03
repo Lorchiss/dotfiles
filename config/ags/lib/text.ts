@@ -15,6 +15,13 @@ function normalize(value: string | number): string {
   return String(value).replace(/\s+/g, " ").trim()
 }
 
+function normalizePrimitive(value: unknown): string | null {
+  if (typeof value === "string" || typeof value === "number") {
+    return normalize(value)
+  }
+  return null
+}
+
 function hasForbiddenTechText(value: string): boolean {
   return FORBIDDEN_TECH_PATTERNS.some((pattern) => pattern.test(value))
 }
@@ -45,11 +52,17 @@ function safeTextRaw(value: unknown): string {
 
 export function safeText(
   value: unknown,
-  fallback = "",
+  fallback: unknown = "",
   moduleName = "TEXT",
   fieldName = "value",
 ): string {
-  const fallbackText = normalize(fallback)
+  const fallbackCandidate = normalizePrimitive(fallback)
+  const fallbackText =
+    typeof fallbackCandidate === "string" &&
+    fallbackCandidate.length > 0 &&
+    !hasForbiddenTechText(fallbackCandidate)
+      ? fallbackCandidate
+      : ""
 
   if (value === null || value === undefined) {
     debugSanitizerWarning(
@@ -72,7 +85,7 @@ export function safeText(
     return fallbackText
   }
 
-  const text = normalize(value)
+  const text = normalizePrimitive(value) ?? ""
   if (!text) {
     return fallbackText
   }

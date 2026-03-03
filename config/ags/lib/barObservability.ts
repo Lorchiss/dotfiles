@@ -43,6 +43,10 @@ export const BAR_SIMULATE_INVALID_TEXT = parseBooleanEnv(
   "BAR_SIMULATE_INVALID_TEXT",
   false,
 )
+export const BAR_PRIMARY_STATUS_V2 = parseBooleanEnv(
+  "BAR_PRIMARY_STATUS_V2",
+  true,
+)
 
 const MODULE_FLAGS: Record<BarModuleName, boolean> = Object.fromEntries(
   Object.entries(BAR_MODULE_SPECS).map(([moduleName, spec]) => [
@@ -77,5 +81,8 @@ export function logBarFlagsSummary(): void {
     })
     .join(" ")
 
-  print(`[BAR:FLAGS] DEBUG_BAR=ON ${summary}`)
+  const primaryStatusV2 = BAR_PRIMARY_STATUS_V2 ? "ON" : "OFF"
+  print(
+    `[BAR:FLAGS] DEBUG_BAR=ON BAR_PRIMARY_STATUS_V2=${primaryStatusV2} ${summary}`,
+  )
 }

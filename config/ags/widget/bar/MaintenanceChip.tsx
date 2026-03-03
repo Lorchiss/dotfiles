@@ -1,17 +1,82 @@
 import { Gtk } from "ags/gtk4"
 import { barSystemStateBinding } from "../../lib/barSignals"
 import { createMusicAccentClassState } from "../../lib/musicAccent"
-import { safeText } from "../../lib/text"
 import { barLog } from "../../lib/barObservability"
 
-function maintenanceStatus(updates: number | null, news: number) {
-  if (news > 0) return "warn"
+const COUNTER_FALLBACK = "—"
+const FORBIDDEN_LABEL_SNIPPETS = [
+  "[object",
+  "accessor",
+  "gtk.",
+  "instance wrapper",
+  "null",
+  "undefined",
+]
+
+function maintenanceStatus(updates: number | null, news: number | null) {
+  if (news !== null && news > 0) return "warn"
   if (updates !== null && updates > 0) return "warn"
   return "ok"
 }
 
-function countText(value: unknown): string {
-  return safeText(value, "--", "MAINTENANCE", "counter")
+function safeLogValue(value: unknown): string {
+  let preview = ""
+
+  if (typeof value === "string" || typeof value === "number") {
+    preview = String(value)
+  } else if (typeof value === "function") {
+    preview = `[function ${value.name || "anonymous"}]`
+  } else if (value === null) {
+    preview = "null"
+  } else if (value === undefined) {
+    preview = "undefined"
+  } else if (typeof value === "object") {
+    const ctorName =
+      (value as { constructor?: { name?: string } }).constructor?.name ||
+      "unknown"
+    preview = `[object ${ctorName}]`
+  } else {
+    preview = String(value)
+  }
+
+  return preview.replace(/\s+/g, " ").trim().slice(0, 80)
+}
+
+function toSafeLabel(value: unknown, fallback = COUNTER_FALLBACK): string {
+  if (typeof value === "number") {
+    if (!Number.isFinite(value)) return fallback
+    return String(value)
+  }
+
+  if (typeof value !== "string") return fallback
+
+  const label = value.replace(/\s+/g, " ").trim()
+  if (!label) return fallback
+
+  const normalized = label.toLowerCase()
+  if (FORBIDDEN_LABEL_SNIPPETS.some((token) => normalized.includes(token))) {
+    return fallback
+  }
+
+  return label
+}
+
+function counterValue(value: unknown, fieldName: string): number | null {
+  if (typeof value === "number" && Number.isFinite(value)) {
+    return value
+  }
+
+  barLog(
+    "MAINTENANCE",
+    `WARN invalid counter field=${fieldName} raw=${safeLogValue(value)} fallback=${COUNTER_FALLBACK}`,
+  )
+  return null
+}
+
+function counterLabel(value: unknown, fieldName: string): string {
+  const parsed = counterValue(value, fieldName)
+  if (parsed === null) return COUNTER_FALLBACK
+  return toSafeLabel(String(parsed), COUNTER_FALLBACK)
 }
 
 export default function MaintenanceChip() {
@@ -21,19 +86,18 @@ export default function MaintenanceChip() {
 
   return (
     <menubutton
-      class={system(
-        (s) =>
-          `maintenance-chip maintenance-${maintenanceStatus(s.updatesCount, s.archNewsUnreadCount)}`,
-      )}
+      class={system((s) => {
+        const updates = counterValue(s.updatesCount, "updates-count-status")
+        const news = counterValue(s.archNewsUnreadCount, "news-count-status")
+        return `maintenance-chip maintenance-${maintenanceStatus(updates, news)}`
+      })}
       tooltipText={system((s) => {
-        const updates = countText(s.updatesCount)
-        const aur = countText(s.updatesAurCount)
-        const news = countText(s.archNewsUnreadCount)
-        return safeText(
+        const updates = counterLabel(s.updatesCount, "updates-count-tooltip")
+        const aur = counterLabel(s.updatesAurCount, "aur-count-tooltip")
+        const news = counterLabel(s.archNewsUnreadCount, "news-count-tooltip")
+        return toSafeLabel(
           `Updates ${updates} · AUR ${aur} · News ${news}`,
-          "Updates -- · AUR -- · News --",
-          "MAINTENANCE",
-          "chip-tooltip",
+          `Updates ${COUNTER_FALLBACK} · AUR ${COUNTER_FALLBACK} · News ${COUNTER_FALLBACK}`,
         )
       })}
     >
@@ -44,14 +108,18 @@ export default function MaintenanceChip() {
           <label
             class="maintenance-inline"
             label={system((s) => {
-              const updates = countText(s.updatesCount)
-              const aur = countText(s.updatesAurCount)
-              const news = countText(s.archNewsUnreadCount)
-              return safeText(
+              const updates = counterLabel(
+                s.updatesCount,
+                "updates-count-inline",
+              )
+              const aur = counterLabel(s.updatesAurCount, "aur-count-inline")
+              const news = counterLabel(
+                s.archNewsUnreadCount,
+                "news-count-inline",
+              )
+              return toSafeLabel(
                 `U${updates} A${aur} N${news}`,
-                "U-- A-- N--",
-                "MAINTENANCE",
-                "chip-inline",
+                `U${COUNTER_FALLBACK} A${COUNTER_FALLBACK} N${COUNTER_FALLBACK}`,
               )
             })}
             xalign={0}
@@ -83,7 +151,12 @@ export default function MaintenanceChip() {
             />
             <label
               class="maintenance-popover-value"
-              label={system((s) => countText(s.updatesCount))}
+              label={system((s) =>
+                toSafeLabel(
+                  counterLabel(s.updatesCount, "updates-count-popover"),
+                  COUNTER_FALLBACK,
+                ),
+              )}
             />
           </box>
 
@@ -96,7 +169,12 @@ export default function MaintenanceChip() {
             />
             <label
               class="maintenance-popover-value"
-              label={system((s) => countText(s.updatesAurCount))}
+              label={system((s) =>
+                toSafeLabel(
+                  counterLabel(s.updatesAurCount, "aur-count-popover"),
+                  COUNTER_FALLBACK,
+                ),
+              )}
             />
           </box>
 
@@ -109,7 +187,12 @@ export default function MaintenanceChip() {
             />
             <label
               class="maintenance-popover-value"
-              label={system((s) => countText(s.archNewsUnreadCount))}
+              label={system((s) =>
+                toSafeLabel(
+                  counterLabel(s.archNewsUnreadCount, "news-count-popover"),
+                  COUNTER_FALLBACK,
+                ),
+              )}
             />
           </box>
         </box>
