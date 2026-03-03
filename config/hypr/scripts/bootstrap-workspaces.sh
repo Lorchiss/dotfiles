@@ -168,12 +168,31 @@ restore_last_session() {
     return 1
   fi
 
-  python3 "${restore_script}" restore >/dev/null 2>&1
+  local state_dir="${XDG_STATE_HOME:-$HOME/.local/state}/hypr"
+  local log_file="${state_dir}/window-session.log"
+  mkdir -p "${state_dir}"
+
+  local now
+  now="$(date -Iseconds)"
+  local output
+  if output="$(python3 "${restore_script}" restore 2>&1)"; then
+    printf '[%s] restore ok: %s\n' "${now}" "${output:-no-output}" >>"${log_file}"
+    return 0
+  fi
+
+  printf '[%s] restore fail: %s\n' "${now}" "${output:-unknown-error}" >>"${log_file}"
+  return 1
 }
 
 if restore_last_session; then
   exit 0
 fi
+
+{
+  state_dir="${XDG_STATE_HOME:-$HOME/.local/state}/hypr"
+  mkdir -p "${state_dir}"
+  printf '[%s] restore unavailable, applying default bootstrap\n' "$(date -Iseconds)" >>"${state_dir}/window-session.log"
+} >/dev/null 2>&1 || true
 
 launch_if_missing() {
   local command_name="$1"
