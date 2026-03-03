@@ -2,12 +2,12 @@ import { Gtk } from "ags/gtk4"
 import { execAsync } from "ags/process"
 import { createPoll } from "ags/time"
 import { createMusicAccentClassState } from "../../lib/musicAccent"
+import { BAR_UI } from "../../lib/uiTokens"
 import { safeText } from "../../lib/text"
 import { barLog } from "../../lib/barObservability"
 
 const volumeStep = 5
 const keepVolumePopoverOpen = false
-const VOLUME_POLL_MS = 700
 
 type VolumeState = {
   value: number
@@ -35,7 +35,7 @@ export default function VolumeControl() {
 
   const state = createPoll<VolumeState>(
     { value: 0, muted: false },
-    VOLUME_POLL_MS,
+    BAR_UI.timing.volumePollMs,
     async (prev) => {
       try {
         const wpLine = (
@@ -99,23 +99,25 @@ printf "%s\n%s" "$vol" "$mute"
     ).catch(() => {})
 
   return (
-    <menubutton class="vol-control" tooltipText="Control de volumen">
-      <box spacing={8}>
+    <menubutton class="vol-control" tooltipText="Volumen">
+      <box spacing={BAR_UI.spacing.tight}>
         <image
           class="vol-trigger-icon"
           iconName={state((s) => volumeIconName(s.value, s.muted))}
-          pixelSize={16}
+          pixelSize={BAR_UI.size.volumeIcon}
         />
         <label
           class="vol-trigger-label"
           label={state((s) =>
             safeText(
-              `VOL ${clampVolume(s.value)}%`,
-              "VOL --",
+              `${clampVolume(s.value)}%`,
+              "--%",
               "AUDIO",
               "trigger-label",
             ),
           )}
+          maxWidthChars={BAR_UI.text.volumeLabelChars}
+          singleLineMode
         />
       </box>
 
@@ -125,7 +127,7 @@ printf "%s\n%s" "$vol" "$mute"
         hasArrow={false}
       >
         <box
-          spacing={12}
+          spacing={BAR_UI.spacing.popover}
           cssName="volPopover"
           class={accentClass(
             (accent) => `volPopover popup-accent-surface ${accent}`,
@@ -134,17 +136,21 @@ printf "%s\n%s" "$vol" "$mute"
           <button
             class="vol-mute-btn"
             onClicked={toggleMute}
-            tooltipText="Silenciar / activar sonido"
+            tooltipText="Silenciar"
           >
             <image
               class="vol-popup-icon"
               iconName={state((s) => volumeIconName(s.value, s.muted))}
-              pixelSize={18}
+              pixelSize={BAR_UI.size.volumePopoverIcon}
             />
           </button>
 
-          <box orientation={Gtk.Orientation.VERTICAL} spacing={8} hexpand>
-            <box spacing={10}>
+          <box
+            orientation={Gtk.Orientation.VERTICAL}
+            spacing={BAR_UI.spacing.popover}
+            hexpand
+          >
+            <box spacing={BAR_UI.spacing.popover}>
               <label
                 class="vol-popup-heading"
                 label="Volumen"
@@ -164,7 +170,7 @@ printf "%s\n%s" "$vol" "$mute"
               />
             </box>
 
-            <box spacing={12}>
+            <box spacing={BAR_UI.spacing.popover}>
               <Gtk.Scale
                 class="vol-scale"
                 orientation={Gtk.Orientation.HORIZONTAL}

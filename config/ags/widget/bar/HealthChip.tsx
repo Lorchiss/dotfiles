@@ -4,12 +4,12 @@ import {
   barSystemStateBinding,
 } from "../../lib/barSignals"
 import { createMusicAccentClassState } from "../../lib/musicAccent"
+import { BAR_UI } from "../../lib/uiTokens"
 import { safeText } from "../../lib/text"
 import { barLog } from "../../lib/barObservability"
 
 type HealthState = {
   level: "ok" | "warn" | "critical"
-  label: string
   detail: string
 }
 
@@ -48,7 +48,6 @@ function resolveHealthState(
   if (critical) {
     return {
       level: "critical",
-      label: "●",
       detail,
     }
   }
@@ -56,16 +55,19 @@ function resolveHealthState(
   if (warning) {
     return {
       level: "warn",
-      label: "●",
       detail,
     }
   }
 
   return {
     level: "ok",
-    label: "●",
     detail,
   }
+}
+
+function counterLabel(value: unknown): string {
+  if (typeof value === "number" && Number.isFinite(value)) return String(value)
+  return "--"
 }
 
 export default function HealthChip() {
@@ -93,7 +95,7 @@ export default function HealthChip() {
         ),
       )}
     >
-      <box class="health-content" spacing={6}>
+      <box class="health-content" spacing={BAR_UI.spacing.tight}>
         <label
           class={compute((c) => {
             const health = resolveHealthState(
@@ -103,50 +105,37 @@ export default function HealthChip() {
             )
             return `health-dot health-dot-${health.level}`
           })}
-          label={compute((c) =>
+          label="●"
+        />
+        <label
+          class="health-inline"
+          label={system((s) =>
             safeText(
-              resolveHealthState(c.cpu, c.ram, system().maxTemperatureC).label,
-              "●",
+              `${temperatureText(s.maxTemperatureC, 0)}°`,
+              "--°",
               "HEALTH",
-              "chip-dot-label",
+              "chip-inline",
             ),
           )}
+          xalign={0}
         />
-        <box orientation={Gtk.Orientation.VERTICAL} spacing={0}>
-          <label class="chip-caption" label="Health" xalign={0} />
-          <label
-            class="health-inline"
-            label={compute((c) => {
-              const cpu = metricText(c.cpu)
-              const ram = metricText(c.ram)
-              const temp = temperatureText(system().maxTemperatureC, 0)
-              return safeText(
-                `${cpu}/${ram}/${temp}`,
-                "--/--/--",
-                "HEALTH",
-                "chip-inline",
-              )
-            })}
-            xalign={0}
-          />
-        </box>
       </box>
 
       <popover class="health-popover-shell" hasArrow={false}>
         <box
           orientation={Gtk.Orientation.VERTICAL}
-          spacing={8}
+          spacing={BAR_UI.spacing.popover}
           class={accentClass(
             (accent) => `health-popover-card popup-accent-surface ${accent}`,
           )}
         >
           <label
             class="health-popover-heading"
-            label="System Health"
+            label="Salud del sistema"
             xalign={0}
           />
 
-          <box class="health-popover-row" spacing={8}>
+          <box class="health-popover-row" spacing={BAR_UI.spacing.popover}>
             <label class="health-popover-key" label="CPU" xalign={0} hexpand />
             <label
               class="health-popover-value"
@@ -156,7 +145,7 @@ export default function HealthChip() {
             />
           </box>
 
-          <box class="health-popover-row" spacing={8}>
+          <box class="health-popover-row" spacing={BAR_UI.spacing.popover}>
             <label class="health-popover-key" label="RAM" xalign={0} hexpand />
             <label
               class="health-popover-value"
@@ -166,7 +155,7 @@ export default function HealthChip() {
             />
           </box>
 
-          <box class="health-popover-row" spacing={8}>
+          <box class="health-popover-row" spacing={BAR_UI.spacing.popover}>
             <label class="health-popover-key" label="TEMP" xalign={0} hexpand />
             <label
               class="health-popover-value"
@@ -176,6 +165,41 @@ export default function HealthChip() {
                   "--°C",
                   "HEALTH",
                   "temp-value",
+                ),
+              )}
+            />
+          </box>
+
+          <box class="health-popover-row" spacing={BAR_UI.spacing.popover}>
+            <label
+              class="health-popover-key"
+              label="Actualizaciones"
+              xalign={0}
+              hexpand
+            />
+            <label
+              class="health-popover-value"
+              label={system((s) =>
+                safeText(
+                  counterLabel(s.updatesCount),
+                  "--",
+                  "HEALTH",
+                  "updates-value",
+                ),
+              )}
+            />
+          </box>
+
+          <box class="health-popover-row" spacing={BAR_UI.spacing.popover}>
+            <label class="health-popover-key" label="Noticias" xalign={0} hexpand />
+            <label
+              class="health-popover-value"
+              label={system((s) =>
+                safeText(
+                  counterLabel(s.archNewsUnreadCount),
+                  "--",
+                  "HEALTH",
+                  "news-value",
                 ),
               )}
             />

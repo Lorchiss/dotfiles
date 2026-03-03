@@ -2,41 +2,73 @@ import { Gtk } from "ags/gtk4"
 import { execAsync } from "ags/process"
 import { createPoll } from "ags/time"
 import { createMusicAccentClassState } from "../../lib/musicAccent"
+import { BAR_UI } from "../../lib/uiTokens"
 import { safeText } from "../../lib/text"
 import { BAR_SIMULATE_INVALID_TEXT, barLog } from "../../lib/barObservability"
+
+type ClockState = {
+  time: string
+  detail: string
+}
 
 export default function ClockMenu() {
   barLog("CLOCK", "mounting ClockMenu")
   const accentClass = createMusicAccentClassState()
-  const clock = createPoll("", 1000, () =>
-    execAsync(`date "+%H:%M  %d-%m-%Y"`).then((s) =>
-      safeText(
-        BAR_SIMULATE_INVALID_TEXT
-          ? "[object instance wrapper Gtk.Calendar]"
-          : s,
-        "",
-        "CLOCK",
-        "clock-poll",
-      ),
-    ),
+  const clock = createPoll<ClockState>(
+    { time: "--:--", detail: "Calendario" },
+    1000,
+    async (prev) => {
+      try {
+        const raw = await execAsync(`date "+%H:%M|%A, %d %b %Y"`)
+        const [timeRaw = "", detailRaw = ""] = raw.trim().split("|")
+        const time = safeText(
+          BAR_SIMULATE_INVALID_TEXT
+            ? "[object instance wrapper Gtk.Calendar]"
+            : timeRaw,
+          prev.time || "--:--",
+          "CLOCK",
+          "clock-time",
+        )
+        const detail = safeText(
+          detailRaw,
+          prev.detail || "Calendario",
+          "CLOCK",
+          "clock-detail",
+        )
+        return { time, detail }
+      } catch {
+        return prev
+      }
+    },
   )
 
   return (
-    <menubutton class="clock-chip" tooltipText="Calendario">
+    <menubutton
+      class="clock-chip"
+      tooltipText={clock((value) =>
+        safeText(value.detail, "Calendario", "CLOCK", "clock-tooltip"),
+      )}
+    >
       <label
         label={clock((value) =>
-          safeText(value, "--:--", "CLOCK", "clock-label"),
+          safeText(value.time, "--:--", "CLOCK", "clock-label"),
         )}
       />
       <popover class="clock-popover-shell" hasArrow={false}>
         <box
           orientation={Gtk.Orientation.VERTICAL}
-          spacing={8}
+          spacing={BAR_UI.spacing.popover}
           class={accentClass(
             (accent) => `clock-popover-card popup-accent-surface ${accent}`,
           )}
         >
-          <label class="clock-popover-heading" label="Calendario" xalign={0} />
+          <label
+            class="clock-popover-heading"
+            label={clock((value) =>
+              safeText(value.detail, "Calendario", "CLOCK", "popover-heading"),
+            )}
+            xalign={0}
+          />
           <Gtk.Calendar class="clock-popover-calendar" />
         </box>
       </popover>

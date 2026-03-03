@@ -10,6 +10,12 @@ const SPOTIFY_FALLBACK = "Spotify"
 
 let lastClickMs = 0
 
+type SpotifyChipState = {
+  available: boolean
+  playing: boolean
+  track: string
+}
+
 function sanitizeChipText(value: unknown, fallback = SPOTIFY_FALLBACK): string {
   const cleaned = safeText(value, fallback, "SPOTIFY", "chip-text")
   if (!cleaned)
@@ -41,38 +47,42 @@ function marqueeText(text: string, tick: number, width: number) {
 
 export default function SpotifyButton() {
   barLog("SPOTIFY", "mounting SpotifyButton")
-  const track = createPoll("", 2000, async () => {
-    try {
-      const out = await execAsync(
-        `playerctl -p spotify metadata --format '{{title}}' 2>/dev/null || echo ''`,
-      )
-      return sanitizeChipText(out, "")
-    } catch {
-      return ""
-    }
-  })
+  const spotify = createPoll<SpotifyChipState>(
+    { available: false, playing: false, track: "" },
+    2000,
+    async (prev) => {
+      try {
+        const [statusRaw, trackRaw] = await Promise.all([
+          execAsync(`playerctl -p spotify status 2>/dev/null || echo ''`),
+          execAsync(
+            `playerctl -p spotify metadata --format '{{title}}' 2>/dev/null || echo ''`,
+          ),
+        ])
+        const status = sanitizeChipText(statusRaw, "").trim()
+        return {
+          available: status.length > 0,
+          playing: status === "Playing",
+          track: sanitizeChipText(trackRaw, ""),
+        }
+      } catch {
+        return {
+          ...prev,
+          available: false,
+          playing: false,
+        }
+      }
+    },
+  )
 
   const marqueeTick = createPoll(0, MARQUEE_TICK_MS, (prev) => prev + 1)
 
   const title = marqueeTick((tick) => {
-    const current = sanitizeChipText(track(), "")
+    const current = sanitizeChipText(spotify().track, "")
     if (!current) return SPOTIFY_FALLBACK
     return sanitizeChipText(
       marqueeText(current, tick, CHIP_TITLE_WIDTH),
       SPOTIFY_FALLBACK,
     )
-  })
-
-  const playing = createPoll(false, 2000, async () => {
-    try {
-      const out = await execAsync(
-        `playerctl -p spotify status 2>/dev/null || echo ''`,
-      )
-      const status = sanitizeChipText(out, "")
-      return status.trim() === "Playing"
-    } catch {
-      return false
-    }
   })
 
   const onSpotifyButtonClick = async () => {
@@ -89,9 +99,10 @@ export default function SpotifyButton() {
 
   return (
     <button
+      visible={spotify((state) => state.available)}
       onClicked={onSpotifyButtonClick}
-      class={playing((isPlaying) =>
-        isPlaying ? "spotify-chip spotify-active" : "spotify-chip",
+      class={spotify((state) =>
+        state.playing ? "spotify-chip spotify-active" : "spotify-chip",
       )}
       tooltipText="Spotify"
     >
