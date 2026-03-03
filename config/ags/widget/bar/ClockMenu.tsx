@@ -54,7 +54,15 @@ export default function ClockMenu() {
         ),
       )}
     >
-      <label class="clock-chip-icon" label="󰥔" />
+      <box spacing={BAR_UI.spacing.tight} halign={Gtk.Align.CENTER}>
+        <image class="clock-chip-icon" iconName="preferences-system-time-symbolic" pixelSize={14} />
+        <label
+          class="clock-chip-time"
+          label={clock((value) =>
+            safeText(value.time, "--:--", "CLOCK", "chip-time"),
+          )}
+        />
+      </box>
       <popover class="clock-popover-shell" hasArrow={false}>
         <box
           orientation={Gtk.Orientation.VERTICAL}

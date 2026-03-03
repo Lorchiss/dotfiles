@@ -9,6 +9,7 @@ import {
 export type BarComputeState = {
   cpu: number | null
   ram: number | null
+  gpu: number | null
 }
 
 const BAR_SYSTEM_POLL_MS = 5200
@@ -30,6 +31,7 @@ const barComputeState = createPoll<BarComputeState>(
   {
     cpu: null,
     ram: null,
+    gpu: null,
   },
   BAR_COMPUTE_POLL_MS,
   async (prev) => {
@@ -45,18 +47,28 @@ read -r _ u1 n1 s1 i1 w1 irq1 sirq1 st1 _ < /proc/stat
  dt=$((t2-t1)); didle=$((idle2-idle1))
  cpu=0
  if [ "$dt" -gt 0 ]; then cpu=$(((100*(dt-didle))/dt)); fi
- read -r memTotal memAvail <<< "$(grep -E "^(MemTotal|MemAvailable):" /proc/meminfo | awk "{print \$2}")"
+ memTotal=$(grep -m1 "^MemTotal:" /proc/meminfo | tr -s " " | cut -d" " -f2)
+ memAvail=$(grep -m1 "^MemAvailable:" /proc/meminfo | tr -s " " | cut -d" " -f2)
  ram=0
  if [ -n "$memTotal" ] && [ "$memTotal" -gt 0 ] && [ -n "$memAvail" ]; then
    ram=$(((100*(memTotal-memAvail))/memTotal))
  fi
- printf "%s\n%s" "$cpu" "$ram"
+ gpu=""
+ if command -v nvidia-smi >/dev/null 2>&1; then
+   gpu=$(nvidia-smi --query-gpu=utilization.gpu --format=csv,noheader,nounits 2>/dev/null | head -n1)
+ elif [ -r /sys/class/drm/card0/device/gpu_busy_percent ]; then
+   gpu=$(cat /sys/class/drm/card0/device/gpu_busy_percent 2>/dev/null)
+ elif [ -r /sys/class/drm/card1/device/gpu_busy_percent ]; then
+   gpu=$(cat /sys/class/drm/card1/device/gpu_busy_percent 2>/dev/null)
+ fi
+ printf "%s\n%s\n%s" "$cpu" "$ram" "$gpu"
 '`)
 
-      const [cpuRaw = "", ramRaw = ""] = raw.split("\n")
+      const [cpuRaw = "", ramRaw = "", gpuRaw = ""] = raw.split("\n")
       return {
         cpu: parseIntSafe(cpuRaw),
         ram: parseIntSafe(ramRaw),
+        gpu: parseIntSafe(gpuRaw),
       }
     } catch {
       return prev

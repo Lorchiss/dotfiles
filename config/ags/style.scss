@@ -826,7 +826,7 @@ window.Bar {
   }
 
   .active-window-chip {
-    min-width: 220px;
+    min-width: 186px;
     padding: $ag-space-4 $ag-space-8;
     border-radius: $ag-bar-block-radius;
     background: $ag-bar-active-window-bg;
@@ -885,8 +885,8 @@ window.Bar {
   }
 
   .health-chip > button {
-    padding: $ag-space-6 $ag-space-8;
-    min-width: 156px;
+    padding: $ag-space-5 $ag-space-6;
+    min-width: 186px;
     border-radius: $ag-bar-block-radius;
     @include ag-interactive-control(
       $bg: $ag-bar-health-bg,
@@ -916,19 +916,37 @@ window.Bar {
 
   .health-content {
     min-width: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+
+  .health-content > * {
+    margin-top: 0;
+    margin-bottom: 0;
   }
 
   .health-metric {
     min-width: 0;
   }
 
+  .health-metric-group {
+    min-width: 0;
+  }
+
   .health-metric-value {
-    @include ag-type($ag-font-label-xs, 700, 0.1px, $ag-text-0);
+    @include ag-type($ag-font-label-xs, 700, 0.06px, $ag-text-0);
     font-variant-numeric: tabular-nums;
+    padding-top: 0;
   }
 
   .health-icon {
     color: $ag-text-1;
+    margin-top: 0;
+  }
+
+  .health-metric-icon {
+    color: $ag-text-muted;
+    margin-top: 0;
   }
 
   .maintenance-chip > button {
@@ -985,7 +1003,7 @@ window.Bar {
 
   .health-popover-row,
   .maintenance-popover-row {
-    padding: $ag-space-6 $ag-space-8;
+    padding: $ag-space-5 $ag-space-6;
     border-radius: $ag-radius-sm-tight;
     background: rgba($aa-pr-white, 0.03);
     border: 1px solid rgba($aa-pr-white, 0.1);
@@ -1000,6 +1018,28 @@ window.Bar {
   .maintenance-popover-value {
     @include ag-type($ag-font-label-sm, 600, 0.14px, $ag-text-0);
     font-variant-numeric: tabular-nums;
+  }
+
+  .health-meter-value {
+    font-family: monospace;
+    letter-spacing: 0;
+  }
+
+  .health-open-monitor {
+    margin-top: $ag-space-6;
+    border-radius: $ag-radius-sm-tight;
+    @include ag-interactive-control(
+      $bg: rgba($aa-pr-frost-250, 0.08),
+      $border: rgba($aa-pr-frost-250, 0.26),
+      $hover-bg: rgba($aa-pr-frost-250, 0.16),
+      $hover-border: rgba($aa-pr-frost-250, 0.34),
+      $active-bg: rgba($aa-pr-frost-250, 0.2),
+      $active-border: rgba($aa-pr-frost-250, 0.4)
+    );
+
+    label {
+      @include ag-type($ag-font-label-sm, 700, 0.14px, $ag-text-0);
+    }
   }
 
   .network-chip {
@@ -1059,26 +1099,32 @@ window.Bar {
   }
 
   .clock-chip > button {
-    min-width: 48px;
-    padding: $ag-space-6 $ag-space-8;
+    min-width: 106px;
+    padding: $ag-space-5 $ag-space-6;
     @include ag-interactive-control(
-      $bg: $ag-bar-clock-bg,
-      $border: $ag-bar-clock-border,
-      $hover-bg: $ag-bar-clock-hover-bg,
-      $hover-border: $ag-bar-clock-hover-border,
-      $active-bg: $ag-bar-clock-active-bg,
-      $active-border: $ag-bar-clock-active-border
+      $bg: rgba($aa-pr-frost-300, 0.08),
+      $border: rgba($aa-pr-frost-300, 0.26),
+      $hover-bg: rgba($aa-pr-frost-300, 0.14),
+      $hover-border: rgba($aa-pr-frost-300, 0.38),
+      $active-bg: rgba($aa-pr-frost-300, 0.19),
+      $active-border: rgba($aa-pr-frost-300, 0.46)
     );
-    box-shadow: 0 0 0 1px rgba($aa-pr-frost-200, 0.18);
+    box-shadow: none;
   }
 
   .clock-chip label {
-    @include ag-type($ag-font-body-sm, 700, 0.2px, $ag-text-inverse);
+    @include ag-type($ag-font-body-sm, 600, 0.16px, $ag-text-1);
     font-variant-numeric: tabular-nums;
   }
 
   .clock-chip-icon {
-    @include ag-type($ag-font-body-md, 700, 0.2px, $ag-text-inverse);
+    color: $ag-text-muted;
+  }
+
+  .clock-chip-time {
+    @include ag-type($ag-font-body-sm, 600, 0.18px, $ag-text-1);
+    min-width: 48px;
+    font-variant-numeric: tabular-nums;
   }
 
   .clock-popover-shell {
@@ -1706,7 +1752,7 @@ window.ControlCenter {
 
   .cc-inline-message {
     @include ag-type($ag-font-body-sm, 600, 0.2px, $ag-text-1);
-    padding: $ag-space-6 $ag-space-8;
+    padding: $ag-space-5 $ag-space-6;
     border-radius: $ag-radius-sm;
     border: 1px solid transparent;
   }
