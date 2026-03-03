@@ -46,14 +46,15 @@ export default function ClockMenu() {
     <menubutton
       class="clock-chip"
       tooltipText={clock((value) =>
-        safeText(value.detail, "Calendario", "CLOCK", "clock-tooltip"),
+        safeText(
+          `${value.time} · ${value.detail}`,
+          "Calendario",
+          "CLOCK",
+          "clock-tooltip",
+        ),
       )}
     >
-      <label
-        label={clock((value) =>
-          safeText(value.time, "--:--", "CLOCK", "clock-label"),
-        )}
-      />
+      <label class="clock-chip-icon" label="󰥔" />
       <popover class="clock-popover-shell" hasArrow={false}>
         <box
           orientation={Gtk.Orientation.VERTICAL}

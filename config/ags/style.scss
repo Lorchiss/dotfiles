@@ -885,8 +885,8 @@ window.Bar {
   }
 
   .health-chip > button {
-    padding: $ag-space-6 $ag-space-10;
-    min-width: 148px;
+    padding: $ag-space-6 $ag-space-8;
+    min-width: 156px;
     border-radius: $ag-bar-block-radius;
     @include ag-interactive-control(
       $bg: $ag-bar-health-bg,
@@ -914,9 +914,21 @@ window.Bar {
     color: rgba($aa-pr-danger-300, 0.96);
   }
 
-  .health-inline {
-    @include ag-type($ag-font-body-sm, 700, 0.12px, $ag-text-0);
+  .health-content {
+    min-width: 0;
+  }
+
+  .health-metric {
+    min-width: 0;
+  }
+
+  .health-metric-value {
+    @include ag-type($ag-font-label-xs, 700, 0.1px, $ag-text-0);
     font-variant-numeric: tabular-nums;
+  }
+
+  .health-icon {
+    color: $ag-text-1;
   }
 
   .maintenance-chip > button {
@@ -1047,7 +1059,8 @@ window.Bar {
   }
 
   .clock-chip > button {
-    min-width: bar-size(clock-chip-min);
+    min-width: 48px;
+    padding: $ag-space-6 $ag-space-8;
     @include ag-interactive-control(
       $bg: $ag-bar-clock-bg,
       $border: $ag-bar-clock-border,
@@ -1060,8 +1073,12 @@ window.Bar {
   }
 
   .clock-chip label {
-    @include ag-type($ag-font-body-md, 700, 0.28px, $ag-text-inverse);
+    @include ag-type($ag-font-body-sm, 700, 0.2px, $ag-text-inverse);
     font-variant-numeric: tabular-nums;
+  }
+
+  .clock-chip-icon {
+    @include ag-type($ag-font-body-md, 700, 0.2px, $ag-text-inverse);
   }
 
   .clock-popover-shell {

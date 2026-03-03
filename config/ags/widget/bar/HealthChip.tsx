@@ -13,6 +13,12 @@ type HealthState = {
   detail: string
 }
 
+function healthIconName(level: HealthState["level"]): string {
+  if (level === "critical") return "dialog-error-symbolic"
+  if (level === "warn") return "dialog-warning-symbolic"
+  return "emblem-ok-symbolic"
+}
+
 function metricText(value: unknown): string {
   return safeText(value, "--", "HEALTH", "metric-value")
 }
@@ -96,25 +102,52 @@ export default function HealthChip() {
       )}
     >
       <box class="health-content" spacing={BAR_UI.spacing.tight}>
-        <label
+        <image
           class={compute((c) => {
             const health = resolveHealthState(
               c.cpu,
               c.ram,
               system().maxTemperatureC,
             )
-            return `health-dot health-dot-${health.level}`
+            return `health-icon health-dot-${health.level}`
           })}
-          label="●"
+          iconName={compute((c) => {
+            const health = resolveHealthState(
+              c.cpu,
+              c.ram,
+              system().maxTemperatureC,
+            )
+            return healthIconName(health.level)
+          })}
+          pixelSize={14}
         />
         <label
-          class="health-inline"
+          class="health-metric health-metric-value"
+          label={compute((c) =>
+            safeText(
+              ` ${metricText(c.cpu)}%`,
+              " --%",
+              "HEALTH",
+              "chip-cpu-inline",
+            ),
+          )}
+          xalign={0}
+        />
+        <label
+          class="health-metric health-metric-value"
+          label={compute((c) =>
+            safeText(`󰍛 ${metricText(c.ram)}%`, "󰍛 --%", "HEALTH", "chip-ram-inline"),
+          )}
+          xalign={0}
+        />
+        <label
+          class="health-metric health-metric-value"
           label={system((s) =>
             safeText(
-              `${temperatureText(s.maxTemperatureC, 0)}°`,
-              "--°",
+              ` ${temperatureText(s.maxTemperatureC, 0)}°`,
+              " --°",
               "HEALTH",
-              "chip-inline",
+              "chip-temp-inline",
             ),
           )}
           xalign={0}
