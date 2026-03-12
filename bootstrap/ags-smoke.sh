@@ -22,6 +22,30 @@ wait_for_ags_ready() {
   return 1
 }
 
+run_ags_toggle() {
+  local target="$1"
+  local attempts="${2:-8}"
+  local delay_s="${3:-0.4}"
+  local output=""
+
+  for _ in $(seq 1 "$attempts"); do
+    if output="$(ags toggle "$target" 2>&1)"; then
+      return 0
+    fi
+
+    if printf '%s' "$output" | grep -Eq "UnknownMethod|Object does not exist at path|instance \"ags\" is not runn?ning"; then
+      sleep "$delay_s"
+      continue
+    fi
+
+    echo "$output"
+    return 1
+  done
+
+  echo "$output"
+  return 1
+}
+
 since="$(date '+%F %T')"
 
 echo "[ags-smoke] restarting ags.service"
@@ -41,14 +65,14 @@ echo "[ags-smoke] forcing control-center tab: system"
 printf '%s' '{"activeTab":"system"}' > "$CC_STATE_PATH"
 
 echo "[ags-smoke] toggling control-center"
-ags toggle control-center
+run_ags_toggle control-center
 sleep 1
-ags toggle control-center
+run_ags_toggle control-center
 
 echo "[ags-smoke] toggling command-palette"
-ags toggle command-palette
+run_ags_toggle command-palette
 sleep 1
-ags toggle command-palette
+run_ags_toggle command-palette
 
 if [[ -x "$UPDATE_SCRIPT" ]]; then
   echo "[ags-smoke] system update dry-run script"
@@ -83,9 +107,9 @@ else
 fi
 
 echo "[ags-smoke] toggling spotify popup"
-ags toggle spotify
+run_ags_toggle spotify
 sleep 1
-ags toggle spotify
+run_ags_toggle spotify
 
 if command -v hyprctl >/dev/null 2>&1; then
   monitor_count="$(hyprctl -j monitors 2>/dev/null | grep -o '"name"' | wc -l | tr -d ' ')"
