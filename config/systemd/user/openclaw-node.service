@@ -1,0 +1,31 @@
+[Unit]
+Description=OpenClaw Node Host (v2026.3.8)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+ExecStart=/usr/bin/node /home/tembleke/.npm-global/lib/node_modules/openclaw/dist/index.js node run --host 192.168.100.16 --port 18789
+Restart=always
+RestartSec=5
+TimeoutStopSec=30
+TimeoutStartSec=30
+SuccessExitStatus=0 143
+KillMode=control-group
+Environment=HOME=/home/tembleke
+Environment=TMPDIR=/tmp
+Environment=PATH=/home/tembleke/.local/bin:/home/tembleke/.npm-global/bin:/home/tembleke/bin:/home/tembleke/.volta/bin:/home/tembleke/.asdf/shims:/home/tembleke/.bun/bin:/home/tembleke/.nvm/current/bin:/home/tembleke/.fnm/current/bin:/home/tembleke/.local/share/pnpm:/usr/local/bin:/usr/bin:/bin
+Environment=OPENCLAW_LAUNCHD_LABEL=ai.openclaw.node
+Environment=OPENCLAW_SYSTEMD_UNIT=openclaw-node
+Environment="OPENCLAW_WINDOWS_TASK_NAME=OpenClaw Node"
+Environment=OPENCLAW_TASK_SCRIPT_NAME=node.cmd
+Environment=OPENCLAW_LOG_PREFIX=node
+Environment=OPENCLAW_SERVICE_MARKER=openclaw
+Environment=OPENCLAW_SERVICE_KIND=node
+Environment=OPENCLAW_SERVICE_VERSION=2026.3.8
+Environment=OPENCLAW_ALLOW_INSECURE_PRIVATE_WS=1
+Environment=OPENCLAW_GATEWAY_URL=ws://192.168.100.16:18789
+Environment=OPENCLAW_GATEWAY_TOKEN=d4345a191a7aaa8186895a9ba57c6ec1f879e9e1b2a97a85b8102e94de0d2fc3
+
+
+[Install]
+WantedBy=default.target
