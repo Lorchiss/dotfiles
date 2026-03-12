@@ -42,12 +42,12 @@ export const COMMAND_PALETTE_UI = {
 } as const
 
 export const SPOTIFY_UI = {
-  coverWrapSize: 196,
-  coverImageSize: 192,
-  popupPadding: 16,
-  popupHorizontalWidth: 548,
-  popupVerticalTitleChars: 24,
-  popupHorizontalTitleChars: 34,
-  popupVerticalArtistChars: 26,
-  popupHorizontalArtistChars: 38,
+  coverWrapSize: 160,
+  coverImageSize: 156,
+  popupPadding: 14,
+  popupHorizontalWidth: 484,
+  popupVerticalTitleChars: 21,
+  popupHorizontalTitleChars: 30,
+  popupVerticalArtistChars: 22,
+  popupHorizontalArtistChars: 33,
 } as const

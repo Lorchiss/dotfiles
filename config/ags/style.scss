@@ -103,6 +103,41 @@ $ag-state-focus-inset: inset 0 1px 0 rgba(233, 245, 255, 0.14);
 $ag-state-progress-track: rgba($aa-pr-white, 0.22);
 $ag-state-like-glow: 0 0 14px rgba($aa-pr-rose-300, 0.2);
 
+// Light mode semantic tokens
+$ag-light-surface-overlay-weak: rgba(33, 66, 111, 0.035);
+$ag-light-surface-overlay-soft: rgba(33, 66, 111, 0.055);
+$ag-light-surface-overlay-base: rgba(33, 66, 111, 0.08);
+$ag-light-surface-overlay-strong: rgba(33, 66, 111, 0.12);
+$ag-light-surface-overlay-stronger: rgba(33, 66, 111, 0.17);
+$ag-light-surface-cover: rgba(228, 236, 248, 0.96);
+$ag-light-popup-base: linear-gradient(
+  162deg,
+  rgba(246, 250, 255, 0.97),
+  rgba(233, 242, 253, 0.96)
+);
+$ag-light-text-primary: rgba(28, 42, 62, 0.96);
+$ag-light-text-secondary: rgba(53, 69, 93, 0.9);
+$ag-light-text-muted: rgba(76, 94, 120, 0.82);
+$ag-light-text-inverse: rgba(247, 251, 255, 0.99);
+$ag-light-text-connection: rgba(28, 74, 143, 0.96);
+$ag-light-text-success: rgba(25, 121, 93, 0.96);
+$ag-light-text-like: rgba(162, 54, 90, 0.96);
+$ag-light-border-subtle: rgba(56, 84, 124, 0.18);
+$ag-light-border-soft: rgba(56, 84, 124, 0.26);
+$ag-light-border-strong: rgba(54, 106, 177, 0.42);
+$ag-light-border-focus: rgba(54, 106, 177, 0.56);
+$ag-light-border-popup: rgba(96, 136, 194, 0.52);
+$ag-light-border-like: rgba(203, 106, 135, 0.46);
+$ag-light-state-progress-track: rgba(53, 76, 112, 0.25);
+$ag-light-shadow-popup:
+  0 24px 38px -24px rgba(47, 76, 120, 0.42),
+  0 8px 18px -16px rgba(59, 101, 172, 0.25),
+  inset 0 0 0 1px rgba(255, 255, 255, 0.46);
+$ag-light-shadow-focus-ring: 0 0 0 1px rgba(54, 106, 177, 0.24);
+$ag-light-shadow-play-glow: 0 0 18px rgba(83, 147, 226, 0.24);
+$ag-light-shadow-action-active: 0 0 12px rgba(86, 162, 229, 0.18);
+$ag-light-shadow-like-active: 0 0 12px rgba(224, 131, 162, 0.24);
+
 // Radius scale
 $ag-radius-xs: 8px;
 $ag-radius-sm-tight: 10px;
@@ -231,6 +266,44 @@ $ag-accent-variants: (
     tint: rgba(245, 132, 161, 0.22),
     fill-start: rgba(245, 132, 161, 0.96),
     fill-end: rgba(233, 103, 141, 0.95),
+  ),
+);
+
+$ag-accent-variants-light: (
+  "emerald": (
+    border: rgba(96, 186, 147, 0.42),
+    text: rgba(24, 108, 82, 0.96),
+    tint: rgba(106, 205, 164, 0.16),
+    fill-start: rgba(106, 205, 164, 0.9),
+    fill-end: rgba(76, 181, 137, 0.88),
+  ),
+  "cyan": (
+    border: rgba(88, 175, 196, 0.42),
+    text: rgba(18, 98, 119, 0.96),
+    tint: rgba(100, 194, 214, 0.16),
+    fill-start: rgba(100, 194, 214, 0.9),
+    fill-end: rgba(73, 162, 196, 0.88),
+  ),
+  "blue": (
+    border: rgba(88, 138, 219, 0.44),
+    text: rgba(28, 76, 149, 0.96),
+    tint: rgba(98, 152, 232, 0.16),
+    fill-start: rgba(98, 152, 232, 0.9),
+    fill-end: rgba(74, 124, 214, 0.88),
+  ),
+  "amber": (
+    border: rgba(214, 155, 66, 0.44),
+    text: rgba(132, 84, 18, 0.96),
+    tint: rgba(226, 172, 86, 0.16),
+    fill-start: rgba(226, 172, 86, 0.9),
+    fill-end: rgba(214, 145, 53, 0.88),
+  ),
+  "rose": (
+    border: rgba(208, 105, 141, 0.44),
+    text: rgba(145, 52, 84, 0.96),
+    tint: rgba(222, 118, 154, 0.16),
+    fill-start: rgba(222, 118, 154, 0.9),
+    fill-end: rgba(206, 94, 132, 0.88),
   ),
 );
 
@@ -523,15 +596,15 @@ $ag-bar-maintenance-warn-bg: rgba(248, 197, 108, 0.1);
 $ag-bar-maintenance-warn-border: rgba(248, 197, 108, 0.34);
 
 // Component tokens: Spotify popup
-$ag-spotify-card-padding: $ag-space-16;
-$ag-spotify-button-bg: rgba(24, 33, 47, 0.96);
-$ag-spotify-button-border: rgba(255, 255, 255, 0.2);
-$ag-spotify-button-hover-bg: rgba(34, 45, 63, 0.98);
-$ag-spotify-button-active-bg: rgba(46, 59, 82, 0.99);
+$ag-spotify-card-padding: $ag-space-14;
+$ag-spotify-button-bg: $ag-surface-overlay-base;
+$ag-spotify-button-border: $ag-border-subtle;
+$ag-spotify-button-hover-bg: $ag-surface-overlay-strong;
+$ag-spotify-button-active-bg: $ag-surface-overlay-stronger;
 $ag-spotify-api-chip-bg: $ag-surface-overlay-strong;
 $ag-spotify-api-chip-border: rgba(255, 255, 255, 0.12);
-$ag-spotify-status-bg: rgba($aa-pr-frost-250, 0.16);
-$ag-spotify-status-border: rgba($aa-pr-frost-250, 0.42);
+$ag-spotify-status-bg: $ag-surface-overlay-soft;
+$ag-spotify-status-border: $ag-border-subtle;
 $ag-spotify-status-padding-y: $ag-space-2;
 $ag-spotify-status-padding-x: $ag-space-9;
 $ag-spotify-control-padding-y: $ag-space-7;
@@ -544,19 +617,68 @@ $ag-spotify-play-hover-bg: rgba($aa-pr-frost-250, 0.32);
 $ag-spotify-play-hover-border: rgba(175, 251, 234, 0.66);
 $ag-spotify-play-active-bg: rgba($aa-pr-frost-250, 0.38);
 $ag-spotify-play-active-border: rgba(175, 251, 234, 0.74);
-$ag-spotify-action-bg: $ag-surface-overlay-strong;
-$ag-spotify-action-border: rgba(255, 255, 255, 0.16);
-$ag-spotify-action-hover-bg: $ag-surface-overlay-stronger;
-$ag-spotify-action-active-bg: rgba(255, 255, 255, 0.12);
+$ag-spotify-action-bg: $ag-surface-overlay-weak;
+$ag-spotify-action-border: $ag-border-subtle;
+$ag-spotify-action-hover-bg: $ag-surface-overlay-soft;
+$ag-spotify-action-active-bg: $ag-surface-overlay-strong;
 $ag-spotify-action-active-border: $ag-border-strong;
 $ag-spotify-action-active-tint: rgba(152, 245, 224, 0.18);
 $ag-spotify-action-active-tint-border: rgba(152, 245, 224, 0.46);
+$ag-spotify-like-active-bg: $ag-surface-like-tint;
+$ag-spotify-like-active-border: $ag-border-like;
 $ag-spotify-connect-bg: rgba(146, 214, 255, 0.14);
 $ag-spotify-connect-border: rgba(146, 214, 255, 0.46);
 $ag-spotify-connect-hover-bg: rgba(146, 214, 255, 0.22);
 $ag-spotify-connect-hover-border: rgba(146, 214, 255, 0.6);
 $ag-spotify-connect-active-bg: rgba(146, 214, 255, 0.3);
 $ag-spotify-connect-active-border: rgba(146, 214, 255, 0.7);
+$ag-spotify-control-secondary-size: $ag-space-32 + $ag-space-4;
+$ag-spotify-control-primary-size: $ag-space-32 + $ag-space-14;
+$ag-spotify-action-min-height: $ag-space-24 + $ag-space-6;
+$ag-spotify-action-min-width: $ag-space-32 + $ag-space-20 + $ag-space-8;
+$ag-spotify-icon-action-width: $ag-space-32;
+$ag-spotify-control-secondary-text: $ag-text-1;
+$ag-spotify-control-primary-text: $ag-text-inverse;
+
+$ag-spotify-light-card-bg: $ag-light-popup-base;
+$ag-spotify-light-card-border: $ag-light-border-popup;
+$ag-spotify-light-card-shadow: $ag-light-shadow-popup;
+$ag-spotify-light-cover-bg: $ag-light-surface-cover;
+$ag-spotify-light-cover-border: $ag-light-border-subtle;
+$ag-spotify-light-track-text: $ag-light-text-primary;
+$ag-spotify-light-artist-text: $ag-light-text-secondary;
+$ag-spotify-light-hint-text: $ag-light-text-muted;
+$ag-spotify-light-time-text: $ag-light-text-secondary;
+$ag-spotify-light-progress-track: $ag-light-state-progress-track;
+$ag-spotify-light-button-bg: $ag-light-surface-overlay-soft;
+$ag-spotify-light-button-border: $ag-light-border-subtle;
+$ag-spotify-light-button-hover-bg: $ag-light-surface-overlay-base;
+$ag-spotify-light-button-hover-border: $ag-light-border-soft;
+$ag-spotify-light-button-active-bg: $ag-light-surface-overlay-strong;
+$ag-spotify-light-button-active-border: $ag-light-border-strong;
+$ag-spotify-light-button-text: $ag-light-text-secondary;
+$ag-spotify-light-play-bg: rgba(70, 133, 214, 0.2);
+$ag-spotify-light-play-border: rgba(70, 133, 214, 0.42);
+$ag-spotify-light-play-hover-bg: rgba(70, 133, 214, 0.26);
+$ag-spotify-light-play-hover-border: rgba(70, 133, 214, 0.52);
+$ag-spotify-light-play-active-bg: rgba(70, 133, 214, 0.32);
+$ag-spotify-light-play-active-border: rgba(70, 133, 214, 0.6);
+$ag-spotify-light-action-bg: $ag-light-surface-overlay-weak;
+$ag-spotify-light-action-border: $ag-light-border-subtle;
+$ag-spotify-light-action-hover-bg: $ag-light-surface-overlay-soft;
+$ag-spotify-light-action-hover-border: $ag-light-border-soft;
+$ag-spotify-light-action-active-bg: $ag-light-surface-overlay-base;
+$ag-spotify-light-action-active-border: $ag-light-border-strong;
+$ag-spotify-light-action-active-tint: rgba(96, 186, 147, 0.16);
+$ag-spotify-light-action-active-tint-border: rgba(96, 186, 147, 0.38);
+$ag-spotify-light-like-active-bg: rgba(222, 118, 154, 0.18);
+$ag-spotify-light-like-active-border: $ag-light-border-like;
+$ag-spotify-light-connect-bg: rgba(70, 133, 214, 0.12);
+$ag-spotify-light-connect-border: rgba(70, 133, 214, 0.34);
+$ag-spotify-light-connect-hover-bg: rgba(70, 133, 214, 0.18);
+$ag-spotify-light-connect-hover-border: rgba(70, 133, 214, 0.46);
+$ag-spotify-light-connect-active-bg: rgba(70, 133, 214, 0.24);
+$ag-spotify-light-connect-active-border: rgba(70, 133, 214, 0.56);
 
 // Component tokens: Command palette
 $ag-command-shell-padding-x: $ag-space-32;
@@ -711,6 +833,7 @@ window.Bar {
 
   .right-controls-zone .vol-control > button,
   .right-controls-zone .network-chip,
+  .right-controls-zone .theme-toggle-chip,
   .right-controls-zone .health-chip > button {
     min-width: 0;
     min-height: $ag-bar-block-height;
@@ -726,6 +849,8 @@ window.Bar {
   .right-controls-zone .vol-control > button:active,
   .right-controls-zone .network-chip:hover,
   .right-controls-zone .network-chip:active,
+  .right-controls-zone .theme-toggle-chip:hover,
+  .right-controls-zone .theme-toggle-chip:active,
   .right-controls-zone .health-chip > button:hover,
   .right-controls-zone .health-chip > button:active {
     background: transparent;
@@ -737,6 +862,8 @@ window.Bar {
   .right-controls-zone .vol-control:focus-within > button,
   .right-controls-zone .network-chip:focus-visible,
   .right-controls-zone .network-chip:focus,
+  .right-controls-zone .theme-toggle-chip:focus-visible,
+  .right-controls-zone .theme-toggle-chip:focus,
   .right-controls-zone .health-chip:focus-within > button {
     border-color: rgba($aa-pr-frost-250, 0.42);
   }
@@ -744,7 +871,8 @@ window.Bar {
   .right-controls-zone .vol-trigger-label,
   .right-controls-zone .network-chip-label,
   .right-controls-zone .health-metric-value {
-    display: none;
+    opacity: 0;
+    font-size: 0;
   }
 
   label {
@@ -1123,6 +1251,38 @@ window.Bar {
     color: $ag-accent-primary;
   }
 
+  .theme-toggle-chip {
+    min-height: $ag-bar-block-height;
+    min-width: 0;
+    padding: $ag-space-4;
+    border-radius: $ag-radius-sm;
+    border: 1px solid transparent;
+    background: transparent;
+    box-shadow: none;
+  }
+
+  .theme-toggle-icon {
+    color: $ag-text-muted;
+    opacity: 0.88;
+    transition:
+      color $ag-motion-fast $ag-curve-standard,
+      opacity $ag-motion-fast $ag-curve-standard;
+  }
+
+  .theme-toggle-chip.theme-dark .theme-toggle-icon {
+    color: $ag-accent-tertiary;
+  }
+
+  .theme-toggle-chip.theme-light .theme-toggle-icon {
+    color: rgba(255, 206, 108, 0.96);
+  }
+
+  .theme-toggle-chip:hover .theme-toggle-icon,
+  .theme-toggle-chip:focus-visible .theme-toggle-icon,
+  .theme-toggle-chip:focus .theme-toggle-icon {
+    opacity: 1;
+  }
+
   .network-chip.network-chip-compact {
     min-height: $ag-bar-block-height;
     padding: $ag-space-4;
@@ -1371,6 +1531,8 @@ window.Bar {
   .vol-control.vol-control-compact > button:active,
   .network-chip.network-chip-compact:hover,
   .network-chip.network-chip-compact:active,
+  .theme-toggle-chip:hover,
+  .theme-toggle-chip:active,
   .health-chip > button:hover,
   .health-chip > button:active {
     background: transparent;
@@ -1381,12 +1543,15 @@ window.Bar {
   .vol-control.vol-control-compact:focus-within > button,
   .network-chip.network-chip-compact:focus-visible,
   .network-chip.network-chip-compact:focus,
+  .theme-toggle-chip:focus-visible,
+  .theme-toggle-chip:focus,
   .health-chip:focus-within > button {
     border-color: rgba($aa-pr-frost-250, 0.42);
   }
 
   .vol-control.vol-control-compact .vol-trigger-icon,
   .network-chip.network-chip-compact .network-chip-icon,
+  .theme-toggle-chip .theme-toggle-icon,
   .health-chip .health-state-icon,
   .health-chip .health-state-dot {
     opacity: 0.84;
@@ -1395,14 +1560,91 @@ window.Bar {
 
   .vol-control.vol-control-compact:hover .vol-trigger-icon,
   .network-chip.network-chip-compact:hover .network-chip-icon,
+  .theme-toggle-chip:hover .theme-toggle-icon,
   .health-chip:hover .health-state-icon,
   .health-chip:hover .health-state-dot,
   .vol-control.vol-control-compact:focus-within .vol-trigger-icon,
   .network-chip.network-chip-compact:focus-visible .network-chip-icon,
   .network-chip.network-chip-compact:focus .network-chip-icon,
+  .theme-toggle-chip:focus-visible .theme-toggle-icon,
+  .theme-toggle-chip:focus .theme-toggle-icon,
   .health-chip:focus-within .health-state-icon,
   .health-chip:focus-within .health-state-dot {
     opacity: 1;
+  }
+}
+
+window.Bar.bar-theme-light {
+  > centerbox {
+    background-image:
+      radial-gradient(
+        circle at 16% 18%,
+        rgba(138, 191, 255, 0.24),
+        transparent 40%
+      ),
+      radial-gradient(
+        circle at 84% 130%,
+        rgba(88, 138, 226, 0.2),
+        transparent 52%
+      ),
+      linear-gradient(
+        162deg,
+        rgba(246, 250, 255, 0.96),
+        rgba(230, 240, 253, 0.95)
+      );
+    border-color: rgba(112, 148, 201, 0.54);
+    box-shadow:
+      0 24px 38px -24px rgba(47, 76, 120, 0.45),
+      0 8px 18px -16px rgba(59, 101, 172, 0.28),
+      inset 0 0 0 1px rgba(255, 255, 255, 0.46);
+  }
+
+  .work-context-block {
+    background: rgba(35, 67, 113, 0.08);
+  }
+
+  label {
+    color: rgba(28, 42, 62, 0.95);
+  }
+
+  button,
+  menubutton > button {
+    @include ag-interactive-control(
+      $bg: rgba(33, 66, 111, 0.07),
+      $border: rgba(33, 66, 111, 0.14),
+      $color: rgba(28, 42, 62, 0.95),
+      $hover-bg: rgba(33, 66, 111, 0.12),
+      $hover-border: rgba(33, 66, 111, 0.22),
+      $active-bg: rgba(33, 66, 111, 0.16),
+      $active-border: rgba(33, 66, 111, 0.28)
+    );
+  }
+
+  .launcher-icon,
+  .network-chip-icon,
+  .vol-trigger-icon,
+  .clock-chip-icon {
+    color: rgba(25, 78, 163, 0.92);
+  }
+
+  .network-offline .network-chip-icon,
+  .network-offline .network-chip-label {
+    color: rgba(98, 114, 142, 0.94);
+  }
+
+  .clock-chip > button {
+    @include ag-interactive-control(
+      $bg: rgba(30, 81, 166, 0.09),
+      $border: rgba(30, 81, 166, 0.24),
+      $hover-bg: rgba(30, 81, 166, 0.16),
+      $hover-border: rgba(30, 81, 166, 0.3),
+      $active-bg: rgba(30, 81, 166, 0.2),
+      $active-border: rgba(30, 81, 166, 0.36)
+    );
+  }
+
+  .theme-toggle-chip.theme-light .theme-toggle-icon {
+    color: rgba(214, 145, 26, 0.98);
   }
 }
 
@@ -1410,38 +1652,26 @@ window.SpotifyPopup {
   background: transparent;
 
   .spotifyPopupCardShell {
-    animation: popupEnter $ag-motion-overlay $ag-curve-emphasis;
-  }
-
-  button {
-    @include ag-interactive-control(
-      $bg: $ag-spotify-button-bg,
-      $border: $ag-spotify-button-border,
-      $hover-bg: $ag-spotify-button-hover-bg,
-      $hover-border: $ag-border-strong,
-      $active-bg: $ag-spotify-button-active-bg,
-      $active-border: $ag-border-strong
-    );
-  }
-
-  .spotifyPopupCardShell {
-    @include popup-card-shell;
     padding: $ag-spotify-card-padding;
   }
 
   .spotifyPopupCardShell.spotify-layout-horizontal {
-    min-width: 520px;
+    min-width: 456px;
   }
 
   .spotifyPopupCardShell.spotify-layout-vertical {
-    min-width: 216px;
+    min-width: 188px;
   }
 
   .spotifyPopupCardShell.spotify-api-busy {
     box-shadow: $ag-popup-shadow;
   }
 
-  .spotifyMainColumn {
+  .spotifyMainColumn,
+  .spotifyTopSection,
+  .spotifyMetaBlock,
+  .spotifyTransportSection,
+  .spotifySecondarySection {
     min-width: 0;
     min-height: 0;
   }
@@ -1451,71 +1681,115 @@ window.SpotifyPopup {
   }
 
   .spotifyPopupCardShell.spotify-layout-vertical .spotifyMainColumn {
-    min-width: 188px;
+    min-width: 156px;
   }
 
-  .spotifyHeaderRow {
-    min-height: 24px;
-  }
-
-  .spotifyPopupCardShell.spotify-layout-vertical .spotifyHeaderRow {
-    min-height: 22px;
-  }
-
-  .spotifyApiChip {
-    min-width: 0;
-    padding: $ag-space-4 $ag-space-10;
-    @include ag-surface-subtle(
-      $ag-radius-pill,
-      $ag-spotify-api-chip-bg,
-      $ag-spotify-api-chip-border
-    );
-    @include ag-type($ag-font-body-xs, 600, 0.18px, $ag-text-1);
-  }
-
-  .spotifyPopupHeading {
-    @include ag-type($ag-font-title-sm, 700, 0.24px, $ag-text-0);
-  }
-
-  .spotifyPopupStatus {
-    border-radius: $ag-radius-pill;
-    padding: $ag-spotify-status-padding-y $ag-spotify-status-padding-x;
-    @include ag-type($ag-font-label-sm, 700, 0.2px, $ag-text-success);
-    background: $ag-spotify-status-bg;
-    border: 1px solid $ag-spotify-status-border;
+  .spotifyMetaBlock {
+    padding: 0 $ag-space-2;
   }
 
   .spotifyPopupTrack {
     min-width: 0;
-    @include ag-type($ag-font-body-lg, 700, 0.16px, $ag-text-0);
+    @include ag-type($ag-font-body-md-soft, 700, 0.14px, $ag-text-0);
   }
 
   .spotifyPopupArtist {
     min-width: 0;
-    @include ag-type($ag-font-body-md, 600, 0.14px, $ag-text-1);
+    @include ag-type($ag-font-body-sm, 600, 0.12px, $ag-text-1);
   }
 
-  .spotifyPrimaryControls button {
-    border-radius: $ag-radius-md;
-    padding: $ag-spotify-control-padding-y $ag-spotify-control-padding-x;
-    min-width: 60px;
+  .spotifyCoverWrap {
+    min-width: 160px;
+    min-height: 160px;
+    @include ag-card-shell(
+      $ag-radius-control,
+      $ag-surface-cover,
+      $ag-border-subtle,
+      none
+    );
+    padding: 2px;
   }
 
-  .spotifyPopupCardShell.spotify-layout-vertical
-    .spotifyPrimaryControls
-    button {
-    min-width: 0;
-    padding: $ag-spotify-control-padding-y 0;
+  .spotifyCover {
+    min-width: 156px;
+    min-height: 156px;
+    border-radius: $ag-radius-md-soft;
   }
 
-  .spotify-primary-btn {
-    min-height: 32px;
+  .spotifyCoverFallback {
+    min-width: 156px;
+    min-height: 156px;
+    font-size: 42px;
+    color: $ag-text-1;
+  }
+
+  .spotifyProgressGroup {
+    margin-top: $ag-space-2;
+  }
+
+  .spotifyProgressBar {
+    min-height: 6px;
+  }
+
+  .spotifyProgressBar trough {
+    min-height: 3px;
+    border-radius: $ag-radius-pill;
+    @include ag-progress-track;
+  }
+
+  .spotifyProgressBar progress {
+    min-height: 3px;
+    border-radius: $ag-radius-pill;
+    @include ag-progress-fill($ag-accent-secondary-95, $ag-accent-primary-95);
+  }
+
+  .spotifyProgressTimesRow {
+    min-height: 14px;
+  }
+
+  .spotifyProgressTime {
+    @include ag-type($ag-font-label-xs, 600, 0.1px, $ag-text-1);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .spotifyTransportRow {
+    min-height: $ag-spotify-control-primary-size;
+  }
+
+  .spotify-transport-btn {
+    min-width: $ag-spotify-control-secondary-size;
+    min-height: $ag-spotify-control-secondary-size;
+    border-radius: $ag-radius-pill;
+    padding: 0;
+    @include ag-type($ag-font-body-sm-soft, 700, 0.04px, $ag-spotify-control-secondary-text);
+    @include ag-interactive-control(
+      $bg: $ag-spotify-button-bg,
+      $border: $ag-spotify-button-border,
+      $hover-bg: $ag-spotify-button-hover-bg,
+      $hover-border: $ag-border-soft,
+      $active-bg: $ag-spotify-button-active-bg,
+      $active-border: $ag-border-strong
+    );
+    box-shadow: none;
+  }
+
+  .spotify-transport-secondary {
+    color: $ag-spotify-control-secondary-text;
+  }
+
+  .spotify-transport-secondary label {
+    @include ag-type($ag-font-body-md-soft, 700, 0.04px, $ag-spotify-control-secondary-text);
   }
 
   .spotifyPlayButton {
+    min-width: $ag-spotify-control-primary-size;
+    min-height: $ag-spotify-control-primary-size;
+    padding: 0;
+    @include ag-type($ag-font-title-sm, 700, 0.06px, $ag-spotify-control-primary-text);
     @include ag-interactive-control(
       $bg: $ag-spotify-play-bg,
       $border: $ag-spotify-play-border,
+      $color: $ag-spotify-control-primary-text,
       $hover-bg: $ag-spotify-play-hover-bg,
       $hover-border: $ag-spotify-play-hover-border,
       $active-bg: $ag-spotify-play-active-bg,
@@ -1524,103 +1798,98 @@ window.SpotifyPopup {
     box-shadow: $ag-shadow-play-glow;
   }
 
-  .spotifyCoverWrap {
-    min-width: 188px;
-    min-height: 188px;
-    @include ag-card-shell(
-      $ag-radius-control,
-      $ag-surface-cover,
-      $ag-state-progress-track,
-      none
-    );
-    padding: $ag-space-2;
+  .spotifyPlayButton label {
+    @include ag-type($ag-font-title-md, 700, 0.04px, $ag-spotify-control-primary-text);
   }
 
-  .spotifyCover {
-    min-width: 184px;
-    min-height: 184px;
-    border-radius: $ag-radius-md-soft;
+  .spotifyPlayButton:hover {
+    box-shadow:
+      $ag-shadow-play-glow,
+      $ag-shadow-md,
+      $ag-state-control-hover-ring,
+      $ag-state-control-hover-inset;
   }
 
-  .spotifyCoverFallback {
-    min-width: 184px;
-    min-height: 184px;
-    font-size: $ag-font-display;
-    color: $ag-text-1;
+  .spotifyPlayButton:active,
+  .spotifyPlayButton:checked {
+    box-shadow:
+      $ag-shadow-play-glow,
+      $ag-state-control-active-inset,
+      $ag-state-control-active-shadow;
   }
 
-  .spotifyProgressGroup {
-    margin-top: $ag-space-2;
-  }
-
-  .spotifyProgressBar trough {
-    @include ag-progress-track;
-  }
-
-  .spotifyProgressBar progress {
-    @include ag-progress-fill($ag-accent-secondary-95, $ag-accent-primary-95);
-  }
-
-  .spotifyProgressTime {
-    @include ag-type($ag-font-label-sm, 600, 0.12px, $ag-text-1);
-  }
-
-  .spotifyHotkeyHint {
-    @include ag-type($ag-font-label-xs, 600, 0.12px, $ag-text-muted);
+  .spotifySecondarySection {
     margin-top: $ag-space-2;
   }
 
   .spotifyUtilityControls {
-    min-height: 32px;
+    min-height: $ag-spotify-action-min-height;
   }
 
-  .spotifyPopupCardShell.spotify-layout-vertical .spotifyUtilityControls {
-    min-height: 30px;
-  }
-
-  .spotify-action-btn {
-    border-radius: $ag-radius-md;
-    min-width: 68px;
-    min-height: 32px;
-    padding: $ag-spotify-action-padding-y $ag-spotify-action-padding-x;
-    @include ag-type($ag-font-label-sm, 700, 0.22px, $ag-text-0);
+  .spotify-secondary-btn {
+    border-radius: $ag-radius-pill;
+    min-height: $ag-spotify-action-min-height;
+    min-width: $ag-spotify-action-min-width;
+    padding: 0 $ag-space-9;
+    @include ag-type($ag-font-label-sm-soft, 700, 0.12px, $ag-text-1);
     @include ag-interactive-control(
       $bg: $ag-spotify-action-bg,
       $border: $ag-spotify-action-border,
       $hover-bg: $ag-spotify-action-hover-bg,
-      $hover-border: $ag-border-strong,
+      $hover-border: $ag-border-soft,
       $active-bg: $ag-spotify-action-active-bg,
       $active-border: $ag-spotify-action-active-border
     );
+    box-shadow: none;
   }
 
-  .spotifyPopupCardShell.spotify-layout-vertical .spotify-action-btn,
-  .spotifyPopupCardShell.spotify-layout-vertical .spotifyConnectButton {
-    min-width: 0;
-    padding-left: 0;
-    padding-right: 0;
+  .spotify-secondary-icon-btn {
+    min-width: $ag-spotify-icon-action-width;
+    min-height: $ag-spotify-icon-action-width;
+    padding: 0;
   }
 
-  .spotify-action-btn.spotify-action-active {
+  .spotify-secondary-icon-btn label {
+    @include ag-type($ag-font-body-sm, 700, 0.06px, $ag-text-1);
+  }
+
+  .spotify-shuffle-ghost-btn,
+  .spotify-shuffle-ghost-btn:hover,
+  .spotify-shuffle-ghost-btn:active,
+  .spotify-shuffle-ghost-btn:checked {
+    background: transparent;
+    border-color: transparent;
+    box-shadow: none;
+    transform: translateY(0);
+  }
+
+  .spotify-shuffle-ghost-btn:focus,
+  .spotify-shuffle-ghost-btn:focus-visible {
+    background: transparent;
+    border-color: transparent;
+    box-shadow: $ag-shadow-focus-ring;
+    transform: translateY(0);
+  }
+
+  .spotify-secondary-btn.spotify-action-active {
     color: $ag-text-success-strong;
     background: $ag-spotify-action-active-tint;
     border-color: $ag-spotify-action-active-tint-border;
     box-shadow: $ag-shadow-action-active;
   }
 
-  .spotify-action-btn.spotify-like-active {
+  .spotify-secondary-btn.spotify-like-active {
     color: $ag-text-like;
-    background: $ag-surface-like-tint;
-    border-color: $ag-border-like;
+    background: $ag-spotify-like-active-bg;
+    border-color: $ag-spotify-like-active-border;
     box-shadow: $ag-state-like-glow;
   }
 
   .spotifyConnectButton {
-    border-radius: $ag-radius-md;
-    min-width: 84px;
-    min-height: 32px;
-    padding: $ag-spotify-action-padding-y $ag-spotify-action-padding-x;
-    @include ag-type($ag-font-label-sm, 700, 0.22px, $ag-text-connection);
+    min-height: $ag-spotify-action-min-height;
+    min-width: $ag-spotify-action-min-width;
+    padding: 0 $ag-space-10;
+    @include ag-type($ag-font-label-xs, 700, 0.2px, $ag-text-connection);
     @include ag-interactive-control(
       $bg: $ag-spotify-connect-bg,
       $border: $ag-spotify-connect-border,
@@ -1630,6 +1899,11 @@ window.SpotifyPopup {
       $active-bg: $ag-spotify-connect-active-bg,
       $active-border: $ag-spotify-connect-active-border
     );
+  }
+
+  .spotifyHotkeyHint {
+    @include ag-type($ag-font-label-2xs, 600, 0.08px, $ag-text-muted);
+    margin-top: $ag-space-2;
   }
 
   @each $accent-name, $accent-token in $ag-accent-variants {
@@ -1645,10 +1919,204 @@ window.SpotifyPopup {
 
     .spotifyPopupCardShell.spotify-accent-#{""
       + $accent-name}
-      .spotifyPopupStatus,
+      .spotify-secondary-btn.spotify-action-active {
+      color: map.get($accent-token, text);
+      background: map.get($accent-token, tint);
+      border-color: map.get($accent-token, border);
+    }
+  }
+}
+
+window.SpotifyPopup.spotify-theme-light {
+  .spotifyPopupCardShell {
+    @include ag-card-shell(
+      $ag-radius-card,
+      $ag-spotify-light-card-bg,
+      $ag-spotify-light-card-border,
+      $ag-spotify-light-card-shadow
+    );
+  }
+
+  .spotifyPopupTrack {
+    color: $ag-spotify-light-track-text;
+  }
+
+  .spotifyPopupArtist {
+    color: $ag-spotify-light-artist-text;
+  }
+
+  .spotifyCoverWrap {
+    @include ag-card-shell(
+      $ag-radius-control,
+      $ag-spotify-light-cover-bg,
+      $ag-spotify-light-cover-border,
+      none
+    );
+  }
+
+  .spotifyCoverFallback {
+    color: $ag-spotify-light-artist-text;
+  }
+
+  .spotifyProgressBar trough {
+    background: $ag-spotify-light-progress-track;
+  }
+
+  .spotifyProgressTime {
+    color: $ag-spotify-light-time-text;
+  }
+
+  .spotify-transport-btn {
+    @include ag-interactive-control(
+      $bg: $ag-spotify-light-button-bg,
+      $border: $ag-spotify-light-button-border,
+      $color: $ag-spotify-light-button-text,
+      $hover-bg: $ag-spotify-light-button-hover-bg,
+      $hover-border: $ag-spotify-light-button-hover-border,
+      $active-bg: $ag-spotify-light-button-active-bg,
+      $active-border: $ag-spotify-light-button-active-border
+    );
+  }
+
+  .spotify-transport-secondary,
+  .spotify-transport-secondary label {
+    color: $ag-spotify-light-button-text;
+  }
+
+  .spotifyPlayButton {
+    @include ag-interactive-control(
+      $bg: $ag-spotify-light-play-bg,
+      $border: $ag-spotify-light-play-border,
+      $color: $ag-light-text-inverse,
+      $hover-bg: $ag-spotify-light-play-hover-bg,
+      $hover-border: $ag-spotify-light-play-hover-border,
+      $active-bg: $ag-spotify-light-play-active-bg,
+      $active-border: $ag-spotify-light-play-active-border
+    );
+    box-shadow: $ag-light-shadow-play-glow;
+  }
+
+  .spotifyPlayButton label {
+    color: $ag-light-text-inverse;
+  }
+
+  .spotifyPlayButton:hover {
+    box-shadow:
+      $ag-light-shadow-play-glow,
+      $ag-shadow-sm,
+      $ag-light-shadow-focus-ring,
+      $ag-state-control-hover-inset;
+  }
+
+  .spotifyPlayButton:active,
+  .spotifyPlayButton:checked {
+    box-shadow:
+      $ag-light-shadow-play-glow,
+      $ag-state-control-active-inset,
+      $ag-state-control-active-shadow;
+  }
+
+  .spotify-secondary-btn {
+    @include ag-interactive-control(
+      $bg: $ag-spotify-light-action-bg,
+      $border: $ag-spotify-light-action-border,
+      $color: $ag-spotify-light-button-text,
+      $hover-bg: $ag-spotify-light-action-hover-bg,
+      $hover-border: $ag-spotify-light-action-hover-border,
+      $active-bg: $ag-spotify-light-action-active-bg,
+      $active-border: $ag-spotify-light-action-active-border
+    );
+  }
+
+  .spotify-secondary-icon-btn label {
+    color: $ag-spotify-light-button-text;
+  }
+
+  .spotify-shuffle-ghost-btn,
+  .spotify-shuffle-ghost-btn:hover,
+  .spotify-shuffle-ghost-btn:active,
+  .spotify-shuffle-ghost-btn:checked {
+    background: transparent;
+    border-color: transparent;
+    box-shadow: none;
+    transform: translateY(0);
+  }
+
+  .spotify-shuffle-ghost-btn:focus,
+  .spotify-shuffle-ghost-btn:focus-visible {
+    background: transparent;
+    border-color: transparent;
+    box-shadow: $ag-light-shadow-focus-ring;
+    transform: translateY(0);
+  }
+
+  .spotify-secondary-btn.spotify-action-active {
+    color: $ag-light-text-success;
+    background: $ag-spotify-light-action-active-tint;
+    border-color: $ag-spotify-light-action-active-tint-border;
+    box-shadow: $ag-light-shadow-action-active;
+  }
+
+  .spotify-secondary-btn.spotify-like-active {
+    color: $ag-light-text-like;
+    background: $ag-spotify-light-like-active-bg;
+    border-color: $ag-spotify-light-like-active-border;
+    box-shadow: $ag-light-shadow-like-active;
+  }
+
+  .spotifyConnectButton {
+    @include ag-type($ag-font-label-xs, 700, 0.2px, $ag-light-text-connection);
+    @include ag-interactive-control(
+      $bg: $ag-spotify-light-connect-bg,
+      $border: $ag-spotify-light-connect-border,
+      $color: $ag-light-text-connection,
+      $hover-bg: $ag-spotify-light-connect-hover-bg,
+      $hover-border: $ag-spotify-light-connect-hover-border,
+      $active-bg: $ag-spotify-light-connect-active-bg,
+      $active-border: $ag-spotify-light-connect-active-border
+    );
+  }
+
+  .spotifyHotkeyHint {
+    color: $ag-spotify-light-hint-text;
+  }
+
+  .spotify-transport-btn:focus,
+  .spotify-transport-btn:focus-visible,
+  .spotify-secondary-btn:focus,
+  .spotify-secondary-btn:focus-visible {
+    border-color: $ag-light-border-focus;
+    box-shadow: $ag-light-shadow-focus-ring, $ag-state-focus-inset;
+  }
+
+  .spotifyPlayButton:focus,
+  .spotifyPlayButton:focus-visible {
+    border-color: $ag-light-border-focus;
+    box-shadow:
+      $ag-light-shadow-play-glow,
+      $ag-light-shadow-focus-ring,
+      $ag-state-focus-inset;
+  }
+
+  @each $accent-name, $accent-token in $ag-accent-variants-light {
+    .spotifyPopupCardShell.spotify-accent-#{""
+      + $accent-name} {
+      border-color: map.get($accent-token, border);
+    }
+
     .spotifyPopupCardShell.spotify-accent-#{""
       + $accent-name}
-      .spotify-action-btn.spotify-action-active {
+      .spotifyProgressBar
+      progress {
+      @include ag-progress-fill(
+        map.get($accent-token, fill-start),
+        map.get($accent-token, fill-end)
+      );
+    }
+
+    .spotifyPopupCardShell.spotify-accent-#{""
+      + $accent-name}
+      .spotify-secondary-btn.spotify-action-active {
       color: map.get($accent-token, text);
       background: map.get($accent-token, tint);
       border-color: map.get($accent-token, border);

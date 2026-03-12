@@ -7,11 +7,14 @@ import HealthChip from "./bar/HealthChip"
 import LauncherButton from "./bar/LauncherButton"
 import QuickStatusBox from "./bar/QuickStatusBox"
 import SpotifyButton from "./bar/SpotifyButton"
+import ThemeToggleChip from "./bar/ThemeToggleChip"
 import { BAR_UI } from "../lib/uiTokens"
 import { barLog, isBarModuleEnabled } from "../lib/barObservability"
+import { themeModeBinding } from "../lib/themeMode"
 
 export default function Bar(gdkmonitor: any) {
   const { TOP, LEFT, RIGHT } = Astal.WindowAnchor
+  const themeMode = themeModeBinding()
   const wsEnabled = isBarModuleEnabled("WS")
   const activeWindowEnabled = isBarModuleEnabled("ACTIVE_WINDOW")
   const spotifyEnabled = isBarModuleEnabled("SPOTIFY")
@@ -38,7 +41,7 @@ export default function Bar(gdkmonitor: any) {
     <window
       visible
       name="bar"
-      class="Bar"
+      class={themeMode((mode) => `Bar bar-theme-${mode}`)}
       gdkmonitor={gdkmonitor}
       layer={Astal.Layer.TOP}
       exclusivity={Astal.Exclusivity.EXCLUSIVE}
@@ -88,6 +91,7 @@ export default function Bar(gdkmonitor: any) {
             audioEnabled={audioEnabled}
             connectivityEnabled={connectivityEnabled}
           />
+          <ThemeToggleChip />
           {healthEnabled ? <HealthChip /> : null}
           {clockEnabled ? <ClockMenu /> : null}
         </box>

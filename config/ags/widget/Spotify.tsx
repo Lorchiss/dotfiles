@@ -6,10 +6,12 @@ import { extractSpotifyTrackId, shellQuoted } from "../lib/spotify"
 import {
   monitorFromLayout,
   onOverlayVisibilityChanged,
+  type OverlayLayoutSnapshot,
   overlayLayoutBinding,
   registerOverlayWindow,
 } from "../lib/overlayOrchestrator"
 import { SPOTIFY_UI } from "../lib/uiTokens"
+import { themeModeBinding } from "../lib/themeMode"
 import {
   readLikeStatus,
   resolveAccentClass,
@@ -132,12 +134,6 @@ function formatTime(seconds: number) {
 function parseFloatSafe(raw: string) {
   const n = Number((raw || "").trim().replace(",", "."))
   return Number.isFinite(n) ? n : 0
-}
-
-function statusLabel(status: string) {
-  if (status === "Playing") return "Reproduciendo"
-  if (status === "Paused") return "Pausado"
-  return "Detenido"
 }
 
 function parseShuffle(raw: string) {
@@ -267,7 +263,7 @@ function buildPopupClass(state: SpotifyState) {
     popupText(state.accentClass, DEFAULT_ACCENT_CLASS, "accent-class")
       .split(" ")
       .find(Boolean) ?? DEFAULT_ACCENT_CLASS
-  let className = `spotifyPopupCardShell spotify-layout-${POPUP_LAYOUT} ${accentClass}`
+  let className = `spotifyPopupCardShell popup-accent-surface spotify-layout-${POPUP_LAYOUT} ${accentClass}`
   if (state.apiBusy) className += " spotify-api-busy"
   return className
 }
@@ -284,6 +280,7 @@ function readBindingValue<T>(binding: any, fallback: T): T {
 export default function SpotifyPopup() {
   let windowRef: any = null
   const overlayLayout = overlayLayoutBinding()
+  const themeMode = themeModeBinding()
 
   const closePopup = () => {
     if (!windowRef) return
@@ -522,23 +519,25 @@ printf "%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s" "$title" "$artist" "$length" "$art" 
 
   const nextTrack = () => execAsync("playerctl -p spotify next").catch(() => {})
 
+  const buildWindowClass = (layout: OverlayLayoutSnapshot) =>
+    [
+      "SpotifyPopup",
+      `spotify-theme-${readBindingValue(themeMode, "dark")}`,
+      `overlay-layout-${layout.mode}`,
+      layout.focus === "spotify"
+        ? "overlay-focused"
+        : layout.focus
+          ? "overlay-muted"
+          : "",
+      layout.focus && layout.focus !== "spotify" ? "overlay-secondary" : "",
+    ]
+      .filter(Boolean)
+      .join(" ")
+
   return (
     <window
       name="spotify"
-      class={overlayLayout((layout) =>
-        [
-          "SpotifyPopup",
-          `overlay-layout-${layout.mode}`,
-          layout.focus === "spotify"
-            ? "overlay-focused"
-            : layout.focus
-              ? "overlay-muted"
-              : "",
-          layout.focus && layout.focus !== "spotify" ? "overlay-secondary" : "",
-        ]
-          .filter(Boolean)
-          .join(" "),
-      )}
+      class={overlayLayout((layout) => buildWindowClass(layout))}
       application={app}
       visible={false}
       layer={Astal.Layer.TOP}
@@ -613,81 +612,72 @@ printf "%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s" "$title" "$artist" "$length" "$art" 
             ? Gtk.Orientation.VERTICAL
             : Gtk.Orientation.HORIZONTAL
         }
-        spacing={POPUP_LAYOUT === "vertical" ? 10 : 16}
+        spacing={POPUP_LAYOUT === "vertical" ? 10 : 14}
         cssName="spotifyPopupCard"
         class={state((s) => buildPopupClass(s))}
         widthRequest={overlayLayout((layout) => layout.spotify.width)}
       >
         <box
-          cssName="spotifyCoverWrap"
-          class="spotifyCoverWrap"
-          valign={Gtk.Align.START}
-          halign={
-            POPUP_LAYOUT === "vertical" ? Gtk.Align.CENTER : Gtk.Align.START
-          }
+          orientation={Gtk.Orientation.VERTICAL}
+          spacing={8}
+          hexpand={POPUP_LAYOUT !== "vertical"}
+          class="spotifyMainColumn spotifyTopSection"
         >
-          <image
-            visible={state((s) => !!s.artPath)}
-            file={state((s) => s.artPath)}
-            cssName="spotifyCover"
-            class="spotifyCover"
-            pixelSize={COVER_IMAGE_SIZE}
-          />
-          <label
-            visible={state((s) => !s.artPath)}
-            label=""
-            cssName="spotifyCoverFallback"
-            class="spotifyCoverFallback"
-          />
+          <box
+            cssName="spotifyCoverWrap"
+            class="spotifyCoverWrap"
+            valign={Gtk.Align.START}
+            halign={
+              POPUP_LAYOUT === "vertical" ? Gtk.Align.CENTER : Gtk.Align.START
+            }
+          >
+            <image
+              visible={state((s) => !!s.artPath)}
+              file={state((s) => s.artPath)}
+              cssName="spotifyCover"
+              class="spotifyCover"
+              pixelSize={COVER_IMAGE_SIZE}
+            />
+            <label
+              visible={state((s) => !s.artPath)}
+              label=""
+              cssName="spotifyCoverFallback"
+              class="spotifyCoverFallback"
+            />
+          </box>
+
+          <box orientation={Gtk.Orientation.VERTICAL} spacing={2} class="spotifyMetaBlock">
+            <label
+              label={marqueeTitle}
+              wrap={false}
+              singleLineMode
+              widthChars={POPUP_TITLE_WIDTH}
+              maxWidthChars={POPUP_TITLE_WIDTH}
+              cssName="spotifyPopupTrack"
+              class="spotifyPopupTrack"
+              xalign={0}
+            />
+            <label
+              label={marqueeArtist}
+              wrap={false}
+              singleLineMode
+              widthChars={POPUP_ARTIST_WIDTH}
+              maxWidthChars={POPUP_ARTIST_WIDTH}
+              cssName="spotifyPopupArtist"
+              class="spotifyPopupArtist"
+              xalign={0}
+            />
+          </box>
         </box>
 
         <box
           orientation={Gtk.Orientation.VERTICAL}
-          spacing={4}
-          hexpand={POPUP_LAYOUT !== "vertical"}
-          class="spotifyMainColumn"
+          spacing={8}
+          class="spotifyTransportSection"
         >
-          <box spacing={8} class="spotifyHeaderRow">
-            <label
-              label=" Spotify"
-              cssName="spotifyPopupHeading"
-              class="spotifyPopupHeading"
-              hexpand
-              xalign={0}
-            />
-            <label
-              label={state((s) =>
-                popupText(statusLabel(s.status), "Detenido", "status-label"),
-              )}
-              cssName="spotifyPopupStatus"
-              class="spotifyPopupStatus"
-            />
-          </box>
-
-          <label
-            label={marqueeTitle}
-            wrap={false}
-            singleLineMode
-            widthChars={POPUP_TITLE_WIDTH}
-            maxWidthChars={POPUP_TITLE_WIDTH}
-            cssName="spotifyPopupTrack"
-            class="spotifyPopupTrack"
-            xalign={0}
-          />
-          <label
-            label={marqueeArtist}
-            wrap={false}
-            singleLineMode
-            widthChars={POPUP_ARTIST_WIDTH}
-            maxWidthChars={POPUP_ARTIST_WIDTH}
-            cssName="spotifyPopupArtist"
-            class="spotifyPopupArtist"
-            xalign={0}
-          />
-
           <box
             orientation={Gtk.Orientation.VERTICAL}
-            spacing={2}
+            spacing={3}
             cssName="spotifyProgressGroup"
             class="spotifyProgressGroup"
           >
@@ -696,7 +686,7 @@ printf "%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s" "$title" "$artist" "$length" "$art" 
               hexpand
               class="spotifyProgressBar"
             />
-            <box>
+            <box class="spotifyProgressTimesRow">
               <label
                 label={state((s) =>
                   popupText(formatTime(s.currentSec), "0:00", "time-current"),
@@ -720,58 +710,70 @@ printf "%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s" "$title" "$artist" "$length" "$art" 
           <box
             spacing={8}
             cssName="spotifyPopupControls"
-            class="spotifyPrimaryControls"
-            halign={Gtk.Align.FILL}
+            class="spotifyPrimaryControls spotifyTransportRow"
+            halign={Gtk.Align.CENTER}
           >
-            <button
-              class="spotify-primary-btn"
-              hexpand
-              onClicked={previousTrack}
-            >
+            <button class="spotify-transport-btn spotify-transport-secondary" onClicked={previousTrack}>
               <label label="⏮" />
             </button>
             <button
-              class="spotify-primary-btn spotifyPlayButton"
-              hexpand
+              class="spotify-transport-btn spotifyPlayButton"
               onClicked={playPause}
             >
               <label label="⏯" />
             </button>
-            <button class="spotify-primary-btn" hexpand onClicked={nextTrack}>
+            <button class="spotify-transport-btn spotify-transport-secondary" onClicked={nextTrack}>
               <label label="⏭" />
             </button>
           </box>
+        </box>
 
-          <box spacing={8} class="spotifyUtilityControls">
+        <box
+          orientation={Gtk.Orientation.VERTICAL}
+          spacing={5}
+          class="spotifySecondarySection"
+        >
+          <box spacing={5} class="spotifyUtilityControls spotifySecondaryActions" halign={Gtk.Align.CENTER}>
             <button
               class={state((s) =>
                 s.shuffleOn
-                  ? "spotify-action-btn spotify-action-active"
-                  : "spotify-action-btn",
+                  ? "spotify-secondary-btn spotify-secondary-icon-btn spotify-shuffle-ghost-btn spotify-action-active"
+                  : "spotify-secondary-btn spotify-secondary-icon-btn spotify-shuffle-ghost-btn",
               )}
-              hexpand
+              tooltipText={state((s) =>
+                s.shuffleOn ? "Desactivar shuffle" : "Activar shuffle",
+              )}
               sensitive={state((s) => !s.apiBusy)}
               onClicked={toggleShuffle}
             >
-              <label label="Shuffle" />
+              <image
+                iconName={state((s) =>
+                  s.shuffleOn
+                    ? "media-playlist-shuffle-symbolic"
+                    : "media-playlist-consecutive-symbolic",
+                )}
+                pixelSize={14}
+              />
             </button>
 
             <button
               visible={state((s) => s.apiAuthorized)}
               class={state((s) =>
                 s.liked
-                  ? "spotify-action-btn spotify-like-active"
-                  : "spotify-action-btn",
+                  ? "spotify-secondary-btn spotify-secondary-icon-btn spotify-like-active"
+                  : "spotify-secondary-btn spotify-secondary-icon-btn",
               )}
-              hexpand
+              tooltipText={state((s) =>
+                s.liked ? "Quitar de favoritos" : "Agregar a favoritos",
+              )}
               sensitive={state((s) => !s.apiBusy && !!s.trackId)}
               onClicked={toggleLikeTrack}
             >
               <label
                 label={state((s) =>
                   popupText(
-                    s.liked ? "❤ Like" : "♡ Like",
-                    "Like",
+                    s.liked ? "❤" : "♡",
+                    "♡",
                     "like-label",
                   ),
                 )}
@@ -779,9 +781,8 @@ printf "%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s" "$title" "$artist" "$length" "$art" 
             </button>
 
             <button
-              class="spotifyConnectButton"
+              class="spotify-secondary-btn spotifyConnectButton"
               visible={state((s) => !s.apiAuthorized)}
-              hexpand
               sensitive={state((s) => !s.apiBusy)}
               onClicked={connectSpotifyApi}
             >
@@ -791,8 +792,8 @@ printf "%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s" "$title" "$artist" "$length" "$art" 
 
           <label
             class="spotifyHotkeyHint"
-            label="Esc cerrar · Space play/pause · ←/→ track · S shuffle · L like"
-            xalign={0}
+            label="Esc · Space · ←/→ · S · L"
+            xalign={0.5}
           />
         </box>
       </box>

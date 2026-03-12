@@ -187,8 +187,8 @@ function buildLayout(
   )
   const spotifyWidth = clamp(
     SPOTIFY_UI.coverWrapSize + SPOTIFY_UI.popupPadding * 2,
-    monitorWidth < 1280 ? 206 : 220,
-    320,
+    monitorWidth < 1280 ? 184 : 188,
+    300,
   )
   const paletteWidth = clamp(
     monitorWidth - sidePadding * 2,
@@ -198,7 +198,7 @@ function buildLayout(
   const controlContentHeight = clamp(Math.floor(monitorHeight * 0.4), 320, 540)
 
   const controlEstimatedHeight = controlContentHeight + 146
-  const spotifyEstimatedHeight = SPOTIFY_UI.coverWrapSize + 212
+  const spotifyEstimatedHeight = SPOTIFY_UI.coverWrapSize + 184
 
   const bothRightPanelsVisible =
     overlayVisibility.spotify && overlayVisibility["control-center"]
