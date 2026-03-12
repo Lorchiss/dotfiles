@@ -1,3 +1,5 @@
+@import "theme-auto-glow.rasi"
+
 configuration {
   show-icons: true;
   icon-theme: "Papirus";
@@ -5,12 +7,6 @@ configuration {
 }
 
 * {
-  bg:    #0b0f17ee;
-  bg2:   #111827ee;
-  fg:    #dbeafe;
-  dim:   #94a3b8;
-  accent:#22d3ee; /* cyan neon */
-
   background-color: transparent;
   text-color: @fg;
 }
@@ -46,9 +42,8 @@ element {
 
 element selected {
   background-color: @accent;
-  text-color: #001018;
+  text-color: @selection_fg;
 }
 
 element-text { text-color: inherit; }
 element-icon { size: 20px; }
-

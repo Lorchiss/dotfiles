@@ -1,3 +1,5 @@
+@import "theme-auto.rasi"
+
 configuration {
   modi: "drun";
   show-icons: true;
@@ -5,12 +7,8 @@ configuration {
 }
 
 * {
-  bg0: #0f0f0f;
-  bg1: #151515;
-  bg2: #1c1c1c;
-  fg0: #e6e6e6;
-  fg1: #9a9a9a;
-  accent: rgba(76, 139, 245, 0.18);
+  background-color: transparent;
+  text-color: @fg0;
 }
 
 window {
@@ -78,4 +76,3 @@ element-text {
   background-color: transparent;
   text-color: inherit;
 }
-
