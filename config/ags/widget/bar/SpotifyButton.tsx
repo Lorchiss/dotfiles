@@ -45,7 +45,9 @@ function marqueeText(text: string, tick: number, width: number) {
   return out
 }
 
-export default function SpotifyButton({ compact = false }: { compact?: boolean } = {}) {
+export default function SpotifyButton({
+  compact = false,
+}: { compact?: boolean } = {}) {
   barLog("SPOTIFY", "mounting SpotifyButton")
   const spotify = createPoll<SpotifyChipState>(
     { available: false, playing: false, track: "" },
@@ -117,7 +119,9 @@ export default function SpotifyButton({ compact = false }: { compact?: boolean }
         {compact ? (
           <label
             class={spotify((state) =>
-              state.playing ? "spotify-compact-state is-playing" : "spotify-compact-state",
+              state.playing
+                ? "spotify-compact-state is-playing"
+                : "spotify-compact-state",
             )}
             label="●"
           />

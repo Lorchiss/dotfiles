@@ -65,8 +65,10 @@ function resolveHealthState(
     "health-detail",
   )
 
-  const critical = safeCpu >= 92 || safeRam >= 92 || safeGpu >= 96 || safeTemp >= 88
-  const warning = safeCpu >= 76 || safeRam >= 80 || safeGpu >= 86 || safeTemp >= 79
+  const critical =
+    safeCpu >= 92 || safeRam >= 92 || safeGpu >= 96 || safeTemp >= 88
+  const warning =
+    safeCpu >= 76 || safeRam >= 80 || safeGpu >= 86 || safeTemp >= 79
 
   if (critical) {
     return {
@@ -112,7 +114,8 @@ export default function HealthChip() {
       })}
       tooltipText={compute((c) =>
         safeText(
-          resolveHealthState(c.cpu, c.ram, c.gpu, system().maxTemperatureC).detail,
+          resolveHealthState(c.cpu, c.ram, c.gpu, system().maxTemperatureC)
+            .detail,
           "CPU --% · RAM --% · GPU --% · TEMP --°C",
           "HEALTH",
           "chip-tooltip",
@@ -327,7 +330,12 @@ export default function HealthChip() {
           </box>
 
           <box class="health-popover-row" spacing={BAR_UI.spacing.popover}>
-            <label class="health-popover-key" label="Noticias" xalign={0} hexpand />
+            <label
+              class="health-popover-key"
+              label="Noticias"
+              xalign={0}
+              hexpand
+            />
             <label
               class="health-popover-value"
               label={system((s) =>

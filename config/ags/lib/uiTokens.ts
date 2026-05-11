@@ -32,8 +32,8 @@ export const BAR_UI = {
 } as const
 
 export const CONTROL_CENTER_UI = {
-  width: 600,
-  contentHeight: 430,
+  width: 620,
+  contentHeight: 456,
 } as const
 
 export const COMMAND_PALETTE_UI = {

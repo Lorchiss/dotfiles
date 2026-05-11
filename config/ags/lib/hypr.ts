@@ -149,7 +149,10 @@ function windowSignature(
 function ensureWindowUpdatedAt(windowId: string, signature: string): number {
   const previousSignature = windowSignatureById.get(windowId)
   const previousUpdatedAt = updatedAtByWindowId.get(windowId)
-  if (previousSignature === signature && typeof previousUpdatedAt === "number") {
+  if (
+    previousSignature === signature &&
+    typeof previousUpdatedAt === "number"
+  ) {
     return previousUpdatedAt
   }
 
@@ -168,7 +171,8 @@ function pruneWindowCaches(activeIds: Set<string>) {
     if (!activeIds.has(id)) windowSignatureById.delete(id)
   }
   for (const [workspaceId, windowId] of [...lastFocusedWindowIdByWorkspace]) {
-    if (!activeIds.has(windowId)) lastFocusedWindowIdByWorkspace.delete(workspaceId)
+    if (!activeIds.has(windowId))
+      lastFocusedWindowIdByWorkspace.delete(workspaceId)
   }
 }
 
@@ -191,7 +195,8 @@ function workspaceRepresentativeId(
     return activeWindowId
   }
 
-  const lastFocusedWindowId = lastFocusedWindowIdByWorkspace.get(workspaceId) ?? ""
+  const lastFocusedWindowId =
+    lastFocusedWindowIdByWorkspace.get(workspaceId) ?? ""
   if (lastFocusedWindowId && windowIds.includes(lastFocusedWindowId)) {
     return lastFocusedWindowId
   }
@@ -222,7 +227,10 @@ function buildWorkspaceWindowModel(
     if (!windowId) continue
     const workspaceId = toPositiveWorkspaceId(client.workspace?.id)
     if (workspaceId <= 0) continue
-    const appName = sanitizeWindowText(client.class ?? client.initialClass, "Desktop")
+    const appName = sanitizeWindowText(
+      client.class ?? client.initialClass,
+      "Desktop",
+    )
     const title = sanitizeWindowText(client.title ?? client.initialTitle, "")
     const hidden = Boolean(client.hidden)
     const signature = windowSignature(workspaceId, appName, title, hidden)
@@ -248,7 +256,11 @@ function buildWorkspaceWindowModel(
   const activeWorkspaceId = toPositiveWorkspaceId(
     windowsById[activeWindowId]?.workspaceId,
   )
-  if (activeWindowId && liveWindowIds.has(activeWindowId) && activeWorkspaceId > 0) {
+  if (
+    activeWindowId &&
+    liveWindowIds.has(activeWindowId) &&
+    activeWorkspaceId > 0
+  ) {
     const idsInWorkspace = workspaceToWindowIds[activeWorkspaceId] ?? []
     if (idsInWorkspace.includes(activeWindowId)) {
       lastFocusedWindowIdByWorkspace.set(activeWorkspaceId, activeWindowId)

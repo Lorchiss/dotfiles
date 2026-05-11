@@ -9,8 +9,7 @@ const SESSION_ACTION_LABELS: Record<SessionAction, string> = {
   shutdown: "Apagar",
 }
 
-const SESSION_SNAPSHOT_COMMAND =
-  `$HOME/.config/hypr/scripts/window-session.py save >/dev/null 2>&1 || true`
+const SESSION_SNAPSHOT_COMMAND = `$HOME/.config/hypr/scripts/window-session.py save >/dev/null 2>&1 || true`
 
 const SESSION_ACTION_COMMANDS: Record<SessionAction, string> = {
   logout: `${SESSION_SNAPSHOT_COMMAND}; hyprctl dispatch exit`,

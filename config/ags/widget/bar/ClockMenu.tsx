@@ -55,7 +55,11 @@ export default function ClockMenu() {
       )}
     >
       <box spacing={BAR_UI.spacing.tight} halign={Gtk.Align.CENTER}>
-        <image class="clock-chip-icon" iconName="preferences-system-time-symbolic" pixelSize={14} />
+        <image
+          class="clock-chip-icon"
+          iconName="preferences-system-time-symbolic"
+          pixelSize={14}
+        />
         <label
           class="clock-chip-time"
           label={clock((value) =>

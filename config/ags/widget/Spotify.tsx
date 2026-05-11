@@ -646,7 +646,11 @@ printf "%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s" "$title" "$artist" "$length" "$art" 
             />
           </box>
 
-          <box orientation={Gtk.Orientation.VERTICAL} spacing={2} class="spotifyMetaBlock">
+          <box
+            orientation={Gtk.Orientation.VERTICAL}
+            spacing={2}
+            class="spotifyMetaBlock"
+          >
             <label
               label={marqueeTitle}
               wrap={false}
@@ -713,7 +717,10 @@ printf "%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s" "$title" "$artist" "$length" "$art" 
             class="spotifyPrimaryControls spotifyTransportRow"
             halign={Gtk.Align.CENTER}
           >
-            <button class="spotify-transport-btn spotify-transport-secondary" onClicked={previousTrack}>
+            <button
+              class="spotify-transport-btn spotify-transport-secondary"
+              onClicked={previousTrack}
+            >
               <label label="⏮" />
             </button>
             <button
@@ -722,7 +729,10 @@ printf "%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s" "$title" "$artist" "$length" "$art" 
             >
               <label label="⏯" />
             </button>
-            <button class="spotify-transport-btn spotify-transport-secondary" onClicked={nextTrack}>
+            <button
+              class="spotify-transport-btn spotify-transport-secondary"
+              onClicked={nextTrack}
+            >
               <label label="⏭" />
             </button>
           </box>
@@ -733,7 +743,11 @@ printf "%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s" "$title" "$artist" "$length" "$art" 
           spacing={5}
           class="spotifySecondarySection"
         >
-          <box spacing={5} class="spotifyUtilityControls spotifySecondaryActions" halign={Gtk.Align.CENTER}>
+          <box
+            spacing={5}
+            class="spotifyUtilityControls spotifySecondaryActions"
+            halign={Gtk.Align.CENTER}
+          >
             <button
               class={state((s) =>
                 s.shuffleOn
@@ -771,11 +785,7 @@ printf "%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s" "$title" "$artist" "$length" "$art" 
             >
               <label
                 label={state((s) =>
-                  popupText(
-                    s.liked ? "❤" : "♡",
-                    "♡",
-                    "like-label",
-                  ),
+                  popupText(s.liked ? "❤" : "♡", "♡", "like-label"),
                 )}
               />
             </button>

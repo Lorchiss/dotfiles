@@ -507,16 +507,16 @@ $bar-side-margin: bar-size(bar-side-margin);
 $bar-padding-x: bar-size(bar-padding-x);
 
 // Component tokens: Bar
-$ag-bar-shell-radial-start: rgba(177, 228, 255, 0.19);
-$ag-bar-shell-radial-end: rgba(84, 153, 255, 0.21);
+$ag-bar-shell-radial-start: rgba(177, 228, 255, 0.12);
+$ag-bar-shell-radial-end: rgba(84, 153, 255, 0.14);
 $ag-bar-shell-gradient: linear-gradient(
   156deg,
-  rgba(8, 17, 30, 0.96),
-  rgba(18, 30, 49, 0.97)
+  rgba(8, 17, 30, 0.9),
+  rgba(18, 30, 49, 0.88)
 );
-$ag-bar-shell-border: rgba(171, 216, 255, 0.32);
+$ag-bar-shell-border: rgba(171, 216, 255, 0.24);
 $ag-bar-shell-margin-top: $ag-space-10;
-$ag-bar-shell-padding-y: $ag-space-4;
+$ag-bar-shell-padding-y: $ag-space-3;
 $ag-bar-button-padding-y: $ag-space-6;
 $ag-bar-button-padding-x: $ag-space-12;
 $ag-bar-monitor-lane-bg: $ag-surface-overlay-base;
@@ -701,22 +701,22 @@ $ag-command-category-bg: rgba(146, 214, 255, 0.13);
 $ag-command-category-border: rgba(146, 214, 255, 0.34);
 
 // Component tokens: Control center
-$ag-control-center-card-padding: $ag-space-16;
-$ag-control-center-button-bg: $ag-surface-overlay-base;
+$ag-control-center-card-padding: $ag-space-20;
+$ag-control-center-button-bg: $ag-surface-overlay-soft;
 $ag-control-center-button-border: $ag-border-subtle;
-$ag-control-center-button-hover-bg: $ag-surface-overlay-stronger;
+$ag-control-center-button-hover-bg: $ag-surface-overlay-strong;
 $ag-control-center-button-active-bg: rgba(255, 255, 255, 0.12);
-$ag-control-center-tab-active-bg: rgba(146, 214, 255, 0.14);
+$ag-control-center-tab-active-bg: rgba(146, 214, 255, 0.16);
 $ag-control-center-tab-active-border: rgba(146, 214, 255, 0.38);
 $ag-control-center-tab-active-shadow: inset 0 0 0 1px rgba(146, 214, 255, 0.18);
-$ag-control-center-section-padding: $ag-space-14;
+$ag-control-center-section-padding: $ag-space-16;
 $ag-control-center-password-padding-y: $ag-space-4;
 $ag-control-center-password-padding-x: $ag-space-10;
 $ag-control-center-password-bg: $ag-surface-overlay-base;
 $ag-control-center-password-border: rgba(255, 255, 255, 0.14);
 $ag-control-center-password-focus-bg: rgba(146, 214, 255, 0.14);
-$ag-control-center-list-row-bg: $ag-surface-overlay-weak;
-$ag-control-center-list-row-border: $ag-surface-overlay-stronger;
+$ag-control-center-list-row-bg: rgba($aa-pr-white, 0.035);
+$ag-control-center-list-row-border: rgba($aa-pr-white, 0.075);
 $ag-control-center-list-row-padding-y: $ag-space-7;
 $ag-control-center-list-row-padding-x: $ag-space-8;
 $ag-control-center-action-bg: $ag-surface-overlay-strong;
@@ -804,9 +804,9 @@ window.Bar {
 
   .work-context-block {
     min-width: 0;
-    padding: $ag-space-4 $ag-space-8;
+    padding: $ag-space-3 $ag-space-7;
     border-radius: $ag-radius-chip;
-    background: rgba($aa-pr-white, 0.03);
+    background: rgba($aa-pr-white, 0.022);
   }
 
   .primary-status-zone {
@@ -819,9 +819,9 @@ window.Bar {
   }
 
   .quick-controls-cluster {
-    padding: $ag-space-3 $ag-space-5;
+    padding: $ag-space-2 $ag-space-4;
     border-radius: $ag-radius-chip;
-    background: rgba($aa-pr-white, 0.03);
+    background: rgba($aa-pr-white, 0.018);
   }
 
   .quick-status-box {
@@ -896,7 +896,7 @@ window.Bar {
   }
 
   .launcher-chip {
-    min-width: 86px;
+    min-width: 78px;
   }
 
   .launcher-icon {
@@ -917,7 +917,7 @@ window.Bar {
       $ag-bar-monitor-lane-bg,
       $ag-bar-monitor-lane-border
     );
-    padding: $ag-bar-monitor-lane-padding-y $ag-bar-monitor-lane-padding-x;
+    padding: $ag-space-3 $ag-space-7;
   }
 
   .workspace-monitor-badge {
@@ -925,7 +925,7 @@ window.Bar {
   }
 
   .workspace-chip {
-    min-width: 34px;
+    min-width: 32px;
     padding: $ag-bar-workspace-padding-y $ag-bar-workspace-padding-x;
     @include ag-surface-subtle(
       $ag-radius-sm,
@@ -953,7 +953,12 @@ window.Bar {
     border-radius: $ag-radius-pill;
     border: 1px solid rgba(240, 248, 255, 0.28);
     background: rgba(240, 248, 255, 0.18);
-    @include ag-type($ag-font-label-2xs, 700, 0.05px, rgba(240, 248, 255, 0.94));
+    @include ag-type(
+      $ag-font-label-2xs,
+      700,
+      0.05px,
+      rgba(240, 248, 255, 0.94)
+    );
     font-variant-numeric: tabular-nums;
   }
 
@@ -1000,10 +1005,11 @@ window.Bar {
   }
 
   .active-window-chip {
-    min-width: 186px;
+    min-width: 220px;
     padding: $ag-space-4 $ag-space-8;
     border-radius: $ag-bar-block-radius;
     background: $ag-bar-active-window-bg;
+    border: 1px solid $ag-bar-active-window-border;
     min-height: $ag-bar-block-height;
   }
 
@@ -1761,7 +1767,12 @@ window.SpotifyPopup {
     min-height: $ag-spotify-control-secondary-size;
     border-radius: $ag-radius-pill;
     padding: 0;
-    @include ag-type($ag-font-body-sm-soft, 700, 0.04px, $ag-spotify-control-secondary-text);
+    @include ag-type(
+      $ag-font-body-sm-soft,
+      700,
+      0.04px,
+      $ag-spotify-control-secondary-text
+    );
     @include ag-interactive-control(
       $bg: $ag-spotify-button-bg,
       $border: $ag-spotify-button-border,
@@ -1778,14 +1789,24 @@ window.SpotifyPopup {
   }
 
   .spotify-transport-secondary label {
-    @include ag-type($ag-font-body-md-soft, 700, 0.04px, $ag-spotify-control-secondary-text);
+    @include ag-type(
+      $ag-font-body-md-soft,
+      700,
+      0.04px,
+      $ag-spotify-control-secondary-text
+    );
   }
 
   .spotifyPlayButton {
     min-width: $ag-spotify-control-primary-size;
     min-height: $ag-spotify-control-primary-size;
     padding: 0;
-    @include ag-type($ag-font-title-sm, 700, 0.06px, $ag-spotify-control-primary-text);
+    @include ag-type(
+      $ag-font-title-sm,
+      700,
+      0.06px,
+      $ag-spotify-control-primary-text
+    );
     @include ag-interactive-control(
       $bg: $ag-spotify-play-bg,
       $border: $ag-spotify-play-border,
@@ -1799,22 +1820,24 @@ window.SpotifyPopup {
   }
 
   .spotifyPlayButton label {
-    @include ag-type($ag-font-title-md, 700, 0.04px, $ag-spotify-control-primary-text);
+    @include ag-type(
+      $ag-font-title-md,
+      700,
+      0.04px,
+      $ag-spotify-control-primary-text
+    );
   }
 
   .spotifyPlayButton:hover {
     box-shadow:
-      $ag-shadow-play-glow,
-      $ag-shadow-md,
-      $ag-state-control-hover-ring,
+      $ag-shadow-play-glow, $ag-shadow-md, $ag-state-control-hover-ring,
       $ag-state-control-hover-inset;
   }
 
   .spotifyPlayButton:active,
   .spotifyPlayButton:checked {
     box-shadow:
-      $ag-shadow-play-glow,
-      $ag-state-control-active-inset,
+      $ag-shadow-play-glow, $ag-state-control-active-inset,
       $ag-state-control-active-shadow;
   }
 
@@ -2002,17 +2025,14 @@ window.SpotifyPopup.spotify-theme-light {
 
   .spotifyPlayButton:hover {
     box-shadow:
-      $ag-light-shadow-play-glow,
-      $ag-shadow-sm,
-      $ag-light-shadow-focus-ring,
+      $ag-light-shadow-play-glow, $ag-shadow-sm, $ag-light-shadow-focus-ring,
       $ag-state-control-hover-inset;
   }
 
   .spotifyPlayButton:active,
   .spotifyPlayButton:checked {
     box-shadow:
-      $ag-light-shadow-play-glow,
-      $ag-state-control-active-inset,
+      $ag-light-shadow-play-glow, $ag-state-control-active-inset,
       $ag-state-control-active-shadow;
   }
 
@@ -2093,14 +2113,12 @@ window.SpotifyPopup.spotify-theme-light {
   .spotifyPlayButton:focus-visible {
     border-color: $ag-light-border-focus;
     box-shadow:
-      $ag-light-shadow-play-glow,
-      $ag-light-shadow-focus-ring,
+      $ag-light-shadow-play-glow, $ag-light-shadow-focus-ring,
       $ag-state-focus-inset;
   }
 
   @each $accent-name, $accent-token in $ag-accent-variants-light {
-    .spotifyPopupCardShell.spotify-accent-#{""
-      + $accent-name} {
+    .spotifyPopupCardShell.spotify-accent-#{"" + $accent-name} {
       border-color: map.get($accent-token, border);
     }
 
@@ -2262,16 +2280,18 @@ window.ControlCenter {
   }
 
   > ccCard {
-    min-width: 560px;
+    min-width: 600px;
     padding: $ag-control-center-card-padding;
   }
 
   .cc-header {
-    min-height: 34px;
+    min-height: 32px;
+    padding: 0 $ag-space-2 $ag-space-8;
+    border-bottom: 1px solid rgba($aa-pr-white, 0.075);
   }
 
   .cc-title {
-    @include ag-type($ag-font-title-lg, 700, 0.2px, $ag-text-0);
+    @include ag-type($ag-font-title-md, 700, 0.12px, $ag-text-0);
   }
 
   .cc-header-hint {
@@ -2279,8 +2299,8 @@ window.ControlCenter {
   }
 
   .cc-close-btn {
-    min-width: 36px;
-    min-height: 30px;
+    min-width: 32px;
+    min-height: 28px;
     padding: 0;
     border-radius: $ag-radius-xs;
     @include ag-interactive-control(
@@ -2295,7 +2315,10 @@ window.ControlCenter {
   }
 
   .cc-tabbar {
-    padding: $ag-space-2 0;
+    padding: $ag-space-4;
+    border-radius: $ag-radius-md;
+    background: rgba($aa-pr-white, 0.035);
+    border: 1px solid rgba($aa-pr-white, 0.08);
   }
 
   .cc-sections-scroll {
@@ -2312,12 +2335,12 @@ window.ControlCenter {
   }
 
   .cc-tab-pane {
-    padding-right: $ag-space-2;
+    padding-right: $ag-space-4;
   }
 
   .cc-tab-btn {
-    min-width: 88px;
-    padding: $ag-space-6 $ag-space-10;
+    min-width: 96px;
+    padding: $ag-space-7 $ag-space-10;
     border-radius: $ag-radius-sm-tight;
     @include ag-type($ag-font-body-sm, 600, 0.15px, $ag-text-1);
     @include ag-interactive-control(
@@ -2335,7 +2358,9 @@ window.ControlCenter {
     background: $ag-control-center-tab-active-bg;
     border-color: $ag-control-center-tab-active-border;
     color: $ag-accent-primary;
-    box-shadow: $ag-control-center-tab-active-shadow;
+    box-shadow:
+      $ag-control-center-tab-active-shadow,
+      0 10px 18px -16px rgba($aa-pr-black, 0.7);
   }
 
   @each $accent-name, $accent-token in $ag-accent-variants {
@@ -2347,19 +2372,19 @@ window.ControlCenter {
   }
 
   .cc-section {
-    background: $ag-surface-1;
-    border: 1px solid $ag-border-soft;
-    border-radius: $ag-radius-md;
+    background: rgba($aa-pr-white, 0.045);
+    border: 1px solid rgba($aa-pr-white, 0.095);
+    border-radius: $ag-radius-lg;
     padding: $ag-control-center-section-padding;
-    margin-top: $ag-space-2;
+    margin-top: $ag-space-10;
   }
 
   .cc-section-title {
-    @include ag-type($ag-font-title-md, 700, 0.16px, $ag-text-0);
+    @include ag-type($ag-font-title-sm, 700, 0.12px, $ag-text-0);
   }
 
   .cc-section-subtitle {
-    @include ag-type($ag-font-body-md, 600, 0.14px, $ag-text-0);
+    @include ag-type($ag-font-body-sm-soft, 600, 0.1px, $ag-text-0);
   }
 
   .cc-section-subtle {
@@ -2410,7 +2435,7 @@ window.ControlCenter {
 
   .cc-network-list,
   .cc-device-list {
-    min-height: 160px;
+    min-height: 176px;
   }
 
   .cc-list-row {
@@ -2419,8 +2444,7 @@ window.ControlCenter {
       $ag-control-center-list-row-bg,
       $ag-control-center-list-row-border
     );
-    padding: $ag-control-center-list-row-padding-y
-      $ag-control-center-list-row-padding-x;
+    padding: $ag-space-8 $ag-space-10;
   }
 
   .cc-audio-volume-row {
@@ -2465,7 +2489,7 @@ window.ControlCenter {
   .cc-action-btn {
     min-width: 82px;
     border-radius: $ag-radius-sm-tight;
-    padding: $ag-space-6 $ag-space-12;
+    padding: $ag-space-7 $ag-space-12;
     @include ag-type($ag-font-body-sm, 600, 0.14px, $ag-text-0);
     @include ag-interactive-control(
       $bg: $ag-control-center-action-bg,
@@ -2514,7 +2538,7 @@ window.ControlCenter {
 
   .cc-session-tile {
     min-width: 0;
-    min-height: 136px;
+    min-height: 124px;
     padding: $ag-control-center-session-padding-y
       $ag-control-center-session-padding-x;
   }

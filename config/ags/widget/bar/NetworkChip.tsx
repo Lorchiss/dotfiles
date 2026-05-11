@@ -83,7 +83,9 @@ function resolveNetworkState(
   }
 }
 
-export default function NetworkChip({ compact = false }: { compact?: boolean } = {}) {
+export default function NetworkChip({
+  compact = false,
+}: { compact?: boolean } = {}) {
   barLog("CONNECTIVITY", "mounting NetworkChip")
   const state = createPoll<NetworkState>(
     {
@@ -115,7 +117,7 @@ export default function NetworkChip({ compact = false }: { compact?: boolean } =
       class={state((s) =>
         compact
           ? `network-chip network-chip-compact network-${s.mode}`
-          : `network-chip network-${s.mode}`
+          : `network-chip network-${s.mode}`,
       )}
       tooltipText={state((s) =>
         safeText(s.detail, "Sin conexión de red", "NETWORK", "chip-tooltip"),

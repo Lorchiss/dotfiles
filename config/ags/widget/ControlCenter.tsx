@@ -186,8 +186,12 @@ export default function ControlCenter() {
         widthRequest={overlayLayout((layout) => layout.controlCenter.width)}
       >
         <box class="cc-header" spacing={8}>
-          <label class="cc-title" label="Control Center" hexpand xalign={0} />
-          <label class="cc-header-hint" label="←/→ tabs · 1-5 · Esc" />
+          <label
+            class="cc-title"
+            label="Centro de control"
+            hexpand
+            xalign={0}
+          />
           <button class="cc-close-btn" onClicked={closePanel}>
             <label label="×" />
           </button>
