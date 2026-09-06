@@ -42,11 +42,11 @@ async function executeCommand(
 
   const script =
     timeoutMs > 0
-      ? `if command -v timeout >/dev/null 2>&1; then timeout ${timeoutSeconds(timeoutMs)}s bash -lc ${shellQuote(trimmed)}; else bash -lc ${shellQuote(trimmed)}; fi`
-      : `bash -lc ${shellQuote(trimmed)}`
+      ? `if command -v timeout >/dev/null 2>&1; then timeout ${timeoutSeconds(timeoutMs)}s bash -c ${shellQuote(trimmed)}; else bash -c ${shellQuote(trimmed)}; fi`
+      : `bash -c ${shellQuote(trimmed)}`
 
   try {
-    return await execAsync(`bash -lc ${shellQuote(script)}`)
+    return await execAsync(`bash -c ${shellQuote(script)}`)
   } catch (error) {
     if (allowFailure) return ""
     const message = normalizeErrorMessage(error)

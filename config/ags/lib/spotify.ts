@@ -6,7 +6,7 @@ function shellQuote(value: string): string {
 
 export async function openSpotifyApp(): Promise<void> {
   await execAsync(
-    `bash -lc '
+    `bash -c '
 launch_cmd=""
 if command -v spotify >/dev/null 2>&1; then
   launch_cmd="exec spotify"
@@ -18,9 +18,9 @@ fi
 
 if command -v systemd-run >/dev/null 2>&1; then
   unit="ags-open-spotify-$(date +%s%N)"
-  systemd-run --user --quiet --collect --unit "$unit" bash -lc "$launch_cmd" >/dev/null 2>&1 || true
+  systemd-run --user --quiet --collect --unit "$unit" bash -c "$launch_cmd" >/dev/null 2>&1 || true
 else
-  bash -lc "$launch_cmd" >/dev/null 2>&1 &
+  bash -c "$launch_cmd" >/dev/null 2>&1 &
 fi
 '`,
   ).catch(() => {})

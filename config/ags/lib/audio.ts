@@ -80,7 +80,7 @@ async function readSinkVolumeState(): Promise<{
   try {
     const wpLine = (
       await execAsync(
-        `bash -lc "LC_ALL=C wpctl get-volume @DEFAULT_AUDIO_SINK@ 2>/dev/null || true"`,
+        `bash -c "LC_ALL=C wpctl get-volume @DEFAULT_AUDIO_SINK@ 2>/dev/null || true"`,
       )
     ).trim()
 
@@ -99,7 +99,7 @@ async function readSinkVolumeState(): Promise<{
   } catch {}
 
   try {
-    const out = await execAsync(`bash -lc '
+    const out = await execAsync(`bash -c '
 vol=$(pactl get-sink-volume @DEFAULT_SINK@ 2>/dev/null | head -n1 | awk "{print \$5}" | tr -d "%")
 mute=$(pactl get-sink-mute @DEFAULT_SINK@ 2>/dev/null | awk "{print \$2}")
 printf "%s\n%s" "$vol" "$mute"
@@ -124,10 +124,10 @@ export async function readAudioState(): Promise<AudioState> {
   try {
     const [sinksRaw, sourcesRaw, defaultSinkRaw, defaultSourceRaw, sinkVolume] =
       await Promise.all([
-        execAsync(`bash -lc "pactl list short sinks"`),
-        execAsync(`bash -lc "pactl list short sources"`),
-        execAsync(`bash -lc "pactl get-default-sink"`),
-        execAsync(`bash -lc "pactl get-default-source"`),
+        execAsync(`bash -c "pactl list short sinks"`),
+        execAsync(`bash -c "pactl list short sources"`),
+        execAsync(`bash -c "pactl get-default-sink"`),
+        execAsync(`bash -c "pactl get-default-source"`),
         readSinkVolumeState(),
       ])
 
@@ -157,30 +157,37 @@ export async function readAudioState(): Promise<AudioState> {
 export async function setDefaultSink(name: string): Promise<void> {
   const cleanName = name.trim()
   if (!cleanName) return
-  await execAsync(`bash -lc "pactl set-default-sink ${shellQuote(cleanName)}"`)
+  const script = `
+set -euo pipefail
+sink=${shellQuote(cleanName)}
+pactl set-default-sink "$sink"
+pactl list short sink-inputs | awk "{print \\$1}" | while read -r input; do
+  [ -n "$input" ] || continue
+  pactl move-sink-input "$input" "$sink" || true
+done
+`
+  await execAsync(`bash -c ${shellQuote(script)}`)
 }
 
 export async function setDefaultSource(name: string): Promise<void> {
   const cleanName = name.trim()
   if (!cleanName) return
-  await execAsync(
-    `bash -lc "pactl set-default-source ${shellQuote(cleanName)}"`,
-  )
+  await execAsync(`bash -c "pactl set-default-source ${shellQuote(cleanName)}"`)
 }
 
 export async function setSinkVolume(percent: number): Promise<void> {
   const safePercent = clampPercent(Math.round(percent))
   await execAsync(
-    `bash -lc "if command -v wpctl >/dev/null 2>&1; then wpctl set-volume @DEFAULT_AUDIO_SINK@ ${safePercent}%; else pactl set-sink-volume @DEFAULT_SINK@ ${safePercent}%; fi"`,
+    `bash -c "if command -v wpctl >/dev/null 2>&1; then wpctl set-volume @DEFAULT_AUDIO_SINK@ ${safePercent}%; else pactl set-sink-volume @DEFAULT_SINK@ ${safePercent}%; fi"`,
   )
 }
 
 export async function toggleSinkMute(): Promise<void> {
   await execAsync(
-    `bash -lc "if command -v wpctl >/dev/null 2>&1; then wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle; else pactl set-sink-mute @DEFAULT_SINK@ toggle; fi"`,
+    `bash -c "if command -v wpctl >/dev/null 2>&1; then wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle; else pactl set-sink-mute @DEFAULT_SINK@ toggle; fi"`,
   )
 }
 
 export async function openPavucontrol(): Promise<void> {
-  await execAsync(`bash -lc "pavucontrol >/dev/null 2>&1 &"`)
+  await execAsync(`bash -c "pavucontrol >/dev/null 2>&1 &"`)
 }

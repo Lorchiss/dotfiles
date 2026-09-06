@@ -1,5 +1,12 @@
 declare function print(...args: unknown[]): void
 
+declare module "ags" {
+  export function createBinding(source: unknown, property: string): unknown
+  export function onCleanup(callback: () => void): void
+  export const For: any
+  export const This: any
+}
+
 declare module "ags/gtk4/app" {
   const app: {
     start: (config: unknown) => void
@@ -19,6 +26,13 @@ declare module "ags/process" {
 }
 
 declare module "ags/time" {
+  export type Timer = {
+    cancel?: () => void
+    connect?: (signal: string, callback: () => void) => void
+  }
+
+  export function interval(intervalMs: number, callback?: () => void): Timer
+
   export type PollBinding<T> = {
     (): T
     <U>(map: (value: T) => U): U

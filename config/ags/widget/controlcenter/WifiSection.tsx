@@ -322,7 +322,10 @@ export default function WifiSection({ isActive }: WifiSectionProps) {
         orientation: Gtk.Orientation.VERTICAL,
         spacing: 8,
       })
-      setClasses(row, "cc-list-row")
+      setClasses(
+        row,
+        network.inUse ? "cc-list-row cc-list-row-active" : "cc-list-row",
+      )
 
       const topRow = new Gtk.Box({ spacing: 8 })
 
@@ -439,7 +442,7 @@ export default function WifiSection({ isActive }: WifiSectionProps) {
 
       <box spacing={8}>
         <button
-          class="cc-action-btn"
+          class="cc-action-btn cc-action-primary"
           sensitive={state((snapshot) => !snapshot.busy)}
           onClicked={() => void toggleRadio()}
         >
@@ -468,7 +471,7 @@ export default function WifiSection({ isActive }: WifiSectionProps) {
         </button>
 
         <button
-          class="cc-action-btn"
+          class="cc-action-btn cc-action-quiet"
           sensitive={state((snapshot) => !snapshot.busy)}
           onClicked={() =>
             void runAction("Abrir nmtui", () => openNmtuiFallback())
@@ -497,7 +500,7 @@ export default function WifiSection({ isActive }: WifiSectionProps) {
       <box
         class="cc-network-list"
         orientation={Gtk.Orientation.VERTICAL}
-        spacing={6}
+        spacing={0}
         $={(self: any) => {
           const source = state as any
 

@@ -20,9 +20,16 @@ config/ags/private/*
 !config/ags/private/spotify-auth.example.json
 !config/ags/private/.gitkeep
 
+# Private environment files
+**/*.env
+!**/*.env.example
+
 # Python cache
 **/__pycache__/
 **/*.pyc
 
 # Local systemd user links (machine-specific)
 config/systemd/user/default.target.wants/
+
+# Quickshell language-server state (machine-specific)
+config/quickshell/.qmlls.ini

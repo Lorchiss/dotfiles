@@ -206,7 +206,10 @@ export default function AudioSection({ isActive }: AudioSectionProps) {
 
     for (const sink of snapshot.sinks) {
       const row = new Gtk.Box({ spacing: 8 })
-      setClasses(row, "cc-list-row")
+      setClasses(
+        row,
+        sink.isDefault ? "cc-list-row cc-list-row-active" : "cc-list-row",
+      )
 
       const left = new Gtk.Box({
         orientation: Gtk.Orientation.VERTICAL,
@@ -280,7 +283,10 @@ export default function AudioSection({ isActive }: AudioSectionProps) {
 
     for (const source of snapshot.sources) {
       const row = new Gtk.Box({ spacing: 8 })
-      setClasses(row, "cc-list-row")
+      setClasses(
+        row,
+        source.isDefault ? "cc-list-row cc-list-row-active" : "cc-list-row",
+      )
 
       const left = new Gtk.Box({
         orientation: Gtk.Orientation.VERTICAL,
@@ -442,7 +448,7 @@ export default function AudioSection({ isActive }: AudioSectionProps) {
         <box
           class="cc-device-list"
           orientation={Gtk.Orientation.VERTICAL}
-          spacing={6}
+          spacing={0}
           $={(self: any) => {
             const source = state as any
 
@@ -464,7 +470,7 @@ export default function AudioSection({ isActive }: AudioSectionProps) {
         <box
           class="cc-device-list"
           orientation={Gtk.Orientation.VERTICAL}
-          spacing={6}
+          spacing={0}
           $={(self: any) => {
             const source = state as any
 

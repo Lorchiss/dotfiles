@@ -1,26 +1,54 @@
 import { Gtk } from "ags/gtk4"
 import { execAsync } from "ags/process"
 import { createPoll } from "ags/time"
-import { createMusicAccentClassState } from "../../lib/musicAccent"
+import { createPopupSurfaceClassState } from "../../lib/themeSurface"
 import { BAR_UI } from "../../lib/uiTokens"
 import { safeText } from "../../lib/text"
 import { BAR_SIMULATE_INVALID_TEXT, barLog } from "../../lib/barObservability"
 
 type ClockState = {
   time: string
+  shortDate: string
   detail: string
+}
+
+function spanishShortDate(raw: string, fallback: string): string {
+  const [weekdayRaw = "", day = "", monthRaw = ""] = raw.trim().split(/\s+/)
+  const weekday = Number.parseInt(weekdayRaw, 10)
+  const month = Number.parseInt(monthRaw, 10)
+  const weekdays = ["LUN", "MAR", "MIÉ", "JUE", "VIE", "SÁB", "DOM"]
+  const months = [
+    "ENE",
+    "FEB",
+    "MAR",
+    "ABR",
+    "MAY",
+    "JUN",
+    "JUL",
+    "AGO",
+    "SEP",
+    "OCT",
+    "NOV",
+    "DIC",
+  ]
+  const weekdayLabel = weekdays[weekday - 1]
+  const monthLabel = months[month - 1]
+  if (!weekdayLabel || !day || !monthLabel) return fallback
+  return `${weekdayLabel} ${day} ${monthLabel}`
 }
 
 export default function ClockMenu() {
   barLog("CLOCK", "mounting ClockMenu")
-  const accentClass = createMusicAccentClassState()
+  const surfaceClass = createPopupSurfaceClassState("clock-popover-card")
   const clock = createPoll<ClockState>(
-    { time: "--:--", detail: "Calendario" },
+    { time: "--:--", shortDate: "--- --", detail: "Calendario" },
     1000,
     async (prev) => {
       try {
-        const raw = await execAsync(`date "+%H:%M|%A, %d %b %Y"`)
-        const [timeRaw = "", detailRaw = ""] = raw.trim().split("|")
+        const raw = await execAsync(`date "+%H:%M|%u %d %m|%A, %d %b %Y"`)
+        const [timeRaw = "", shortDateRaw = "", detailRaw = ""] = raw
+          .trim()
+          .split("|")
         const time = safeText(
           BAR_SIMULATE_INVALID_TEXT
             ? "[object instance wrapper Gtk.Calendar]"
@@ -35,7 +63,13 @@ export default function ClockMenu() {
           "CLOCK",
           "clock-detail",
         )
-        return { time, detail }
+        const shortDate = safeText(
+          spanishShortDate(shortDateRaw, prev.shortDate || "--- --"),
+          prev.shortDate || "--- --",
+          "CLOCK",
+          "clock-short-date",
+        )
+        return { time, shortDate, detail }
       } catch {
         return prev
       }
@@ -54,11 +88,12 @@ export default function ClockMenu() {
         ),
       )}
     >
-      <box spacing={BAR_UI.spacing.tight} halign={Gtk.Align.CENTER}>
-        <image
-          class="clock-chip-icon"
-          iconName="preferences-system-time-symbolic"
-          pixelSize={14}
+      <box class="clock-chip-content" spacing={7} halign={Gtk.Align.CENTER}>
+        <label
+          class="clock-chip-date"
+          label={clock((value) =>
+            safeText(value.shortDate, "--- --", "CLOCK", "chip-date"),
+          )}
         />
         <label
           class="clock-chip-time"
@@ -71,9 +106,7 @@ export default function ClockMenu() {
         <box
           orientation={Gtk.Orientation.VERTICAL}
           spacing={BAR_UI.spacing.popover}
-          class={accentClass(
-            (accent) => `clock-popover-card popup-accent-surface ${accent}`,
-          )}
+          class={surfaceClass((className) => className)}
         >
           <label
             class="clock-popover-heading"

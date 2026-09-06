@@ -4,7 +4,7 @@ import {
   barComputeStateBinding,
   barSystemStateBinding,
 } from "../../lib/barSignals"
-import { createMusicAccentClassState } from "../../lib/musicAccent"
+import { createPopupSurfaceClassState } from "../../lib/themeSurface"
 import { BAR_UI } from "../../lib/uiTokens"
 import { safeText } from "../../lib/text"
 import { barLog } from "../../lib/barObservability"
@@ -36,12 +36,27 @@ function percentValue(value: unknown): number | null {
   return Math.max(0, Math.min(100, Math.round(value)))
 }
 
-function meterText(value: unknown, width = 10): string {
+function percentFraction(value: unknown): number {
   const p = percentValue(value)
-  if (p === null) return "--"
-  const filled = Math.round((p / 100) * width)
-  const empty = Math.max(0, width - filled)
-  return `${"█".repeat(filled)}${"░".repeat(empty)}`
+  if (p === null) return 0
+  return p / 100
+}
+
+function temperatureFraction(value: unknown): number {
+  if (typeof value !== "number" || !Number.isFinite(value)) return 0
+  return Math.max(0, Math.min(1, value / 100))
+}
+
+function meterClass(
+  value: unknown,
+  warnAt: number,
+  criticalAt: number,
+): string {
+  if (typeof value !== "number" || !Number.isFinite(value))
+    return "health-meter-bar health-meter-unknown"
+  if (value >= criticalAt) return "health-meter-bar health-meter-critical"
+  if (value >= warnAt) return "health-meter-bar health-meter-warn"
+  return "health-meter-bar health-meter-ok"
 }
 
 function resolveHealthState(
@@ -97,7 +112,7 @@ function counterLabel(value: unknown): string {
 
 export default function HealthChip() {
   barLog("HEALTH", "mounting HealthChip")
-  const accentClass = createMusicAccentClassState()
+  const surfaceClass = createPopupSurfaceClassState("health-popover-card")
   const compute = barComputeStateBinding()
   const system = barSystemStateBinding()
 
@@ -149,99 +164,13 @@ export default function HealthChip() {
           pixelSize={BAR_UI.size.networkIcon}
           valign={Gtk.Align.CENTER}
         />
-        <box
-          class={compute((c) => {
-            const health = resolveHealthState(
-              c.cpu,
-              c.ram,
-              c.gpu,
-              system().maxTemperatureC,
-            )
-            return `health-state-dot health-dot-${health.level}`
-          })}
-          valign={Gtk.Align.CENTER}
-        />
-        <image
-          class="health-metric-icon"
-          iconName="utilities-system-monitor-symbolic"
-          pixelSize={11}
-          valign={Gtk.Align.CENTER}
-        />
-        <label
-          class="health-usage-inline"
-          label={compute((c) =>
-            safeText(
-              `${metricText(c.cpu)}%`,
-              "--%",
-              "HEALTH",
-              "chip-cpu-inline",
-            ),
-          )}
-          valign={Gtk.Align.CENTER}
-        />
-        <image
-          class="health-metric-icon"
-          iconName="drive-harddisk-symbolic"
-          pixelSize={12}
-          valign={Gtk.Align.CENTER}
-        />
-        <label
-          class="health-usage-inline"
-          label={compute((c) =>
-            safeText(
-              `${metricText(c.ram)}%`,
-              "--%",
-              "HEALTH",
-              "chip-ram-inline",
-            ),
-          )}
-          valign={Gtk.Align.CENTER}
-        />
-        <image
-          class="health-metric-icon"
-          iconName="video-display-symbolic"
-          pixelSize={12}
-          valign={Gtk.Align.CENTER}
-        />
-        <label
-          class="health-usage-inline"
-          label={compute((c) =>
-            safeText(
-              `${metricText(c.gpu)}%`,
-              "--%",
-              "HEALTH",
-              "chip-gpu-inline",
-            ),
-          )}
-          valign={Gtk.Align.CENTER}
-        />
-        <image
-          class="health-metric-icon"
-          iconName="weather-clear-symbolic"
-          pixelSize={12}
-          valign={Gtk.Align.CENTER}
-        />
-        <label
-          class="health-usage-inline"
-          label={system((s) =>
-            safeText(
-              `${temperatureText(s.maxTemperatureC, 0)}°`,
-              "--°",
-              "HEALTH",
-              "chip-temp-inline",
-            ),
-          )}
-          valign={Gtk.Align.CENTER}
-        />
       </box>
 
       <popover class="health-popover-shell" hasArrow={false}>
         <box
           orientation={Gtk.Orientation.VERTICAL}
           spacing={BAR_UI.spacing.popover}
-          class={accentClass(
-            (accent) => `health-popover-card popup-accent-surface ${accent}`,
-          )}
+          class={surfaceClass((className) => className)}
         >
           <label
             class="health-popover-heading"
@@ -249,111 +178,189 @@ export default function HealthChip() {
             xalign={0}
           />
 
-          <box class="health-popover-row" spacing={BAR_UI.spacing.popover}>
-            <label class="health-popover-key" label="CPU" xalign={0} hexpand />
-            <label
-              class="health-popover-value health-meter-value"
-              label={compute((c) =>
-                safeText(
-                  `${metricText(c.cpu)}%  ${meterText(c.cpu)}`,
-                  "--%  --",
-                  "HEALTH",
-                  "cpu-value",
-                ),
-              )}
-            />
+          <box
+            class="health-visual-grid"
+            orientation={Gtk.Orientation.VERTICAL}
+            spacing={8}
+          >
+            <box
+              class="health-popover-row health-visual-row"
+              orientation={Gtk.Orientation.VERTICAL}
+              spacing={5}
+            >
+              <box class="health-visual-row-header" spacing={8}>
+                <label
+                  class="health-popover-key"
+                  label="CPU"
+                  xalign={0}
+                  hexpand
+                />
+                <label
+                  class="health-popover-value health-meter-value"
+                  label={compute((c) =>
+                    safeText(
+                      `${metricText(c.cpu)}%`,
+                      "--%",
+                      "HEALTH",
+                      "cpu-value",
+                    ),
+                  )}
+                />
+              </box>
+              <Gtk.ProgressBar
+                class={compute((c) => meterClass(c.cpu, 76, 92))}
+                fraction={compute((c) => percentFraction(c.cpu))}
+                hexpand
+              />
+            </box>
+
+            <box
+              class="health-popover-row health-visual-row"
+              orientation={Gtk.Orientation.VERTICAL}
+              spacing={5}
+            >
+              <box class="health-visual-row-header" spacing={8}>
+                <label
+                  class="health-popover-key"
+                  label="RAM"
+                  xalign={0}
+                  hexpand
+                />
+                <label
+                  class="health-popover-value health-meter-value"
+                  label={compute((c) =>
+                    safeText(
+                      `${metricText(c.ram)}%`,
+                      "--%",
+                      "HEALTH",
+                      "ram-value",
+                    ),
+                  )}
+                />
+              </box>
+              <Gtk.ProgressBar
+                class={compute((c) => meterClass(c.ram, 80, 92))}
+                fraction={compute((c) => percentFraction(c.ram))}
+                hexpand
+              />
+            </box>
+
+            <box
+              class="health-popover-row health-visual-row"
+              orientation={Gtk.Orientation.VERTICAL}
+              spacing={5}
+            >
+              <box class="health-visual-row-header" spacing={8}>
+                <label
+                  class="health-popover-key"
+                  label="GPU"
+                  xalign={0}
+                  hexpand
+                />
+                <label
+                  class="health-popover-value health-meter-value"
+                  label={compute((c) =>
+                    safeText(
+                      `${metricText(c.gpu)}%`,
+                      "--%",
+                      "HEALTH",
+                      "gpu-value",
+                    ),
+                  )}
+                />
+              </box>
+              <Gtk.ProgressBar
+                class={compute((c) => meterClass(c.gpu, 86, 96))}
+                fraction={compute((c) => percentFraction(c.gpu))}
+                hexpand
+              />
+            </box>
+
+            <box
+              class="health-popover-row health-visual-row"
+              orientation={Gtk.Orientation.VERTICAL}
+              spacing={5}
+            >
+              <box class="health-visual-row-header" spacing={8}>
+                <label
+                  class="health-popover-key"
+                  label="TEMP"
+                  xalign={0}
+                  hexpand
+                />
+                <label
+                  class="health-popover-value health-meter-value"
+                  label={system((s) =>
+                    safeText(
+                      `${temperatureText(s.maxTemperatureC, 1)}°C`,
+                      "--°C",
+                      "HEALTH",
+                      "temp-value",
+                    ),
+                  )}
+                />
+              </box>
+              <Gtk.ProgressBar
+                class={system((s) => meterClass(s.maxTemperatureC, 79, 88))}
+                fraction={system((s) => temperatureFraction(s.maxTemperatureC))}
+                hexpand
+              />
+            </box>
           </box>
 
-          <box class="health-popover-row" spacing={BAR_UI.spacing.popover}>
-            <label class="health-popover-key" label="RAM" xalign={0} hexpand />
-            <label
-              class="health-popover-value health-meter-value"
-              label={compute((c) =>
-                safeText(
-                  `${metricText(c.ram)}%  ${meterText(c.ram)}`,
-                  "--%  --",
-                  "HEALTH",
-                  "ram-value",
-                ),
-              )}
-            />
-          </box>
-
-          <box class="health-popover-row" spacing={BAR_UI.spacing.popover}>
-            <label class="health-popover-key" label="GPU" xalign={0} hexpand />
-            <label
-              class="health-popover-value health-meter-value"
-              label={compute((c) =>
-                safeText(
-                  `${metricText(c.gpu)}%  ${meterText(c.gpu)}`,
-                  "--%  --",
-                  "HEALTH",
-                  "gpu-value",
-                ),
-              )}
-            />
-          </box>
-
-          <box class="health-popover-row" spacing={BAR_UI.spacing.popover}>
-            <label class="health-popover-key" label="TEMP" xalign={0} hexpand />
-            <label
-              class="health-popover-value"
-              label={system((s) =>
-                safeText(
-                  `${temperatureText(s.maxTemperatureC, 1)}°C`,
-                  "--°C",
-                  "HEALTH",
-                  "temp-value",
-                ),
-              )}
-            />
-          </box>
-
-          <box class="health-popover-row" spacing={BAR_UI.spacing.popover}>
-            <label
-              class="health-popover-key"
-              label="Actualizaciones"
-              xalign={0}
+          <box class="health-counter-grid" spacing={8}>
+            <box
+              class="health-counter-card"
+              orientation={Gtk.Orientation.VERTICAL}
+              spacing={2}
               hexpand
-            />
-            <label
-              class="health-popover-value"
-              label={system((s) =>
-                safeText(
-                  counterLabel(s.updatesCount),
-                  "--",
-                  "HEALTH",
-                  "updates-value",
-                ),
-              )}
-            />
-          </box>
+            >
+              <label
+                class="health-popover-key"
+                label="Actualizaciones"
+                xalign={0}
+              />
+              <label
+                class="health-counter-value"
+                label={system((s) =>
+                  safeText(
+                    counterLabel(s.updatesCount),
+                    "--",
+                    "HEALTH",
+                    "updates-value",
+                  ),
+                )}
+                xalign={0}
+              />
+            </box>
 
-          <box class="health-popover-row" spacing={BAR_UI.spacing.popover}>
-            <label
-              class="health-popover-key"
-              label="Noticias"
-              xalign={0}
+            <box
+              class="health-counter-card"
+              orientation={Gtk.Orientation.VERTICAL}
+              spacing={2}
               hexpand
-            />
-            <label
-              class="health-popover-value"
-              label={system((s) =>
-                safeText(
-                  counterLabel(s.archNewsUnreadCount),
-                  "--",
-                  "HEALTH",
-                  "news-value",
-                ),
-              )}
-            />
+            >
+              <label class="health-popover-key" label="Noticias" xalign={0} />
+              <label
+                class="health-counter-value"
+                label={system((s) =>
+                  safeText(
+                    counterLabel(s.archNewsUnreadCount),
+                    "--",
+                    "HEALTH",
+                    "news-value",
+                  ),
+                )}
+                xalign={0}
+              />
+            </box>
           </box>
 
           <button
             class="health-open-monitor"
             onClicked={() =>
               execAsync(
-                `bash -lc 'if command -v kitty >/dev/null 2>&1; then kitty -e btop || kitty -e htop; elif command -v foot >/dev/null 2>&1; then foot -e btop || foot -e htop; fi'`,
+                `bash -c 'if command -v kitty >/dev/null 2>&1; then kitty -e btop || kitty -e htop; elif command -v foot >/dev/null 2>&1; then foot -e btop || foot -e htop; fi'`,
               ).catch(() => {})
             }
           >
@@ -364,7 +371,7 @@ export default function HealthChip() {
             class="health-open-monitor"
             onClicked={() =>
               execAsync(
-                `bash -lc 'if command -v kitty >/dev/null 2>&1; then kitty -e nvtop || kitty -e nvidia-smi -l 1; elif command -v foot >/dev/null 2>&1; then foot -e nvtop || foot -e nvidia-smi -l 1; fi'`,
+                `bash -c 'if command -v kitty >/dev/null 2>&1; then kitty -e nvtop || kitty -e nvidia-smi -l 1; elif command -v foot >/dev/null 2>&1; then foot -e nvtop || foot -e nvidia-smi -l 1; fi'`,
               ).catch(() => {})
             }
           >

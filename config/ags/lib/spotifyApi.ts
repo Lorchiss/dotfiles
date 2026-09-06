@@ -56,7 +56,7 @@ async function runSpotifyApi(args: string[]): Promise<Record<string, unknown>> {
     `python3 "$script_path" ${joinedArgs}`
 
   try {
-    const output = await execAsync(`bash -lc ${shellQuoted(command)}`)
+    const output = await execAsync(`bash -c ${shellQuoted(command)}`)
     return parseJsonOutput(output)
   } catch (error) {
     const message =

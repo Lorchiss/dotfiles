@@ -3,7 +3,7 @@ import { execAsync } from "ags/process"
 import { BAR_UI } from "../../lib/uiTokens"
 import { barLog } from "../../lib/barObservability"
 
-const LAUNCHER_COMMAND = `bash -lc '
+const LAUNCHER_COMMAND = `bash -c '
 if command -v rofi >/dev/null 2>&1; then
   rofi -show drun
 elif command -v wofi >/dev/null 2>&1; then

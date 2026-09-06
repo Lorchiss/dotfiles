@@ -1,3 +1,4 @@
+import { onCleanup } from "ags"
 import app from "ags/gtk4/app"
 import { Astal, Gtk } from "ags/gtk4"
 import ClockMenu from "./bar/ClockMenu"
@@ -7,14 +8,23 @@ import HealthChip from "./bar/HealthChip"
 import LauncherButton from "./bar/LauncherButton"
 import QuickStatusBox from "./bar/QuickStatusBox"
 import SpotifyButton from "./bar/SpotifyButton"
-import ThemeToggleChip from "./bar/ThemeToggleChip"
 import { BAR_UI } from "../lib/uiTokens"
 import { barLog, isBarModuleEnabled } from "../lib/barObservability"
 import { themeModeBinding } from "../lib/themeMode"
 
-export default function Bar(gdkmonitor: any) {
+type BarProps = {
+  barKey?: string
+  gdkmonitor: any
+  onReady?: (window: any) => void
+}
+
+export default function Bar({ barKey, gdkmonitor, onReady }: BarProps) {
   const { TOP, LEFT, RIGHT } = Astal.WindowAnchor
+  const connector = String(
+    gdkmonitor?.get_connector?.() ?? gdkmonitor?.connector ?? "",
+  ).trim()
   const themeMode = themeModeBinding()
+  const isPrimary = connector === "DP-1" || !connector
   const wsEnabled = isBarModuleEnabled("WS")
   const activeWindowEnabled = isBarModuleEnabled("ACTIVE_WINDOW")
   const spotifyEnabled = isBarModuleEnabled("SPOTIFY")
@@ -36,17 +46,25 @@ export default function Bar(gdkmonitor: any) {
     "CONNECTIVITY",
     connectivityEnabled ? "enabled" : "disabled by BAR_CONNECTIVITY=0",
   )
+  barLog("WS", connector ? `bar monitor=${connector}` : "bar monitor=unknown")
 
   return (
     <window
       visible
-      name="bar"
-      class={themeMode((mode) => `Bar bar-theme-${mode}`)}
+      name={barKey ? `bar-${barKey}` : connector ? `bar-${connector}` : "bar"}
+      class={themeMode(
+        (mode) =>
+          `Bar bar-theme-${mode} ${isPrimary ? "bar-primary" : "bar-secondary"}`,
+      )}
       gdkmonitor={gdkmonitor}
       layer={Astal.Layer.TOP}
       exclusivity={Astal.Exclusivity.EXCLUSIVE}
       anchor={TOP | LEFT | RIGHT}
       application={app}
+      $={(window: any) => {
+        onReady?.(window)
+        onCleanup(() => window.destroy?.())
+      }}
     >
       <centerbox cssName="centerbox">
         <box
@@ -59,7 +77,7 @@ export default function Bar(gdkmonitor: any) {
         >
           <LauncherButton />
           <box class="work-context-block" spacing={BAR_UI.spacing.inline}>
-            {wsEnabled ? <WorkspaceLanes /> : null}
+            {wsEnabled ? <WorkspaceLanes monitorName={connector} /> : null}
           </box>
         </box>
 
@@ -86,13 +104,14 @@ export default function Bar(gdkmonitor: any) {
           hexpand
           halign={Gtk.Align.END}
         >
-          {spotifyEnabled ? <SpotifyButton compact /> : null}
-          <QuickStatusBox
-            audioEnabled={audioEnabled}
-            connectivityEnabled={connectivityEnabled}
-          />
-          <ThemeToggleChip />
-          {healthEnabled ? <HealthChip /> : null}
+          {spotifyEnabled && isPrimary ? <SpotifyButton compact /> : null}
+          {isPrimary ? (
+            <QuickStatusBox
+              audioEnabled={audioEnabled}
+              connectivityEnabled={connectivityEnabled}
+            />
+          ) : null}
+          {healthEnabled && isPrimary ? <HealthChip /> : null}
           {clockEnabled ? <ClockMenu /> : null}
         </box>
       </centerbox>

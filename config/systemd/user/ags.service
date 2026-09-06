@@ -1,9 +1,10 @@
 [Unit]
-Description=AGS (Aylur's Gtk Shell)
+Description=AGS fallback desktop shell
 After=graphical-session.target
 PartOf=graphical-session.target
 StartLimitIntervalSec=30
 StartLimitBurst=5
+Conflicts=quickshell.service quickshell-prototype.service
 
 [Service]
 Type=simple
@@ -15,5 +16,4 @@ RestartSec=1
 TimeoutStopSec=5
 KillMode=control-group
 
-[Install]
-WantedBy=default.target
+# Recovery only. Do not enable at login alongside Polar.

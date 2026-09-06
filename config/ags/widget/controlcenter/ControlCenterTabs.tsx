@@ -4,6 +4,7 @@ export type ControlCenterTab =
   | "wifi"
   | "bluetooth"
   | "audio"
+  | "displays"
   | "system"
   | "session"
 
@@ -11,6 +12,7 @@ export const CONTROL_CENTER_TAB_ORDER: ControlCenterTab[] = [
   "wifi",
   "bluetooth",
   "audio",
+  "displays",
   "system",
   "session",
 ]
@@ -91,6 +93,12 @@ export default function ControlCenterTabs({
       </button>
       <button $={registerButton("audio")} onClicked={() => selectTab("audio")}>
         <label label="Audio" />
+      </button>
+      <button
+        $={registerButton("displays")}
+        onClicked={() => selectTab("displays")}
+      >
+        <label label="Pantallas" />
       </button>
       <button
         $={registerButton("system")}

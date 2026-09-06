@@ -247,7 +247,10 @@ export default function BluetoothSection({ isActive }: BluetoothSectionProps) {
 
     for (const device of snapshot.devices) {
       const row = new Gtk.Box({ spacing: 8 })
-      setClasses(row, "cc-list-row")
+      setClasses(
+        row,
+        device.connected ? "cc-list-row cc-list-row-active" : "cc-list-row",
+      )
 
       const left = new Gtk.Box({
         orientation: Gtk.Orientation.VERTICAL,
@@ -284,7 +287,7 @@ export default function BluetoothSection({ isActive }: BluetoothSectionProps) {
       })
       pairButton.set_child(
         new Gtk.Label({
-          label: bluetoothText("Pair+Trust", "Pair+Trust", "pair-label"),
+          label: bluetoothText("Vincular", "Vincular", "pair-label"),
         }),
       )
 
@@ -335,10 +338,15 @@ export default function BluetoothSection({ isActive }: BluetoothSectionProps) {
         }),
       )
 
-      actions.append(pairButton)
-      actions.append(connectButton)
-      actions.append(disconnectButton)
-      actions.append(removeButton)
+      if (!device.paired) {
+        actions.append(pairButton)
+      } else if (device.connected) {
+        actions.append(disconnectButton)
+      } else {
+        actions.append(connectButton)
+      }
+
+      if (device.paired) actions.append(removeButton)
 
       row.append(left)
       row.append(actions)
@@ -372,7 +380,7 @@ export default function BluetoothSection({ isActive }: BluetoothSectionProps) {
 
       <box spacing={8}>
         <button
-          class="cc-action-btn"
+          class="cc-action-btn cc-action-primary"
           sensitive={state((snapshot) => !snapshot.busy)}
           onClicked={() => void togglePower()}
         >
@@ -404,7 +412,7 @@ export default function BluetoothSection({ isActive }: BluetoothSectionProps) {
         </button>
 
         <button
-          class="cc-action-btn"
+          class="cc-action-btn cc-action-quiet"
           sensitive={state((snapshot) => !snapshot.busy)}
           onClicked={() =>
             void runAction("Abrir blueman-manager", () => openBluemanFallback())
@@ -433,7 +441,7 @@ export default function BluetoothSection({ isActive }: BluetoothSectionProps) {
       <box
         class="cc-device-list"
         orientation={Gtk.Orientation.VERTICAL}
-        spacing={6}
+        spacing={0}
         $={(self: any) => {
           const source = state as any
 

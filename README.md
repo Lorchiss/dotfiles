@@ -1,20 +1,53 @@
 # Dotfiles overview
 
-Este repositorio configura un entorno de escritorio Linux centrado en **Hyprland + AGS**.
+Este repositorio configura un entorno de escritorio Linux centrado en **Hyprland + Quickshell**.
+
+**Polar Command Deck** es la barra de inicio desde el 2026-09-06. AGS queda
+disponible como recuperacion. Hyprland importa el entorno y arranca una sola
+unidad `quickshell.service`; la version nueva ya no depende de iniciar el
+prototipo manualmente despues de cada reinicio.
 
 ## Qué hace hoy
 
-- `bootstrap/deploy.sh`: despliega symlinks de `config/*` a `~/.config/*`, hace backup y habilita `ags.service` de systemd usuario.
+- `bootstrap/deploy.sh`: despliega configuraciones y unidades con backup, retira el autostart de AGS/Waybar y arranca Polar desde la sesion Hyprland.
 - `config/hypr`: configuración modular de Hyprland en `conf.d/*`.
 - `config/hypr/scripts/window-session.py`: snapshot/restore de ventanas por workspace persistente entre sesiones.
 - `config/ags`: barra/popup escritos en TypeScript + SCSS para AGS (clock, red, volumen, controles Spotify).
 - `config/kitty`, `config/rofi`: ajustes de terminal y launcher.
-- `config/systemd/user/ags.service`: servicio de usuario para arrancar AGS.
+- `config/systemd/user/quickshell.service`: barra oficial, exclusiva respecto de AGS, Waybar y el prototipo anterior.
+- `config/systemd/user/ags.service`: recuperacion manual o ante fallo de Polar.
+- `config/quickshell`: Polar Command Deck en QML/QtQuick, incluido en el arranque de Hyprland.
+- `config/hypr/scripts/start-desktop-shell.sh`: entrada unica para importar entorno e iniciar la barra.
+
+`Super+C` abre el Control Center Polar. Los apartados AGS siguientes documentan
+el runtime de recuperacion; su Command Palette (`Super+P`) y popup Spotify
+(`Super+M`) requieren que AGS este activo.
 
 ## Workflow diario (2 monitores)
 
-- Guía práctica: `docs/workflow-diario.md`
+- Guía práctica: `docs/operations/daily-workflow.md`
 - Incluye: estrategia de workspaces por monitor, keymap diario, multimedia global con `playerctl`, Kitty `copy_on_select`, smoke test y rollback simple.
+
+## Mapa de arranque
+
+- Mapa operativo: `docs/operations/startup-map.md`
+- Incluye: Hyprland `exec-once`, servicios systemd user, recursos esenciales/opcionales, dependencias externas y puntos `needs-review`.
+
+## Gobierno de agentes
+
+- Entrada global: `.github/copilot-instructions.md`.
+- Orquestación y especialistas: `.github/agents/`.
+- Contratos de alcance, prioridad, riesgo y workflows: `.github/instructions/`.
+- Validación estática: `bash bootstrap/validate-agent-config.sh`.
+- Prioridad operativa: `P0` seguridad/pérdida de datos, `P1` regresiones,
+  `P2` deuda relevante y documentación, `P3` mejoras opcionales.
+- Las mutaciones de sesión y acciones de sistema/Git requieren autorización según
+  el nivel `R0`-`R3` definido en el contrato de gobierno.
+- Los cambios materiales de arquitectura, operación, riesgos o decisiones deben
+  cerrar con sincronización acotada en `10 Projects/dotfiles/**` de Obsidian.
+- Cola priorizada de mejoras: `docs/operations/improvement-priorities.md`.
+- Estado bloqueante actual: una credencial retirada permanece en el historial;
+  falta decidir su limpieza antes de continuar con los `P1`.
 
 ## Persistencia de ventanas (Hyprland)
 
@@ -167,6 +200,10 @@ chmod 600 ~/.config/ags/private/spotify-auth.json
 4. Revisar logs:
    - `journalctl --user -u ags.service -f`
 
+El prototipo Quickshell se valida sin alterar la sesion con
+`bash bootstrap/quickshell-check.sh`. Consulta
+`docs/architecture/quickshell-migration.md` antes de instalarlo o iniciarlo.
+
 ## Estado de auditoría actual
 
 Estado: `cerrada` (auditoría de estabilidad cerrada el 2026-02-23).
@@ -269,9 +306,9 @@ Secuencia recomendada de aislamiento:
 4. Activar siguiente módulo.
 5. El primer módulo que rompe es el sospechoso.
 
-Arquitectura de módulos (bar + popups):
+Contrato runtime AGS (bar + popups):
 
-- `docs/ags-modules-architecture.md`
+- `.github/instructions/ags-runtime-contract.instructions.md`
 
 ## QA estricto bloqueante (fail-fast)
 

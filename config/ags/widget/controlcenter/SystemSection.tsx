@@ -296,6 +296,7 @@ export default function SystemSection({ isActive }: SystemSectionProps) {
             ),
           )}
           xalign={0}
+          wrap
         />
         <label
           class="cc-list-subtitle"
@@ -307,9 +308,10 @@ export default function SystemSection({ isActive }: SystemSectionProps) {
             ),
           )}
           xalign={0}
+          wrap
         />
 
-        <box spacing={8}>
+        <box class="cc-action-row cc-system-action-row" spacing={8}>
           <button
             class="cc-action-btn"
             sensitive={state((snapshot) => !snapshot.busy)}
@@ -358,8 +360,9 @@ export default function SystemSection({ isActive }: SystemSectionProps) {
             ),
           )}
           xalign={0}
+          wrap
         />
-        <box spacing={8}>
+        <box class="cc-action-row cc-system-action-row" spacing={8}>
           <button
             class="cc-action-btn"
             sensitive={state(
@@ -390,6 +393,7 @@ export default function SystemSection({ isActive }: SystemSectionProps) {
             ),
           )}
           xalign={0}
+          wrap
         />
         <label
           class="cc-list-subtitle"
@@ -401,6 +405,7 @@ export default function SystemSection({ isActive }: SystemSectionProps) {
             ),
           )}
           xalign={0}
+          wrap
         />
       </box>
 
@@ -443,9 +448,10 @@ export default function SystemSection({ isActive }: SystemSectionProps) {
             ),
           )}
           xalign={0}
+          wrap
         />
 
-        <box spacing={8}>
+        <box class="cc-action-row cc-system-action-row" spacing={8}>
           <button
             class="cc-action-btn"
             sensitive={state(

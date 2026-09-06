@@ -26,5 +26,5 @@ export async function executeSessionAction(
   action: SessionAction,
 ): Promise<void> {
   const command = SESSION_ACTION_COMMANDS[action]
-  await execAsync(`bash -lc "${command}"`)
+  await execAsync(`bash -c "${command}"`)
 }

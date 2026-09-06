@@ -36,7 +36,7 @@ const barComputeState = createPoll<BarComputeState>(
   BAR_COMPUTE_POLL_MS,
   async (prev) => {
     try {
-      const raw = await execAsync(`bash -lc '
+      const raw = await execAsync(`bash -c '
 read -r _ u1 n1 s1 i1 w1 irq1 sirq1 st1 _ < /proc/stat
  t1=$((u1+n1+s1+i1+w1+irq1+sirq1+st1))
  idle1=$((i1+w1))

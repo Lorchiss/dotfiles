@@ -13,6 +13,7 @@ type OverlayFocus = OverlayId | null
 
 type HyprMonitorRaw = {
   id?: number
+  name?: string
   focused?: boolean
   width?: number
   height?: number
@@ -27,6 +28,7 @@ type OverlayBox = {
 }
 
 export type OverlayLayoutSnapshot = {
+  monitorName: string
   monitorIndex: number
   monitorWidth: number
   monitorHeight: number
@@ -50,6 +52,7 @@ let activeOverlay: OverlayFocus = null
 const suppressedSync = new Set<OverlayId>()
 
 const FALLBACK_LAYOUT: OverlayLayoutSnapshot = {
+  monitorName: "",
   monitorIndex: 0,
   monitorWidth: 1920,
   monitorHeight: 1080,
@@ -84,10 +87,11 @@ function readNumber(value: unknown, fallback: number): number {
 
 async function readFocusedMonitor() {
   try {
-    const raw = await execAsync(`bash -lc "hyprctl -j monitors"`)
+    const raw = await execAsync(`bash -c "hyprctl -j monitors"`)
     const parsed = JSON.parse(raw) as HyprMonitorRaw[]
     if (!Array.isArray(parsed) || parsed.length === 0) {
       return {
+        monitorName: "",
         monitorIndex: 0,
         width: FALLBACK_LAYOUT.monitorWidth,
         height: FALLBACK_LAYOUT.monitorHeight,
@@ -102,12 +106,14 @@ async function readFocusedMonitor() {
     )
 
     return {
+      monitorName: String(focused?.name ?? ""),
       monitorIndex,
       width: readNumber(focused?.width, FALLBACK_LAYOUT.monitorWidth),
       height: readNumber(focused?.height, FALLBACK_LAYOUT.monitorHeight),
     }
   } catch {
     return {
+      monitorName: "",
       monitorIndex: 0,
       width: FALLBACK_LAYOUT.monitorWidth,
       height: FALLBACK_LAYOUT.monitorHeight,
@@ -155,6 +161,25 @@ export function registerOverlayWindow(id: OverlayId, windowRef: any) {
   overlayRefs[id] = windowRef
 }
 
+export function showOverlay(id: OverlayId) {
+  activeOverlay = id
+  setOverlayVisible(id, true)
+  applyVisibilityPolicy(id, true)
+}
+
+export function hideOverlay(id: OverlayId) {
+  setOverlayVisible(id, false)
+  if (activeOverlay === id) activeOverlay = null
+}
+
+export function toggleOverlay(id: OverlayId) {
+  if (overlayVisibility[id]) {
+    hideOverlay(id)
+    return
+  }
+  showOverlay(id)
+}
+
 export function onOverlayVisibilityChanged(id: OverlayId, visible: boolean) {
   if (suppressedSync.has(id)) {
     suppressedSync.delete(id)
@@ -172,6 +197,7 @@ export function onOverlayVisibilityChanged(id: OverlayId, visible: boolean) {
 }
 
 function buildLayout(
+  monitorName: string,
   monitorIndex: number,
   monitorWidth: number,
   monitorHeight: number,
@@ -241,6 +267,7 @@ function buildLayout(
   }
 
   return {
+    monitorName,
     monitorIndex,
     monitorWidth,
     monitorHeight,
@@ -261,7 +288,12 @@ const overlayLayoutState = createPoll<OverlayLayoutSnapshot>(
   900,
   async () => {
     const monitor = await readFocusedMonitor()
-    return buildLayout(monitor.monitorIndex, monitor.width, monitor.height)
+    return buildLayout(
+      monitor.monitorName,
+      monitor.monitorIndex,
+      monitor.width,
+      monitor.height,
+    )
   },
 )
 
@@ -272,6 +304,14 @@ export function overlayLayoutBinding() {
 export function monitorFromLayout(layout: OverlayLayoutSnapshot): any {
   const monitors = app.get_monitors?.() ?? []
   if (!Array.isArray(monitors) || monitors.length === 0) return null
+
+  if (layout.monitorName) {
+    const byConnector = monitors.find((monitor: any) => {
+      const connector = monitor?.get_connector?.() ?? monitor?.connector
+      return connector === layout.monitorName
+    })
+    if (byConnector) return byConnector
+  }
 
   const safeIndex = clamp(layout.monitorIndex, 0, monitors.length - 1)
   return monitors[safeIndex] ?? monitors[0] ?? null

@@ -1,9 +1,11 @@
 import { runCommand } from "./command"
+import { showOverlay } from "./overlayOrchestrator"
 
 export type PersistedControlCenterTab =
   | "wifi"
   | "bluetooth"
   | "audio"
+  | "displays"
   | "system"
   | "session"
 
@@ -20,6 +22,7 @@ function isControlCenterTab(
     value === "wifi" ||
     value === "bluetooth" ||
     value === "audio" ||
+    value === "displays" ||
     value === "system" ||
     value === "session"
   )
@@ -54,4 +57,11 @@ export async function writeLastControlCenterTab(
       dedupeKey: "control-center-tab-write",
     },
   )
+}
+
+export async function openControlCenterTab(
+  tab: PersistedControlCenterTab,
+): Promise<void> {
+  await writeLastControlCenterTab(tab)
+  showOverlay("control-center")
 }

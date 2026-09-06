@@ -153,7 +153,7 @@ async function fileExists(path: string) {
   if (!path) return false
   try {
     const checkCommand = `[ -f ${shellQuoted(path)} ] && echo yes || echo no`
-    const out = await execAsync(`bash -lc ${shellQuoted(checkCommand)}`)
+    const out = await execAsync(`bash -c ${shellQuoted(checkCommand)}`)
     return out.trim() === "yes"
   } catch {
     return false
@@ -179,7 +179,7 @@ async function resolveArtPath(url: string) {
         const curlCommand =
           `curl -L --silent --show-error --max-time 6 ` +
           `--output ${shellQuoted(target)} -- ${shellQuoted(url)}`
-        await execAsync(`bash -lc ${shellQuoted(curlCommand)}`)
+        await execAsync(`bash -c ${shellQuoted(curlCommand)}`)
       } catch {
         return lastResolvedArtPath || ""
       }
@@ -255,7 +255,7 @@ function notifyUser(title: string, body: string) {
   if (!cleanBody) return
 
   const command = `notify-send ${shellQuoted(cleanTitle)} ${shellQuoted(cleanBody)}`
-  execAsync(`bash -lc ${shellQuoted(command)}`).catch(() => {})
+  execAsync(`bash -c ${shellQuoted(command)}`).catch(() => {})
 }
 
 function buildPopupClass(state: SpotifyState) {
@@ -289,7 +289,7 @@ export default function SpotifyPopup() {
 
   const state = createPoll<SpotifyState>(EMPTY_STATE, 1500, async () => {
     try {
-      const snapshot = await execAsync(`bash -lc '
+      const snapshot = await execAsync(`bash -c '
 title=$(playerctl -p spotify metadata --format "{{title}}" 2>/dev/null || echo "")
 artist=$(playerctl -p spotify metadata --format "{{artist}}" 2>/dev/null || echo "")
 length=$(playerctl -p spotify metadata --format "{{mpris:length}}" 2>/dev/null || echo "0")

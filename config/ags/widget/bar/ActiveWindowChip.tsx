@@ -18,6 +18,21 @@ type ActiveWindowState = {
   tooltip: string
 }
 
+function displayAppName(value: string): string {
+  const normalized = value.trim().toLowerCase()
+  const knownNames: Record<string, string> = {
+    code: "VS Code",
+    "code-url-handler": "VS Code",
+    kitty: "Kitty",
+    obsidian: "Obsidian",
+    spotify: "Spotify",
+  }
+  if (knownNames[normalized]) return knownNames[normalized]
+  return value
+    .replace(/[-_]+/g, " ")
+    .replace(/^./, (char) => char.toUpperCase())
+}
+
 function resolveDisplayTitle(
   theme: any,
   appRaw: unknown,
@@ -38,13 +53,14 @@ function resolveDisplayTitle(
     "window-initial-class",
   )
   const title = safeText(titleRaw, "", "ACTIVE_WINDOW", "window-title")
-  const identity = safeText(
+  const identityRaw = safeText(
     app || initialClass,
     "Desktop",
     "ACTIVE_WINDOW",
     "window-identity",
   )
-  const iconName = resolveAppIcon(theme, identity)
+  const identity = displayAppName(identityRaw)
+  const iconName = resolveAppIcon(theme, identityRaw)
   const displayTitle = safeText(
     title || identity,
     "Desktop",
@@ -86,7 +102,7 @@ export default function ActiveWindowChip() {
     async (prev) => {
       try {
         const raw = await execAsync(
-          `bash -lc "hyprctl -j activewindow 2>/dev/null || echo '{}'"`,
+          `bash -c "hyprctl -j activewindow 2>/dev/null || echo '{}'"`,
         )
         const parsed = JSON.parse(raw) as {
           title?: unknown
@@ -144,9 +160,28 @@ export default function ActiveWindowChip() {
         pixelSize={BAR_UI.size.activeWindowIcon}
       />
       <label
+        class="active-window-app"
+        label={state((s) =>
+          safeText(s.app, "Desktop", "ACTIVE_WINDOW", "app-label"),
+        )}
+        maxWidthChars={18}
+        singleLineMode
+        xalign={0}
+      />
+      <label
+        class="active-window-separator"
+        label="·"
+        visible={state((s) => Boolean(s.title && s.title !== s.app))}
+      />
+      <label
         class="active-window-title"
         label={state((s) =>
-          safeText(s.displayTitle, "Desktop", "ACTIVE_WINDOW", "title-label"),
+          safeText(
+            s.title || s.displayTitle,
+            "Desktop",
+            "ACTIVE_WINDOW",
+            "title-label",
+          ),
         )}
         tooltipText={state((s) =>
           safeText(s.tooltip, "Desktop", "ACTIVE_WINDOW", "title-tooltip"),

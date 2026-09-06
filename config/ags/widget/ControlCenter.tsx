@@ -7,9 +7,10 @@ import ControlCenterTabs, {
 import WifiSection from "./controlcenter/WifiSection"
 import BluetoothSection from "./controlcenter/BluetoothSection"
 import AudioSection from "./controlcenter/AudioSection"
+import DisplaySection from "./controlcenter/DisplaySection"
 import SystemSection from "./controlcenter/SystemSection"
 import SessionSection from "./controlcenter/SessionSection"
-import { createMusicAccentClassState } from "../lib/musicAccent"
+import { createPopupSurfaceClassState } from "../lib/themeSurface"
 import {
   monitorFromLayout,
   onOverlayVisibilityChanged,
@@ -32,7 +33,7 @@ export default function ControlCenter() {
     getActiveTab: () => ControlCenterTab
   } | null = null
   let pendingStoredTab: ControlCenterTab | null = null
-  const accentClass = createMusicAccentClassState()
+  const surfaceClass = createPopupSurfaceClassState("cc-card")
   const overlayLayout = overlayLayoutBinding()
 
   const sectionRefs: Partial<Record<ControlCenterTab, any>> = {}
@@ -154,6 +155,8 @@ export default function ControlCenter() {
               return selectTabByIndex(3)
             if (keyval === Gdk.KEY_5 || keyval === Gdk.KEY_KP_5)
               return selectTabByIndex(4)
+            if (keyval === Gdk.KEY_6 || keyval === Gdk.KEY_KP_6)
+              return selectTabByIndex(5)
 
             if (keyval === Gdk.KEY_w || keyval === Gdk.KEY_W)
               return selectTabByIndex(0)
@@ -161,10 +164,12 @@ export default function ControlCenter() {
               return selectTabByIndex(1)
             if (keyval === Gdk.KEY_a || keyval === Gdk.KEY_A)
               return selectTabByIndex(2)
-            if (keyval === Gdk.KEY_s || keyval === Gdk.KEY_S)
+            if (keyval === Gdk.KEY_p || keyval === Gdk.KEY_P)
               return selectTabByIndex(3)
-            if (keyval === Gdk.KEY_e || keyval === Gdk.KEY_E)
+            if (keyval === Gdk.KEY_s || keyval === Gdk.KEY_S)
               return selectTabByIndex(4)
+            if (keyval === Gdk.KEY_e || keyval === Gdk.KEY_E)
+              return selectTabByIndex(5)
 
             return false
           },
@@ -180,9 +185,7 @@ export default function ControlCenter() {
         orientation={Gtk.Orientation.VERTICAL}
         spacing={10}
         cssName="ccCard"
-        class={accentClass(
-          (accent) => `cc-card popup-accent-surface ${accent}`,
-        )}
+        class={surfaceClass((className) => className)}
         widthRequest={overlayLayout((layout) => layout.controlCenter.width)}
       >
         <box class="cc-header" spacing={8}>
@@ -246,6 +249,14 @@ export default function ControlCenter() {
               visible={false}
             >
               <AudioSection isActive={() => activeTab === "audio"} />
+            </box>
+
+            <box
+              class="cc-tab-pane"
+              $={registerSection("displays")}
+              visible={false}
+            >
+              <DisplaySection isActive={() => activeTab === "displays"} />
             </box>
 
             <box

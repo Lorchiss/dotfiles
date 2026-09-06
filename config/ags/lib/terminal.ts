@@ -9,37 +9,37 @@ const TERMINAL_LAUNCHERS: TerminalLauncher[] = [
   {
     binary: "kitty",
     command: (shellCommand) =>
-      `kitty -e bash -lc ${shellQuote(shellCommand)} >/dev/null 2>&1 &`,
+      `kitty -e bash -c ${shellQuote(shellCommand)} >/dev/null 2>&1 &`,
   },
   {
     binary: "foot",
     command: (shellCommand) =>
-      `foot bash -lc ${shellQuote(shellCommand)} >/dev/null 2>&1 &`,
+      `foot bash -c ${shellQuote(shellCommand)} >/dev/null 2>&1 &`,
   },
   {
     binary: "alacritty",
     command: (shellCommand) =>
-      `alacritty -e bash -lc ${shellQuote(shellCommand)} >/dev/null 2>&1 &`,
+      `alacritty -e bash -c ${shellQuote(shellCommand)} >/dev/null 2>&1 &`,
   },
   {
     binary: "wezterm",
     command: (shellCommand) =>
-      `wezterm start --always-new-process -- bash -lc ${shellQuote(shellCommand)} >/dev/null 2>&1 &`,
+      `wezterm start --always-new-process -- bash -c ${shellQuote(shellCommand)} >/dev/null 2>&1 &`,
   },
   {
     binary: "gnome-terminal",
     command: (shellCommand) =>
-      `gnome-terminal -- bash -lc ${shellQuote(shellCommand)} >/dev/null 2>&1 &`,
+      `gnome-terminal -- bash -c ${shellQuote(shellCommand)} >/dev/null 2>&1 &`,
   },
   {
     binary: "konsole",
     command: (shellCommand) =>
-      `konsole -e bash -lc ${shellQuote(shellCommand)} >/dev/null 2>&1 &`,
+      `konsole -e bash -c ${shellQuote(shellCommand)} >/dev/null 2>&1 &`,
   },
   {
     binary: "xterm",
     command: (shellCommand) =>
-      `xterm -e bash -lc ${shellQuote(shellCommand)} >/dev/null 2>&1 &`,
+      `xterm -e bash -c ${shellQuote(shellCommand)} >/dev/null 2>&1 &`,
   },
 ]
 
@@ -52,7 +52,7 @@ function shellQuote(value: string): string {
 async function commandExists(binary: string): Promise<boolean> {
   try {
     await execAsync(
-      `bash -lc ${shellQuote(`command -v ${shellQuote(binary)} >/dev/null 2>&1`)}`,
+      `bash -c ${shellQuote(`command -v ${shellQuote(binary)} >/dev/null 2>&1`)}`,
     )
     return true
   } catch {
@@ -74,7 +74,7 @@ export async function openInTerminal(shellCommand: string): Promise<void> {
   }
 
   if (cachedLauncher) {
-    await execAsync(`bash -lc ${shellQuote(cachedLauncher.command(trimmed))}`)
+    await execAsync(`bash -c ${shellQuote(cachedLauncher.command(trimmed))}`)
     return
   }
 

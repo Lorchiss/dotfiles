@@ -99,10 +99,10 @@ export default function NetworkChip({
       try {
         const [radioRaw, deviceStatusRaw] = await Promise.all([
           execAsync(
-            `bash -lc "LC_ALL=C nmcli -t -f WIFI g 2>/dev/null || echo disabled"`,
+            `bash -c "LC_ALL=C nmcli -t -f WIFI g 2>/dev/null || echo disabled"`,
           ),
           execAsync(
-            `bash -lc "LC_ALL=C nmcli -t -f TYPE,STATE,CONNECTION device status 2>/dev/null || true"`,
+            `bash -c "LC_ALL=C nmcli -t -f TYPE,STATE,CONNECTION device status 2>/dev/null || true"`,
           ),
         ])
         return resolveNetworkState(radioRaw, deviceStatusRaw)

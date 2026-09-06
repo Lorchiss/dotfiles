@@ -1,0 +1,21 @@
+[Unit]
+Description=Polar Command Deck desktop shell
+Documentation=https://quickshell.org/docs/v0.3.0/
+PartOf=graphical-session.target
+After=graphical-session.target ags.service quickshell-prototype.service waybar.service
+Conflicts=ags.service quickshell-prototype.service waybar.service
+OnFailure=ags.service
+StartLimitIntervalSec=60
+StartLimitBurst=3
+
+[Service]
+Type=exec
+ExecStart=/usr/bin/quickshell --no-duplicate --path %h/.config/quickshell
+ExecStartPost=/usr/bin/bash %h/.config/hypr/scripts/start-desktop-shell.sh --wait
+Restart=on-failure
+RestartSec=2
+TimeoutStartSec=15
+TimeoutStopSec=5
+KillMode=control-group
+
+# Hyprland starts this unit after importing its environment; no default.target hook.

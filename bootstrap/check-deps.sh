@@ -62,7 +62,8 @@ fi
 
 echo "- Required: core session"
 check_cmd required hyprctl "Hyprland control"
-check_cmd required ags "Aylur's GTK Shell"
+check_cmd required quickshell "Polar desktop shell"
+check_cmd optional ags "AGS recovery shell"
 check_cmd required systemctl "systemd user manager"
 
 echo "- Required: bar / control center runtime"

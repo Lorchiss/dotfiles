@@ -1,7 +1,7 @@
 import { Gtk } from "ags/gtk4"
 import { execAsync } from "ags/process"
 import { createPoll } from "ags/time"
-import { createMusicAccentClassState } from "../../lib/musicAccent"
+import { createPopupSurfaceClassState } from "../../lib/themeSurface"
 import { BAR_UI } from "../../lib/uiTokens"
 import { safeText } from "../../lib/text"
 import { barLog } from "../../lib/barObservability"
@@ -33,7 +33,7 @@ export default function VolumeControl({
   barLog("AUDIO", "mounting VolumeControl")
   let syncingScale = false
   let ignoreStateSyncUntil = 0
-  const accentClass = createMusicAccentClassState()
+  const surfaceClass = createPopupSurfaceClassState("volPopover")
 
   const state = createPoll<VolumeState>(
     { value: 0, muted: false },
@@ -42,7 +42,7 @@ export default function VolumeControl({
       try {
         const wpLine = (
           await execAsync(
-            `bash -lc "LC_ALL=C wpctl get-volume @DEFAULT_AUDIO_SINK@ 2>/dev/null || true"`,
+            `bash -c "LC_ALL=C wpctl get-volume @DEFAULT_AUDIO_SINK@ 2>/dev/null || true"`,
           )
         ).trim()
         if (wpLine) {
@@ -58,7 +58,7 @@ export default function VolumeControl({
           }
         }
 
-        const out = await execAsync(`bash -lc '
+        const out = await execAsync(`bash -c '
 vol=$(pactl get-sink-volume @DEFAULT_SINK@ 2>/dev/null | head -n1 | awk "{print \$5}" | tr -d "%")
 mute=$(pactl get-sink-mute @DEFAULT_SINK@ 2>/dev/null | awk "{print \$2}")
 printf "%s\n%s" "$vol" "$mute"
@@ -84,7 +84,7 @@ printf "%s\n%s" "$vol" "$mute"
   const setVolume = (value: number) => {
     const next = Math.round(clampVolume(value))
     return execAsync(
-      `bash -lc "if command -v wpctl >/dev/null 2>&1; then wpctl set-volume @DEFAULT_AUDIO_SINK@ ${next}%; else pactl set-sink-volume @DEFAULT_SINK@ ${next}%; fi"`,
+      `bash -c "if command -v wpctl >/dev/null 2>&1; then wpctl set-volume @DEFAULT_AUDIO_SINK@ ${next}%; else pactl set-sink-volume @DEFAULT_SINK@ ${next}%; fi"`,
     ).catch(() => {})
   }
 
@@ -97,7 +97,7 @@ printf "%s\n%s" "$vol" "$mute"
 
   const toggleMute = () =>
     execAsync(
-      `bash -lc "if command -v wpctl >/dev/null 2>&1; then wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle; else pactl set-sink-mute @DEFAULT_SINK@ toggle; fi"`,
+      `bash -c "if command -v wpctl >/dev/null 2>&1; then wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle; else pactl set-sink-mute @DEFAULT_SINK@ toggle; fi"`,
     ).catch(() => {})
 
   return (
@@ -136,9 +136,7 @@ printf "%s\n%s" "$vol" "$mute"
         <box
           spacing={BAR_UI.spacing.popover}
           cssName="volPopover"
-          class={accentClass(
-            (accent) => `volPopover popup-accent-surface ${accent}`,
-          )}
+          class={surfaceClass((className) => className)}
         >
           <button
             class="vol-mute-btn"

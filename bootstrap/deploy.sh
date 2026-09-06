@@ -6,7 +6,7 @@ cat <<'HELP'
 Usage: bootstrap/deploy.sh [options]
 --dry-run Show planned actions without changes
 --skip-preflight Skip strict deps check
---no-systemd Do not touch ags.service
+--no-systemd Do not change running/enabled desktop shell services
 HELP
 }
 
@@ -40,6 +40,11 @@ run "mkdir -p '$BACKUP_DIR' '$HOME/.config'"
 
 link_dir() {
 local src="$1" dst="$2"
+# Older installs link the whole systemd directory; its children already resolve here.
+if [[ -e "$dst" && "$src" -ef "$dst" ]]; then
+echo "[ok] $dst"
+return
+fi
 if [[ -L "$dst" ]]; then
 current="$(readlink "$dst" || true)"
 [[ "$current" == "$src" ]] && { echo "[ok] $dst"; return; }
@@ -54,13 +59,23 @@ link_dir "$CFG_DIR/hypr" "$HOME/.config/hypr"
 link_dir "$CFG_DIR/kitty" "$HOME/.config/kitty"
 link_dir "$CFG_DIR/rofi" "$HOME/.config/rofi"
 link_dir "$CFG_DIR/ags" "$HOME/.config/ags"
-link_dir "$CFG_DIR/systemd" "$HOME/.config/systemd"
+link_dir "$CFG_DIR/quickshell" "$HOME/.config/quickshell"
+# Preserve unrelated user units and enablement links.
+run "mkdir -p '$HOME/.config/systemd/user'"
+for unit in ags.service quickshell.service quickshell-prototype.service; do
+link_dir "$CFG_DIR/systemd/user/$unit" "$HOME/.config/systemd/user/$unit"
+done
 
 bash "$CHECK"
 
 if [[ "$NO_SYSTEMD" -eq 0 ]]; then
 run "systemctl --user daemon-reload"
-run "systemctl --user enable --now ags.service || true"
+run "systemctl --user disable ags.service waybar.service"
+if [[ -n "${WAYLAND_DISPLAY:-}" && -n "${HYPRLAND_INSTANCE_SIGNATURE:-}" ]]; then
+run "bash '$HOME/.config/hypr/scripts/start-desktop-shell.sh'"
+else
+echo "[info] Polar will start on the next Hyprland login."
+fi
 fi
 
 echo "[done] backup: $BACKUP_DIR"

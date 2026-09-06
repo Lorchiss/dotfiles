@@ -1,6 +1,6 @@
 import { Gtk } from "ags/gtk4"
 import { barSystemStateBinding } from "../../lib/barSignals"
-import { createMusicAccentClassState } from "../../lib/musicAccent"
+import { createPopupSurfaceClassState } from "../../lib/themeSurface"
 import { barLog } from "../../lib/barObservability"
 
 const COUNTER_FALLBACK = "—"
@@ -81,7 +81,7 @@ function counterLabel(value: unknown, fieldName: string): string {
 
 export default function MaintenanceChip() {
   barLog("MAINTENANCE", "mounting MaintenanceChip")
-  const accentClass = createMusicAccentClassState()
+  const surfaceClass = createPopupSurfaceClassState("maintenance-popover-card")
   const system = barSystemStateBinding()
 
   return (
@@ -131,10 +131,7 @@ export default function MaintenanceChip() {
         <box
           orientation={Gtk.Orientation.VERTICAL}
           spacing={8}
-          class={accentClass(
-            (accent) =>
-              `maintenance-popover-card popup-accent-surface ${accent}`,
-          )}
+          class={surfaceClass((className) => className)}
         >
           <label
             class="maintenance-popover-heading"

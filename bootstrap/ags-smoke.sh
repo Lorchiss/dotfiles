@@ -112,12 +112,35 @@ sleep 1
 run_ags_toggle spotify
 
 if command -v hyprctl >/dev/null 2>&1; then
-  monitor_count="$(hyprctl -j monitors 2>/dev/null | grep -o '"name"' | wc -l | tr -d ' ')"
+  monitors_json="$(hyprctl -j monitors 2>/dev/null || printf '[]')"
+  if command -v jq >/dev/null 2>&1; then
+    monitor_count="$(printf '%s' "$monitors_json" | jq 'map(select(.disabled == false)) | length' 2>/dev/null || printf '0')"
+  else
+    monitor_count="$(printf '%s' "$monitors_json" | grep -o '"disabled":[[:space:]]*false' | wc -l | tr -d ' ')"
+  fi
   if [[ "${monitor_count:-0}" -ge 2 ]]; then
     echo "[ags-smoke] multi-monitor check: detected $monitor_count monitors"
   else
     echo "[ags-smoke] multi-monitor check: detected $monitor_count monitor (no fail)"
   fi
+
+  if command -v jq >/dev/null 2>&1; then
+    layers_json="$(hyprctl layers -j 2>/dev/null || printf '{}')"
+    bar_layer_count="$(
+      printf '%s' "$layers_json" |
+        jq '[.[] | .levels["2"][]? | select(.y == 0 and .h >= 40 and .h <= 120)] | length' 2>/dev/null ||
+        printf '0'
+    )"
+  else
+    layers_json="$(hyprctl layers -j 2>/dev/null || printf '{}')"
+    bar_layer_count="$(printf '%s' "$layers_json" | grep -Ec '"h":[[:space:]]*76' || true)"
+  fi
+
+  if [[ "${monitor_count:-0}" -ge 1 && "${bar_layer_count:-0}" -ne "${monitor_count:-0}" ]]; then
+    echo "[ags-smoke] FAIL: expected exactly $monitor_count bar layers, found $bar_layer_count"
+    exit 1
+  fi
+  echo "[ags-smoke] bar layer check: found $bar_layer_count top bars"
 fi
 
 sleep 1

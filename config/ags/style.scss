@@ -1,7 +1,7 @@
 // https://gitlab.gnome.org/GNOME/gtk/-/blob/gtk-3-24/gtk/theme/Adwaita/_colors-public.scss
 @use "sass:map";
 
-// Identity: Arctic Aurora Pro v2
+// Identity: Arctic Instrument
 // Primitives
 $aa-pr-ink-900: #070f1b;
 $aa-pr-ink-850: #0e1726;
@@ -102,6 +102,29 @@ $ag-state-focus-ring: 0 0 0 1px rgba($aa-pr-frost-300, 0.24);
 $ag-state-focus-inset: inset 0 1px 0 rgba(233, 245, 255, 0.14);
 $ag-state-progress-track: rgba($aa-pr-white, 0.22);
 $ag-state-like-glow: 0 0 14px rgba($aa-pr-rose-300, 0.2);
+$ag-state-disabled-opacity: 0.56;
+
+// Shared visual language
+$ag-ui-surface-quiet: rgba($aa-pr-white, 0.032);
+$ag-ui-surface-raised: rgba($aa-pr-white, 0.046);
+$ag-ui-surface-hover: rgba($aa-pr-frost-300, 0.135);
+$ag-ui-surface-active: rgba($aa-pr-frost-300, 0.19);
+$ag-ui-border-quiet: rgba($aa-pr-white, 0.105);
+$ag-ui-border-hover: rgba($aa-pr-frost-300, 0.34);
+$ag-ui-border-active: rgba($aa-pr-frost-300, 0.46);
+$ag-ui-elevation-quiet:
+  0 12px 22px -18px rgba($aa-pr-black, 0.74),
+  inset 0 1px 0 rgba($aa-pr-white, 0.035);
+$ag-ui-elevation-raised:
+  0 18px 28px -20px rgba($aa-pr-black, 0.76),
+  inset 0 1px 0 rgba($aa-pr-white, 0.052);
+$ag-ui-elevation-focus: $ag-state-focus-ring, $ag-state-focus-inset;
+$ag-ui-selected-bg: linear-gradient(
+  148deg,
+  rgba($aa-pr-frost-200, 0.25),
+  rgba($aa-pr-frost-300, 0.18)
+);
+$ag-ui-selected-border: rgba($aa-pr-frost-200, 0.52);
 
 // Light mode semantic tokens
 $ag-light-surface-overlay-weak: rgba(33, 66, 111, 0.035);
@@ -171,6 +194,21 @@ $ag-space-24: 24px;
 $ag-space-32: 32px;
 
 // Type scale
+$ag-type-meta: 11px;
+$ag-type-body: 13px;
+$ag-type-title: 15px;
+$ag-type-heading: 20px;
+
+// Canonical spacing and shape for new/migrated surfaces.
+$ag-step-1: 4px;
+$ag-step-2: 8px;
+$ag-step-3: 12px;
+$ag-step-4: 16px;
+$ag-step-5: 24px;
+$ag-shape-compact: 10px;
+$ag-shape-control: 14px;
+$ag-shape-panel: 18px;
+
 $ag-font-label-2xs: 10.8px;
 $ag-font-label-xs: 11.4px;
 $ag-font-label-sm-soft: 11.5px;
@@ -401,12 +439,12 @@ $bar-density: balanced !default; // compact | balanced | hero
   &:focus,
   &:focus-visible {
     border-color: $ag-border-focus;
-    box-shadow: $ag-shadow-focus-ring, $ag-state-focus-inset;
+    box-shadow: $ag-ui-elevation-focus;
     outline: none;
   }
 
   &:disabled {
-    opacity: 0.56;
+    opacity: $ag-state-disabled-opacity;
     border-color: rgba($aa-pr-white, 0.1);
     background: rgba($aa-pr-white, 0.03);
     box-shadow: none;
@@ -514,7 +552,7 @@ $ag-bar-shell-gradient: linear-gradient(
   rgba(8, 17, 30, 0.9),
   rgba(18, 30, 49, 0.88)
 );
-$ag-bar-shell-border: rgba(171, 216, 255, 0.24);
+$ag-bar-shell-border: rgba(171, 216, 255, 0.28);
 $ag-bar-shell-margin-top: $ag-space-10;
 $ag-bar-shell-padding-y: $ag-space-3;
 $ag-bar-button-padding-y: $ag-space-6;
@@ -582,25 +620,25 @@ $ag-bar-volume-mute-active-border: rgba($aa-pr-frost-300, 0.5);
 $ag-bar-volume-popover-padding: $ag-space-16;
 $ag-bar-block-height: 34px;
 $ag-bar-block-radius: $ag-radius-sm-tight;
-$ag-bar-active-window-bg: rgba($aa-pr-white, 0.05);
-$ag-bar-active-window-border: rgba($aa-pr-frost-200, 0.24);
+$ag-bar-active-window-bg: $ag-ui-surface-raised;
+$ag-bar-active-window-border: rgba($aa-pr-frost-200, 0.26);
 $ag-bar-active-window-app-bg: rgba($aa-pr-frost-300, 0.14);
 $ag-bar-active-window-app-border: rgba($aa-pr-frost-300, 0.34);
 $ag-bar-critical-bg: rgba($aa-pr-danger-300, 0.14);
 $ag-bar-critical-border: rgba($aa-pr-danger-300, 0.56);
-$ag-bar-health-bg: rgba($aa-pr-white, 0.05);
-$ag-bar-health-border: rgba($aa-pr-frost-200, 0.24);
-$ag-bar-maintenance-bg: rgba($aa-pr-white, 0.05);
-$ag-bar-maintenance-border: rgba($aa-pr-frost-200, 0.24);
+$ag-bar-health-bg: $ag-ui-surface-raised;
+$ag-bar-health-border: rgba($aa-pr-frost-200, 0.26);
+$ag-bar-maintenance-bg: $ag-ui-surface-raised;
+$ag-bar-maintenance-border: rgba($aa-pr-frost-200, 0.26);
 $ag-bar-maintenance-warn-bg: rgba(248, 197, 108, 0.1);
 $ag-bar-maintenance-warn-border: rgba(248, 197, 108, 0.34);
 
 // Component tokens: Spotify popup
 $ag-spotify-card-padding: $ag-space-14;
-$ag-spotify-button-bg: $ag-surface-overlay-base;
-$ag-spotify-button-border: $ag-border-subtle;
-$ag-spotify-button-hover-bg: $ag-surface-overlay-strong;
-$ag-spotify-button-active-bg: $ag-surface-overlay-stronger;
+$ag-spotify-button-bg: $ag-ui-surface-quiet;
+$ag-spotify-button-border: $ag-ui-border-quiet;
+$ag-spotify-button-hover-bg: $ag-ui-surface-hover;
+$ag-spotify-button-active-bg: $ag-ui-surface-active;
 $ag-spotify-api-chip-bg: $ag-surface-overlay-strong;
 $ag-spotify-api-chip-border: rgba(255, 255, 255, 0.12);
 $ag-spotify-status-bg: $ag-surface-overlay-soft;
@@ -617,11 +655,11 @@ $ag-spotify-play-hover-bg: rgba($aa-pr-frost-250, 0.32);
 $ag-spotify-play-hover-border: rgba(175, 251, 234, 0.66);
 $ag-spotify-play-active-bg: rgba($aa-pr-frost-250, 0.38);
 $ag-spotify-play-active-border: rgba(175, 251, 234, 0.74);
-$ag-spotify-action-bg: $ag-surface-overlay-weak;
-$ag-spotify-action-border: $ag-border-subtle;
-$ag-spotify-action-hover-bg: $ag-surface-overlay-soft;
-$ag-spotify-action-active-bg: $ag-surface-overlay-strong;
-$ag-spotify-action-active-border: $ag-border-strong;
+$ag-spotify-action-bg: $ag-ui-surface-quiet;
+$ag-spotify-action-border: $ag-ui-border-quiet;
+$ag-spotify-action-hover-bg: $ag-ui-surface-hover;
+$ag-spotify-action-active-bg: $ag-ui-surface-active;
+$ag-spotify-action-active-border: $ag-ui-border-active;
 $ag-spotify-action-active-tint: rgba(152, 245, 224, 0.18);
 $ag-spotify-action-active-tint-border: rgba(152, 245, 224, 0.46);
 $ag-spotify-like-active-bg: $ag-surface-like-tint;
@@ -684,45 +722,48 @@ $ag-spotify-light-connect-active-border: rgba(70, 133, 214, 0.56);
 $ag-command-shell-padding-x: $ag-space-32;
 $ag-command-card-padding: $ag-space-16;
 $ag-command-input-bg: $ag-surface-input;
-$ag-command-input-border: rgba($aa-pr-frost-300, 0.36);
-$ag-command-input-focus-bg: rgba(146, 214, 255, 0.14);
+$ag-command-input-border: $ag-ui-border-quiet;
+$ag-command-input-focus-bg: rgba($aa-pr-frost-300, 0.13);
 $ag-command-input-focus-shadow: 0 10px 18px -14px rgba(0, 0, 0, 0.72);
-$ag-command-item-bg: $ag-surface-overlay-soft;
-$ag-command-item-border: rgba(255, 255, 255, 0.12);
-$ag-command-item-hover-bg: rgba(132, 203, 255, 0.16);
-$ag-command-item-hover-border: rgba(170, 220, 255, 0.48);
-$ag-command-item-active-bg: linear-gradient(
-  148deg,
-  rgba(189, 214, 255, 0.34),
-  rgba(121, 174, 255, 0.26)
-);
-$ag-command-item-active-border: rgba(202, 230, 255, 0.74);
+$ag-command-item-bg: $ag-ui-surface-quiet;
+$ag-command-item-border: $ag-ui-border-quiet;
+$ag-command-item-hover-bg: $ag-ui-surface-hover;
+$ag-command-item-hover-border: $ag-ui-border-hover;
+$ag-command-item-active-bg: $ag-ui-selected-bg;
+$ag-command-item-active-border: $ag-ui-selected-border;
 $ag-command-category-bg: rgba(146, 214, 255, 0.13);
 $ag-command-category-border: rgba(146, 214, 255, 0.34);
+$ag-command-category-apps-bg: rgba($aa-pr-frost-250, 0.12);
+$ag-command-category-apps-border: rgba($aa-pr-frost-250, 0.34);
+$ag-command-category-maintenance-bg: rgba(248, 197, 108, 0.11);
+$ag-command-category-maintenance-border: rgba(248, 197, 108, 0.32);
 
 // Component tokens: Control center
 $ag-control-center-card-padding: $ag-space-20;
-$ag-control-center-button-bg: $ag-surface-overlay-soft;
-$ag-control-center-button-border: $ag-border-subtle;
-$ag-control-center-button-hover-bg: $ag-surface-overlay-strong;
-$ag-control-center-button-active-bg: rgba(255, 255, 255, 0.12);
-$ag-control-center-tab-active-bg: rgba(146, 214, 255, 0.16);
-$ag-control-center-tab-active-border: rgba(146, 214, 255, 0.38);
+$ag-control-center-button-bg: $ag-ui-surface-quiet;
+$ag-control-center-button-border: $ag-ui-border-quiet;
+$ag-control-center-button-hover-bg: $ag-ui-surface-hover;
+$ag-control-center-button-active-bg: $ag-ui-surface-active;
+$ag-control-center-tab-active-bg: rgba($aa-pr-frost-300, 0.16);
+$ag-control-center-tab-active-border: $ag-ui-border-active;
 $ag-control-center-tab-active-shadow: inset 0 0 0 1px rgba(146, 214, 255, 0.18);
 $ag-control-center-section-padding: $ag-space-16;
+$ag-control-center-section-bg: $ag-ui-surface-raised;
+$ag-control-center-section-border: $ag-ui-border-quiet;
 $ag-control-center-password-padding-y: $ag-space-4;
 $ag-control-center-password-padding-x: $ag-space-10;
 $ag-control-center-password-bg: $ag-surface-overlay-base;
 $ag-control-center-password-border: rgba(255, 255, 255, 0.14);
 $ag-control-center-password-focus-bg: rgba(146, 214, 255, 0.14);
-$ag-control-center-list-row-bg: rgba($aa-pr-white, 0.035);
-$ag-control-center-list-row-border: rgba($aa-pr-white, 0.075);
+$ag-control-center-list-row-bg: $ag-ui-surface-quiet;
+$ag-control-center-list-row-border: $ag-ui-border-quiet;
 $ag-control-center-list-row-padding-y: $ag-space-7;
 $ag-control-center-list-row-padding-x: $ag-space-8;
-$ag-control-center-action-bg: $ag-surface-overlay-strong;
-$ag-control-center-action-border: rgba(255, 255, 255, 0.14);
-$ag-control-center-action-hover-bg: $ag-surface-overlay-stronger;
-$ag-control-center-action-active-bg: rgba(255, 255, 255, 0.12);
+$ag-control-center-action-bg: $ag-ui-surface-raised;
+$ag-control-center-action-border: $ag-ui-border-quiet;
+$ag-control-center-action-hover-bg: $ag-ui-surface-hover;
+$ag-control-center-action-active-bg: $ag-ui-surface-active;
+$ag-control-center-action-shadow: $ag-ui-elevation-quiet;
 $ag-control-center-confirm-padding: $ag-space-8;
 $ag-control-center-session-padding-y: $ag-space-10;
 $ag-control-center-session-padding-x: $ag-space-8;
@@ -747,20 +788,27 @@ $ag-control-center-session-pending-bg: rgba(146, 214, 255, 0.12);
   }
 }
 
+@each $accent-name, $accent-token in $ag-accent-variants-light {
+  .popup-accent-surface.popup-theme-light.spotify-accent-#{"" + $accent-name} {
+    border-color: map.get($accent-token, border);
+  }
+}
+
 window.CommandPalette.overlay-muted,
 window.ControlCenter.overlay-muted,
 window.SpotifyPopup.overlay-muted {
   opacity: 0.9;
 }
 
-window.CommandPalette.overlay-focused .command-palette-card,
 window.ControlCenter.overlay-focused > ccCard,
+window.CommandPalette.overlay-focused .command-palette-card,
 window.SpotifyPopup.overlay-focused .spotifyPopupCardShell {
   box-shadow:
     $ag-popup-shadow,
     0 0 0 1px rgba($aa-pr-frost-300, 0.28);
 }
 
+window.CommandPalette.overlay-secondary .command-palette-card,
 window.SpotifyPopup.overlay-secondary .spotifyPopupCardShell {
   box-shadow: $ag-shadow-md;
 }
@@ -839,8 +887,8 @@ window.Bar {
     min-height: $ag-bar-block-height;
     padding: $ag-space-4;
     border-radius: $ag-radius-sm;
-    border: 1px solid transparent;
-    background: transparent;
+    border: 1px solid rgba($aa-pr-white, 0.04);
+    background: rgba($aa-pr-white, 0.012);
     background-image: none;
     box-shadow: none;
   }
@@ -853,10 +901,10 @@ window.Bar {
   .right-controls-zone .theme-toggle-chip:active,
   .right-controls-zone .health-chip > button:hover,
   .right-controls-zone .health-chip > button:active {
-    background: transparent;
+    background: rgba($aa-pr-frost-300, 0.075);
     background-image: none;
-    border-color: transparent;
-    box-shadow: none;
+    border-color: rgba($aa-pr-frost-300, 0.18);
+    box-shadow: $ag-ui-elevation-quiet;
   }
 
   .right-controls-zone .vol-control:focus-within > button,
@@ -865,7 +913,8 @@ window.Bar {
   .right-controls-zone .theme-toggle-chip:focus-visible,
   .right-controls-zone .theme-toggle-chip:focus,
   .right-controls-zone .health-chip:focus-within > button {
-    border-color: rgba($aa-pr-frost-250, 0.42);
+    border-color: $ag-border-focus;
+    box-shadow: $ag-ui-elevation-focus;
   }
 
   .right-controls-zone .vol-trigger-label,
@@ -1207,6 +1256,10 @@ window.Bar {
     padding: $ag-space-12;
   }
 
+  .health-popover-card {
+    min-width: 340px;
+  }
+
   .health-popover-heading,
   .maintenance-popover-heading {
     @include ag-type($ag-font-title-sm, 700, 0.2px, $ag-text-0);
@@ -1218,6 +1271,21 @@ window.Bar {
     border-radius: $ag-radius-sm-tight;
     background: rgba($aa-pr-white, 0.03);
     border: 1px solid rgba($aa-pr-white, 0.1);
+  }
+
+  .health-visual-grid {
+    margin-top: $ag-space-2;
+  }
+
+  .health-visual-row {
+    padding: $ag-space-8 $ag-space-9;
+    background: $ag-ui-surface-quiet;
+    border-color: $ag-ui-border-quiet;
+    box-shadow: inset 0 1px 0 rgba($aa-pr-white, 0.026);
+  }
+
+  .health-visual-row-header {
+    min-width: 0;
   }
 
   .health-popover-key,
@@ -1232,8 +1300,70 @@ window.Bar {
   }
 
   .health-meter-value {
-    font-family: monospace;
+    min-width: 52px;
+    color: $ag-text-0;
+    font-weight: 800;
     letter-spacing: 0;
+  }
+
+  .health-meter-bar {
+    min-height: 8px;
+  }
+
+  .health-meter-bar trough {
+    min-height: 7px;
+    border-radius: $ag-radius-pill;
+    border: 1px solid rgba($aa-pr-white, 0.075);
+    background: rgba($aa-pr-black, 0.2);
+    box-shadow: inset 0 1px 2px rgba($aa-pr-black, 0.25);
+  }
+
+  .health-meter-bar progress {
+    min-height: 7px;
+    border-radius: $ag-radius-pill;
+    box-shadow: inset 0 1px 0 rgba($aa-pr-white, 0.16);
+  }
+
+  .health-meter-ok progress {
+    @include ag-progress-fill($ag-accent-secondary-95, $ag-accent-primary-95);
+  }
+
+  .health-meter-warn progress {
+    background: linear-gradient(
+      90deg,
+      rgba(248, 197, 108, 0.86),
+      rgba(255, 221, 150, 0.96)
+    );
+  }
+
+  .health-meter-critical progress {
+    background: linear-gradient(
+      90deg,
+      rgba($aa-pr-danger-300, 0.84),
+      rgba(255, 167, 167, 0.96)
+    );
+  }
+
+  .health-meter-unknown progress {
+    background: rgba($aa-pr-white, 0.18);
+  }
+
+  .health-counter-grid {
+    margin-top: $ag-space-2;
+  }
+
+  .health-counter-card {
+    min-width: 0;
+    padding: $ag-space-8 $ag-space-9;
+    border-radius: $ag-radius-sm-tight;
+    background: $ag-ui-surface-raised;
+    border: 1px solid $ag-ui-border-quiet;
+    box-shadow: inset 0 1px 0 rgba($aa-pr-white, 0.03);
+  }
+
+  .health-counter-value {
+    @include ag-type($ag-font-title-md, 800, 0.08px, $ag-text-0);
+    font-variant-numeric: tabular-nums;
   }
 
   .health-open-monitor {
@@ -1523,8 +1653,8 @@ window.Bar {
       min-height: $ag-bar-block-height;
       padding: $ag-space-4;
       border-radius: $ag-radius-sm;
-      border: 1px solid transparent;
-      background: transparent;
+      border: 1px solid rgba($aa-pr-white, 0.04);
+      background: rgba($aa-pr-white, 0.012);
       box-shadow: none;
     }
 
@@ -1541,9 +1671,9 @@ window.Bar {
   .theme-toggle-chip:active,
   .health-chip > button:hover,
   .health-chip > button:active {
-    background: transparent;
-    border-color: transparent;
-    box-shadow: none;
+    background: rgba($aa-pr-frost-300, 0.075);
+    border-color: rgba($aa-pr-frost-300, 0.18);
+    box-shadow: $ag-ui-elevation-quiet;
   }
 
   .vol-control.vol-control-compact:focus-within > button,
@@ -1552,7 +1682,8 @@ window.Bar {
   .theme-toggle-chip:focus-visible,
   .theme-toggle-chip:focus,
   .health-chip:focus-within > button {
-    border-color: rgba($aa-pr-frost-250, 0.42);
+    border-color: $ag-border-focus;
+    box-shadow: $ag-ui-elevation-focus;
   }
 
   .vol-control.vol-control-compact .vol-trigger-icon,
@@ -1577,6 +1708,198 @@ window.Bar {
   .health-chip:focus-within .health-state-icon,
   .health-chip:focus-within .health-state-dot {
     opacity: 1;
+  }
+
+  // Instrument Rail: one quiet shell, stateful controls only.
+  > centerbox {
+    min-height: 42px;
+    margin: $ag-step-2 $ag-space-20 0;
+    padding: $ag-space-3 $ag-step-3;
+    border-radius: $ag-step-4;
+    background-image:
+      radial-gradient(
+        circle at 18% 0%,
+        rgba($aa-pr-frost-300, 0.08),
+        transparent 34%
+      ),
+      linear-gradient(162deg, rgba(8, 17, 30, 0.92), rgba(15, 27, 44, 0.9));
+    border-color: rgba($aa-pr-frost-200, 0.22);
+    box-shadow:
+      0 16px 28px -22px rgba($aa-pr-black, 0.86),
+      inset 0 1px 0 rgba($aa-pr-white, 0.045);
+  }
+
+  > centerbox > box,
+  .bar-section-start,
+  .bar-section-center,
+  .bar-section-end {
+    min-height: 36px;
+  }
+
+  .work-context-block,
+  .workspace-monitor-lane,
+  .quick-status-box {
+    padding: 0;
+    background: transparent;
+    border: none;
+    box-shadow: none;
+  }
+
+  .launcher-chip {
+    min-width: 62px;
+    min-height: 32px;
+    padding: 0 $ag-step-2;
+    border-color: transparent;
+    background: transparent;
+    box-shadow: none;
+  }
+
+  .launcher-chip:hover,
+  .launcher-chip:active {
+    background: $ag-ui-surface-hover;
+    border-color: $ag-ui-border-hover;
+  }
+
+  &.bar-secondary .launcher-chip {
+    min-width: 32px;
+    padding: 0 $ag-step-1;
+  }
+
+  &.bar-secondary .launcher-label {
+    opacity: 0;
+    font-size: 0;
+  }
+
+  .workspace-lanes {
+    min-width: 0;
+  }
+
+  .workspace-chip {
+    min-width: 30px;
+    min-height: 30px;
+    padding: 0;
+    border-radius: 9px;
+    border-color: transparent;
+    background: transparent;
+    box-shadow: none;
+  }
+
+  .workspace-chip-number {
+    min-width: 18px;
+    @include ag-type($ag-type-meta, 700, 0, $ag-text-1);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .workspace-chip-dot {
+    min-width: 4px;
+    min-height: 4px;
+    margin-bottom: 3px;
+    border-radius: $ag-radius-pill;
+    background: rgba($aa-pr-frost-200, 0.48);
+  }
+
+  .workspace-chip-occupied {
+    background: transparent;
+    border-color: transparent;
+  }
+
+  .workspace-chip:hover {
+    background: $ag-ui-surface-hover;
+    border-color: $ag-ui-border-hover;
+    box-shadow: none;
+  }
+
+  .workspace-chip-active.workspace-chip-focused {
+    background: rgba($aa-pr-frost-300, 0.16);
+    border-color: rgba($aa-pr-frost-300, 0.28);
+    box-shadow: inset 0 -2px 0 rgba($aa-pr-frost-200, 0.9);
+  }
+
+  .workspace-chip-active.workspace-chip-focused .workspace-chip-number {
+    color: $ag-text-0;
+    font-weight: 800;
+  }
+
+  .workspace-chip-active.workspace-chip-unfocused {
+    background: rgba($aa-pr-white, 0.045);
+    border-color: transparent;
+    box-shadow: inset 0 -2px 0 rgba($aa-pr-white, 0.24);
+  }
+
+  .active-window-chip {
+    min-width: 300px;
+    min-height: 32px;
+    padding: 0 $ag-step-3;
+    border: none;
+    border-radius: 0;
+    background: transparent;
+  }
+
+  .active-window-app {
+    padding: 0;
+    border: none;
+    background: transparent;
+    @include ag-type($ag-type-body, 800, 0.02px, $ag-text-0);
+  }
+
+  .active-window-separator {
+    @include ag-type($ag-type-body, 700, 0, $ag-text-muted);
+  }
+
+  .active-window-title {
+    @include ag-type($ag-type-body, 600, 0.02px, $ag-text-1);
+  }
+
+  .right-controls-zone {
+    padding-right: 0;
+  }
+
+  .right-controls-zone .spotify-chip,
+  .right-controls-zone .vol-control > button,
+  .right-controls-zone .network-chip,
+  .right-controls-zone .health-chip > button {
+    min-width: 30px;
+    min-height: 30px;
+    padding: $ag-step-1;
+    border-radius: 9px;
+    border-color: transparent;
+    background: transparent;
+    box-shadow: none;
+  }
+
+  .health-content-icononly {
+    padding: 0;
+  }
+
+  .health-ok .health-state-icon {
+    color: $ag-accent-secondary;
+  }
+
+  .health-warn .health-state-icon {
+    color: $aa-sem-warn;
+  }
+
+  .health-critical .health-state-icon {
+    color: $aa-sem-error;
+  }
+
+  .clock-chip > button {
+    min-width: 128px;
+    min-height: 32px;
+    padding: 0 $ag-step-2;
+    border-radius: 9px;
+    border-color: transparent;
+    background: transparent;
+    box-shadow: inset 1px 0 0 rgba($aa-pr-white, 0.08);
+  }
+
+  .clock-chip-date {
+    @include ag-type(10px, 700, 0.12px, $ag-text-muted);
+  }
+
+  .clock-chip-time {
+    min-width: 46px;
+    @include ag-type($ag-type-title, 800, -0.08px, $ag-text-0);
   }
 }
 
@@ -1652,6 +1975,77 @@ window.Bar.bar-theme-light {
   .theme-toggle-chip.theme-light .theme-toggle-icon {
     color: rgba(214, 145, 26, 0.98);
   }
+
+  > centerbox {
+    background-image:
+      radial-gradient(
+        circle at 18% 0%,
+        rgba(85, 144, 220, 0.12),
+        transparent 34%
+      ),
+      linear-gradient(
+        162deg,
+        rgba(244, 249, 255, 0.96),
+        rgba(230, 240, 253, 0.94)
+      );
+    border-color: rgba(76, 119, 182, 0.3);
+    box-shadow:
+      0 16px 28px -22px rgba(47, 76, 120, 0.48),
+      inset 0 1px 0 rgba($aa-pr-white, 0.58);
+  }
+
+  .work-context-block,
+  .workspace-monitor-lane,
+  .launcher-chip,
+  .workspace-chip,
+  .workspace-chip-occupied,
+  .active-window-chip,
+  .right-controls-zone .spotify-chip,
+  .right-controls-zone .vol-control > button,
+  .right-controls-zone .network-chip,
+  .right-controls-zone .health-chip > button,
+  .clock-chip > button {
+    background: transparent;
+    border-color: transparent;
+    box-shadow: none;
+  }
+
+  .workspace-chip:hover,
+  .launcher-chip:hover,
+  .right-controls-zone .vol-control > button:hover,
+  .right-controls-zone .network-chip:hover,
+  .right-controls-zone .health-chip > button:hover {
+    background: rgba(33, 66, 111, 0.1);
+    border-color: rgba(33, 66, 111, 0.18);
+  }
+
+  .workspace-chip-active.workspace-chip-focused {
+    background: rgba(44, 105, 194, 0.13);
+    border-color: rgba(44, 105, 194, 0.24);
+    box-shadow: inset 0 -2px 0 rgba(44, 105, 194, 0.78);
+  }
+
+  .workspace-chip-active.workspace-chip-unfocused {
+    background: rgba(33, 66, 111, 0.05);
+    box-shadow: inset 0 -2px 0 rgba(33, 66, 111, 0.22);
+  }
+
+  .workspace-chip-number,
+  .workspace-chip-active.workspace-chip-focused .workspace-chip-number,
+  .active-window-app,
+  .clock-chip-time {
+    color: $ag-light-text-primary;
+  }
+
+  .active-window-title,
+  .active-window-separator,
+  .clock-chip-date {
+    color: $ag-light-text-muted;
+  }
+
+  .clock-chip > button {
+    box-shadow: inset 1px 0 0 rgba(56, 84, 124, 0.14);
+  }
 }
 
 window.SpotifyPopup {
@@ -1659,6 +2053,9 @@ window.SpotifyPopup {
 
   .spotifyPopupCardShell {
     padding: $ag-spotify-card-padding;
+    box-shadow:
+      $ag-popup-shadow,
+      inset 0 1px 0 rgba($aa-pr-white, 0.055);
   }
 
   .spotifyPopupCardShell.spotify-layout-horizontal {
@@ -1711,7 +2108,7 @@ window.SpotifyPopup {
       $ag-radius-control,
       $ag-surface-cover,
       $ag-border-subtle,
-      none
+      $ag-ui-elevation-quiet
     );
     padding: 2px;
   }
@@ -1781,7 +2178,7 @@ window.SpotifyPopup {
       $active-bg: $ag-spotify-button-active-bg,
       $active-border: $ag-border-strong
     );
-    box-shadow: none;
+    box-shadow: $ag-ui-elevation-quiet;
   }
 
   .spotify-transport-secondary {
@@ -1863,7 +2260,7 @@ window.SpotifyPopup {
       $active-bg: $ag-spotify-action-active-bg,
       $active-border: $ag-spotify-action-active-border
     );
-    box-shadow: none;
+    box-shadow: $ag-ui-elevation-quiet;
   }
 
   .spotify-secondary-icon-btn {
@@ -1890,7 +2287,7 @@ window.SpotifyPopup {
   .spotify-shuffle-ghost-btn:focus-visible {
     background: transparent;
     border-color: transparent;
-    box-shadow: $ag-shadow-focus-ring;
+    box-shadow: $ag-ui-elevation-focus;
     transform: translateY(0);
   }
 
@@ -2156,28 +2553,34 @@ window.CommandPalette {
   .command-palette-card {
     min-width: 700px;
     padding: $ag-command-card-padding;
+    box-shadow:
+      $ag-popup-shadow,
+      inset 0 1px 0 rgba($aa-pr-white, 0.055);
   }
 
   .command-palette-header {
-    min-height: 30px;
+    min-height: 32px;
+    padding-bottom: $ag-space-4;
+    border-bottom: 1px solid rgba($aa-pr-white, 0.07);
   }
 
   .command-palette-title {
-    @include ag-type($ag-font-title-md, 700, 0.24px, $ag-text-0);
+    @include ag-type($ag-font-title-md, 800, 0.14px, $ag-text-0);
   }
 
   .command-palette-hint {
-    @include ag-type($ag-font-label-sm-soft, 600, 0.18px, $ag-text-1);
+    @include ag-type($ag-font-label-sm-soft, 700, 0.08px, $ag-text-muted);
   }
 
   .command-palette-input {
-    min-height: 38px;
+    min-height: 40px;
     border-radius: $ag-radius-sm;
-    padding: 0 $ag-space-12;
+    padding: 0 $ag-space-14;
     border: 1px solid $ag-command-input-border;
     background: $ag-command-input-bg;
     color: $ag-text-0;
     caret-color: $ag-accent-primary;
+    box-shadow: inset 0 1px 0 rgba($aa-pr-white, 0.035);
     transition:
       background-color $ag-motion-fast $ag-curve-standard,
       border-color $ag-motion-fast $ag-curve-standard,
@@ -2187,7 +2590,7 @@ window.CommandPalette {
   .command-palette-input:focus {
     border-color: $ag-border-focus;
     background: $ag-command-input-focus-bg;
-    box-shadow: $ag-shadow-focus-ring, $ag-command-input-focus-shadow;
+    box-shadow: $ag-ui-elevation-focus, $ag-command-input-focus-shadow;
   }
 
   .command-palette-scroll {
@@ -2203,10 +2606,12 @@ window.CommandPalette {
   }
 
   .command-palette-item {
-    border-radius: $ag-radius-sm;
+    min-height: 54px;
+    border-radius: $ag-radius-md;
     border: 1px solid $ag-command-item-border;
     background: $ag-command-item-bg;
-    padding: $ag-space-8 $ag-space-10;
+    padding: $ag-space-8 $ag-space-12;
+    box-shadow: inset 0 1px 0 rgba($aa-pr-white, 0.025);
     transition:
       background-color $ag-motion-fast $ag-curve-standard,
       border-color $ag-motion-fast $ag-curve-standard,
@@ -2216,54 +2621,80 @@ window.CommandPalette {
   .command-palette-item:hover {
     background: $ag-command-item-hover-bg;
     border-color: $ag-command-item-hover-border;
-    box-shadow: $ag-shadow-sm;
+    box-shadow: $ag-ui-elevation-quiet;
   }
 
   .command-palette-item-active,
   .command-palette-item-active:hover {
     background: $ag-command-item-active-bg;
     border-color: $ag-command-item-active-border;
-    box-shadow: $ag-shadow-command-active;
+    box-shadow: $ag-shadow-command-active, $ag-state-focus-inset;
+  }
+
+  .command-palette-item-row,
+  .command-palette-item-copy {
+    min-width: 0;
   }
 
   .command-palette-item-title {
-    color: $ag-text-0;
-    font-size: $ag-font-body-lg-soft;
-    font-weight: 700;
-    letter-spacing: 0.16px;
+    min-width: 0;
+    @include ag-type($ag-font-body-lg-soft, 800, 0.08px, $ag-text-0);
   }
 
   .command-palette-item-subtitle {
-    color: $ag-text-1;
-    font-size: $ag-font-label-sm;
-    letter-spacing: 0.12px;
+    min-width: 0;
+    @include ag-type($ag-font-label-sm, 600, 0.08px, $ag-text-1);
   }
 
   .command-palette-item-category {
     border-radius: $ag-radius-pill;
-    padding: $ag-space-3 $ag-space-9;
+    min-width: 86px;
+    padding: $ag-space-3 $ag-space-8;
     background: $ag-command-category-bg;
     border: 1px solid $ag-command-category-border;
     color: $ag-accent-primary;
     font-size: $ag-font-label-2xs;
     font-weight: 700;
-    letter-spacing: 0.22px;
+    letter-spacing: 0.12px;
+  }
+
+  .command-palette-category-apps {
+    background: $ag-command-category-apps-bg;
+    border-color: $ag-command-category-apps-border;
+    color: $ag-accent-secondary;
+  }
+
+  .command-palette-category-maintenance {
+    background: $ag-command-category-maintenance-bg;
+    border-color: $ag-command-category-maintenance-border;
+    color: $aa-sem-warn;
   }
 
   .command-palette-empty {
-    color: $ag-text-1;
-    font-size: $ag-font-body-sm;
-    padding: $ag-space-10 $ag-space-2;
+    @include ag-type($ag-font-body-sm, 700, 0.08px, $ag-text-1);
+    padding: $ag-space-14 $ag-space-2;
   }
 
   .command-palette-footer {
     min-height: 24px;
+    border-top: 1px solid rgba($aa-pr-white, 0.07);
+    padding-top: $ag-space-6;
   }
 
   .command-palette-status {
     color: $ag-text-1;
     font-size: $ag-font-label-sm;
     letter-spacing: 0.15px;
+  }
+
+  .command-palette-status-busy {
+    color: $ag-accent-primary;
+    font-weight: 700;
+  }
+
+  .command-palette-status-success {
+    color: $ag-accent-secondary;
+    font-weight: 700;
   }
 
   .command-palette-status-error {
@@ -2281,17 +2712,20 @@ window.ControlCenter {
 
   > ccCard {
     min-width: 600px;
-    padding: $ag-control-center-card-padding;
+    padding: $ag-step-4;
+    box-shadow:
+      $ag-popup-shadow,
+      inset 0 1px 0 rgba($aa-pr-white, 0.06);
   }
 
   .cc-header {
-    min-height: 32px;
-    padding: 0 $ag-space-2 $ag-space-8;
-    border-bottom: 1px solid rgba($aa-pr-white, 0.075);
+    min-height: 40px;
+    padding: 0 $ag-step-1 $ag-step-2;
+    border-bottom: 1px solid rgba($aa-pr-white, 0.085);
   }
 
   .cc-title {
-    @include ag-type($ag-font-title-md, 700, 0.12px, $ag-text-0);
+    @include ag-type($ag-type-heading, 800, -0.16px, $ag-text-0);
   }
 
   .cc-header-hint {
@@ -2300,9 +2734,9 @@ window.ControlCenter {
 
   .cc-close-btn {
     min-width: 32px;
-    min-height: 28px;
+    min-height: 30px;
     padding: 0;
-    border-radius: $ag-radius-xs;
+    border-radius: $ag-shape-compact;
     @include ag-interactive-control(
       $bg: $ag-control-center-button-bg,
       $border: $ag-control-center-button-border,
@@ -2315,10 +2749,11 @@ window.ControlCenter {
   }
 
   .cc-tabbar {
-    padding: $ag-space-4;
-    border-radius: $ag-radius-md;
-    background: rgba($aa-pr-white, 0.035);
-    border: 1px solid rgba($aa-pr-white, 0.08);
+    padding: $ag-step-1;
+    border-radius: $ag-shape-control;
+    background: rgba($aa-pr-white, 0.022);
+    border: 1px solid rgba($aa-pr-white, 0.065);
+    box-shadow: none;
   }
 
   .cc-sections-scroll {
@@ -2335,22 +2770,23 @@ window.ControlCenter {
   }
 
   .cc-tab-pane {
-    padding-right: $ag-space-4;
+    padding-right: $ag-step-1;
   }
 
   .cc-tab-btn {
-    min-width: 96px;
-    padding: $ag-space-7 $ag-space-10;
-    border-radius: $ag-radius-sm-tight;
-    @include ag-type($ag-font-body-sm, 600, 0.15px, $ag-text-1);
+    min-width: 84px;
+    min-height: 32px;
+    padding: $ag-step-1 $ag-step-2;
+    border-radius: $ag-shape-compact;
+    @include ag-type($ag-type-meta, 700, 0.08px, $ag-text-1);
     @include ag-interactive-control(
-      $bg: $ag-control-center-button-bg,
-      $border: $ag-control-center-button-border,
+      $bg: transparent,
+      $border: transparent,
       $color: $ag-text-1,
       $hover-bg: $ag-control-center-button-hover-bg,
-      $hover-border: $ag-border-strong,
+      $hover-border: $ag-ui-border-hover,
       $active-bg: $ag-control-center-button-active-bg,
-      $active-border: $ag-border-strong
+      $active-border: $ag-ui-border-active
     );
   }
 
@@ -2358,9 +2794,17 @@ window.ControlCenter {
     background: $ag-control-center-tab-active-bg;
     border-color: $ag-control-center-tab-active-border;
     color: $ag-accent-primary;
-    box-shadow:
-      $ag-control-center-tab-active-shadow,
-      0 10px 18px -16px rgba($aa-pr-black, 0.7);
+    box-shadow: inset 0 -2px 0 rgba($aa-pr-frost-300, 0.78);
+  }
+
+  .cc-tab-btn:focus,
+  .cc-tab-btn:focus-visible,
+  .cc-close-btn:focus,
+  .cc-close-btn:focus-visible,
+  .cc-action-btn:focus,
+  .cc-action-btn:focus-visible {
+    border-color: $ag-border-focus;
+    box-shadow: $ag-ui-elevation-focus;
   }
 
   @each $accent-name, $accent-token in $ag-accent-variants {
@@ -2372,28 +2816,30 @@ window.ControlCenter {
   }
 
   .cc-section {
-    background: rgba($aa-pr-white, 0.045);
-    border: 1px solid rgba($aa-pr-white, 0.095);
-    border-radius: $ag-radius-lg;
-    padding: $ag-control-center-section-padding;
-    margin-top: $ag-space-10;
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    padding: $ag-step-3 $ag-step-1 $ag-step-1;
+    margin-top: $ag-step-1;
+    box-shadow: none;
   }
 
   .cc-section-title {
-    @include ag-type($ag-font-title-sm, 700, 0.12px, $ag-text-0);
+    @include ag-type($ag-type-title, 800, -0.08px, $ag-text-0);
+    margin-bottom: $ag-step-1;
   }
 
   .cc-section-subtitle {
-    @include ag-type($ag-font-body-sm-soft, 600, 0.1px, $ag-text-0);
+    @include ag-type($ag-type-body, 600, 0.04px, $ag-text-0);
   }
 
   .cc-section-subtle {
-    @include ag-type($ag-font-body-sm, 600, 0.12px, $ag-text-muted);
+    @include ag-type($ag-type-meta, 600, 0.08px, $ag-text-muted);
   }
 
   .cc-inline-message {
-    @include ag-type($ag-font-body-sm, 600, 0.2px, $ag-text-1);
-    padding: $ag-space-4 $ag-space-5;
+    @include ag-type($ag-font-label-sm, 700, 0.14px, $ag-text-1);
+    padding: $ag-space-5 $ag-space-8;
     border-radius: $ag-radius-sm;
     border: 1px solid transparent;
   }
@@ -2439,12 +2885,18 @@ window.ControlCenter {
   }
 
   .cc-list-row {
-    @include ag-surface-subtle(
-      $ag-radius-sm-tight,
-      $ag-control-center-list-row-bg,
-      $ag-control-center-list-row-border
-    );
-    padding: $ag-space-8 $ag-space-10;
+    min-width: 0;
+    padding: $ag-step-2;
+    border: none;
+    border-bottom: 1px solid $ag-ui-border-quiet;
+    border-radius: 0;
+    background: rgba($aa-pr-white, 0.018);
+    box-shadow: none;
+  }
+
+  .cc-list-row-active {
+    background: rgba($aa-pr-frost-300, 0.075);
+    box-shadow: inset 2px 0 0 rgba($aa-pr-frost-300, 0.76);
   }
 
   .cc-audio-volume-row {
@@ -2474,23 +2926,29 @@ window.ControlCenter {
   }
 
   .cc-list-title {
-    @include ag-type($ag-font-body-md-soft, 600, 0.12px, $ag-text-0);
+    @include ag-type($ag-type-body, 700, 0.04px, $ag-text-0);
   }
 
   .cc-list-subtitle {
-    @include ag-type($ag-font-label-md, 600, 0.1px, $ag-text-1);
+    @include ag-type($ag-type-meta, 600, 0.06px, $ag-text-1);
+    line-height: 1.34;
   }
 
   .cc-empty-state {
     @include ag-type($ag-font-body-sm, 600, 0.1px, $ag-text-1);
-    padding: $ag-space-8 0;
+    padding: $ag-space-9 $ag-space-2;
+  }
+
+  .cc-action-row {
+    min-width: 0;
   }
 
   .cc-action-btn {
-    min-width: 82px;
-    border-radius: $ag-radius-sm-tight;
-    padding: $ag-space-7 $ag-space-12;
-    @include ag-type($ag-font-body-sm, 600, 0.14px, $ag-text-0);
+    min-width: 86px;
+    min-height: 32px;
+    border-radius: $ag-shape-compact;
+    padding: $ag-step-1 $ag-step-3;
+    @include ag-type($ag-type-meta, 700, 0.08px, $ag-text-0);
     @include ag-interactive-control(
       $bg: $ag-control-center-action-bg,
       $border: $ag-control-center-action-border,
@@ -2499,6 +2957,141 @@ window.ControlCenter {
       $active-bg: $ag-control-center-action-active-bg,
       $active-border: $ag-border-strong
     );
+    box-shadow: $ag-control-center-action-shadow;
+  }
+
+  .cc-action-btn:hover {
+    box-shadow:
+      $ag-control-center-action-shadow, $ag-state-control-hover-ring,
+      $ag-state-control-hover-inset;
+  }
+
+  .cc-action-btn:disabled {
+    opacity: 0.54;
+    box-shadow: none;
+  }
+
+  .cc-action-primary {
+    background: rgba($aa-pr-frost-300, 0.14);
+    border-color: rgba($aa-pr-frost-300, 0.34);
+    color: $ag-accent-primary;
+  }
+
+  .cc-action-quiet {
+    background: transparent;
+    border-color: transparent;
+    box-shadow: none;
+    color: $ag-text-1;
+  }
+
+  .cc-display-heading {
+    min-width: 0;
+  }
+
+  .cc-display-monitors {
+    min-width: 0;
+  }
+
+  .cc-display-monitor {
+    min-width: 0;
+    padding: $ag-step-2 $ag-step-3;
+    border-radius: $ag-shape-control;
+    border: 1px solid $ag-ui-border-quiet;
+    background: $ag-ui-surface-quiet;
+    box-shadow: inset 0 1px 0 rgba($aa-pr-white, 0.03);
+  }
+
+  .cc-display-monitor-active {
+    border-color: rgba($aa-pr-frost-300, 0.34);
+    background: rgba($aa-pr-frost-300, 0.075);
+    box-shadow: inset 2px 0 0 rgba($aa-pr-frost-300, 0.76);
+  }
+
+  .cc-display-monitor-title {
+    @include ag-type($ag-type-body, 800, 0.02px, $ag-text-0);
+  }
+
+  .cc-display-monitor-badge {
+    padding: 2px $ag-step-2;
+    border-radius: $ag-radius-pill;
+    border: 1px solid rgba($aa-pr-frost-250, 0.28);
+    background: rgba($aa-pr-frost-250, 0.1);
+    @include ag-type(10px, 800, 0.18px, $ag-accent-secondary);
+  }
+
+  .cc-display-monitor-details {
+    @include ag-type($ag-type-meta, 700, 0.04px, $ag-text-1);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .cc-display-monitor-position {
+    @include ag-type(10px, 600, 0.04px, $ag-text-muted);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .cc-display-layouts,
+  .cc-display-utilities {
+    min-width: 0;
+    padding-top: $ag-step-1;
+  }
+
+  .cc-display-utilities {
+    border-top: 1px solid $ag-ui-border-quiet;
+  }
+
+  .cc-display-action-row,
+  .cc-display-action-row > button {
+    min-width: 0;
+  }
+
+  .cc-display-preset {
+    min-height: 48px;
+    padding: $ag-step-2 $ag-step-3;
+    border-radius: $ag-shape-compact;
+    @include ag-interactive-control(
+      $bg: $ag-ui-surface-raised,
+      $border: $ag-ui-border-quiet,
+      $color: $ag-text-1,
+      $hover-bg: $ag-ui-surface-hover,
+      $hover-border: $ag-ui-border-hover,
+      $active-bg: $ag-ui-surface-active,
+      $active-border: $ag-ui-border-active
+    );
+    box-shadow: $ag-ui-elevation-quiet;
+  }
+
+  .cc-display-preset image {
+    color: $ag-accent-primary;
+  }
+
+  .cc-display-preset-primary {
+    border-color: rgba($aa-pr-frost-300, 0.34);
+    background: rgba($aa-pr-frost-300, 0.11);
+  }
+
+  .cc-display-preset-title {
+    @include ag-type($ag-type-body, 800, 0.02px, $ag-text-0);
+  }
+
+  .cc-display-preset-subtitle {
+    @include ag-type($ag-type-meta, 600, 0.02px, $ag-text-muted);
+  }
+
+  .cc-display-single-btn {
+    border-color: rgba(248, 197, 108, 0.24);
+    color: $aa-sem-warn;
+  }
+
+  .cc-display-workspaces-btn {
+    min-width: 156px;
+  }
+
+  .cc-display-warning {
+    @include ag-type($ag-type-meta, 600, 0.04px, $ag-text-muted);
+  }
+
+  .cc-system-section .cc-action-btn {
+    min-width: 104px;
   }
 
   .cc-danger-btn {
@@ -2602,6 +3195,259 @@ window.ControlCenter {
   .cc-session-confirm-timer {
     font-variant-numeric: tabular-nums;
     min-width: 72px;
+  }
+}
+
+.popup-accent-surface.popup-theme-light {
+  @include ag-card-shell(
+    $ag-radius-card,
+    $ag-light-popup-base,
+    $ag-light-border-popup,
+    $ag-light-shadow-popup
+  );
+
+  label {
+    color: $ag-light-text-primary;
+  }
+
+  .command-palette-hint,
+  .command-palette-item-subtitle,
+  .cc-section-subtle,
+  .cc-list-subtitle,
+  .cc-session-tile-hint,
+  .clock-popover-calendar,
+  .health-popover-key,
+  .maintenance-popover-key,
+  .health-usage-inline {
+    color: $ag-light-text-muted;
+  }
+
+  .command-palette-header,
+  .command-palette-footer,
+  .cc-header {
+    border-color: rgba(56, 84, 124, 0.16);
+  }
+
+  .command-palette-input,
+  .cc-password-entry {
+    background: rgba(33, 66, 111, 0.06);
+    border-color: $ag-light-border-subtle;
+    color: $ag-light-text-primary;
+  }
+
+  .command-palette-input:focus,
+  .cc-password-entry:focus {
+    background: rgba(33, 66, 111, 0.1);
+    border-color: $ag-light-border-focus;
+    box-shadow: $ag-light-shadow-focus-ring, $ag-state-focus-inset;
+  }
+
+  .command-palette-item,
+  .health-visual-row,
+  .health-counter-card,
+  .health-popover-row,
+  .maintenance-popover-row,
+  .clock-popover-calendar {
+    background: $ag-light-surface-overlay-soft;
+    border-color: $ag-light-border-subtle;
+    box-shadow: inset 0 1px 0 rgba($aa-pr-white, 0.42);
+  }
+
+  .command-palette-item:hover,
+  .cc-action-btn:hover,
+  .cc-tab-btn:hover {
+    background: $ag-light-surface-overlay-strong;
+    border-color: $ag-light-border-soft;
+  }
+
+  .command-palette-item-active,
+  .command-palette-item-active:hover,
+  .cc-tab-btn-active {
+    background: linear-gradient(
+      148deg,
+      rgba(98, 152, 232, 0.18),
+      rgba(74, 124, 214, 0.13)
+    );
+    border-color: $ag-light-border-strong;
+    color: rgba(28, 76, 149, 0.96);
+  }
+
+  .command-palette-item-category,
+  .cc-tabbar {
+    background: rgba(33, 66, 111, 0.055);
+    border-color: rgba(56, 84, 124, 0.16);
+  }
+
+  .command-palette-category-apps,
+  .command-palette-status-success,
+  .cc-inline-message-success {
+    color: $ag-light-text-success;
+  }
+
+  .command-palette-status-busy,
+  .cc-tab-btn-active,
+  .cc-session-tile-icon,
+  .vol-popup-icon,
+  .vol-popup-heading {
+    color: $ag-light-text-connection;
+  }
+
+  .command-palette-status-error,
+  .cc-inline-message-error,
+  .cc-session-tile-icon-danger {
+    color: rgba(172, 64, 75, 0.96);
+  }
+
+  .cc-close-btn,
+  .cc-tab-btn,
+  .cc-action-btn,
+  .health-open-monitor,
+  .vol-mute-btn {
+    @include ag-interactive-control(
+      $bg: rgba(33, 66, 111, 0.07),
+      $border: rgba(33, 66, 111, 0.14),
+      $color: $ag-light-text-primary,
+      $hover-bg: rgba(33, 66, 111, 0.12),
+      $hover-border: rgba(33, 66, 111, 0.22),
+      $active-bg: rgba(33, 66, 111, 0.16),
+      $active-border: rgba(33, 66, 111, 0.28)
+    );
+  }
+
+  .cc-section {
+    background: transparent;
+    border: none;
+    box-shadow: none;
+  }
+
+  .cc-list-row {
+    background: rgba(33, 66, 111, 0.025);
+    border-color: rgba(56, 84, 124, 0.13);
+    box-shadow: none;
+  }
+
+  .cc-list-row-active {
+    background: rgba(74, 124, 214, 0.09);
+    box-shadow: inset 2px 0 0 rgba(44, 105, 194, 0.72);
+  }
+
+  .cc-action-primary {
+    background: rgba(74, 124, 214, 0.14);
+    border-color: rgba(44, 105, 194, 0.32);
+    color: $ag-light-text-connection;
+  }
+
+  .cc-tab-btn:not(.cc-tab-btn-active) {
+    background: transparent;
+    border-color: transparent;
+    box-shadow: none;
+  }
+
+  .cc-action-quiet {
+    background: transparent;
+    border-color: transparent;
+    box-shadow: none;
+    color: $ag-light-text-muted;
+  }
+
+  .cc-display-monitor {
+    background: rgba(33, 66, 111, 0.045);
+    border-color: rgba(56, 84, 124, 0.16);
+    box-shadow: inset 0 1px 0 rgba($aa-pr-white, 0.46);
+  }
+
+  .cc-display-monitor-active {
+    background: rgba(74, 124, 214, 0.09);
+    border-color: rgba(44, 105, 194, 0.28);
+    box-shadow: inset 2px 0 0 rgba(44, 105, 194, 0.72);
+  }
+
+  .cc-display-monitor-title,
+  .cc-display-preset-title {
+    color: $ag-light-text-primary;
+  }
+
+  .cc-display-monitor-details,
+  .cc-display-monitor-position,
+  .cc-display-preset-subtitle,
+  .cc-display-warning {
+    color: $ag-light-text-muted;
+  }
+
+  .cc-display-monitor-badge {
+    background: rgba(39, 143, 105, 0.09);
+    border-color: rgba(39, 143, 105, 0.24);
+    color: $ag-light-text-success;
+  }
+
+  .cc-display-utilities {
+    border-color: rgba(56, 84, 124, 0.14);
+  }
+
+  .cc-display-preset {
+    @include ag-interactive-control(
+      $bg: rgba(33, 66, 111, 0.065),
+      $border: rgba(33, 66, 111, 0.14),
+      $color: $ag-light-text-primary,
+      $hover-bg: rgba(33, 66, 111, 0.12),
+      $hover-border: rgba(33, 66, 111, 0.22),
+      $active-bg: rgba(33, 66, 111, 0.16),
+      $active-border: rgba(33, 66, 111, 0.28)
+    );
+    box-shadow: $ag-shadow-sm;
+  }
+
+  .cc-display-preset image {
+    color: $ag-light-text-connection;
+  }
+
+  .cc-display-preset-primary {
+    background: rgba(74, 124, 214, 0.13);
+    border-color: rgba(44, 105, 194, 0.3);
+  }
+
+  .cc-display-single-btn {
+    border-color: rgba(176, 116, 28, 0.28);
+    color: rgba(145, 88, 12, 0.96);
+  }
+
+  .cc-audio-scale trough,
+  .vol-scale trough,
+  .health-meter-bar trough {
+    background: $ag-light-state-progress-track;
+    border-color: rgba(56, 84, 124, 0.16);
+  }
+
+  .cc-audio-scale highlight,
+  .vol-scale highlight,
+  .health-meter-ok progress {
+    @include ag-progress-fill(
+      rgba(98, 152, 232, 0.9),
+      rgba(76, 181, 137, 0.88)
+    );
+  }
+
+  @each $accent-name, $accent-token in $ag-accent-variants-light {
+    &.spotify-accent-#{"" + $accent-name} {
+      border-color: map.get($accent-token, border);
+    }
+
+    &.spotify-accent-#{"" + $accent-name} .cc-tab-btn-active,
+    &.spotify-accent-#{"" + $accent-name} .command-palette-item-active,
+    &.spotify-accent-#{"" + $accent-name} .command-palette-item-active:hover {
+      background: map.get($accent-token, tint);
+      border-color: map.get($accent-token, border);
+      color: map.get($accent-token, text);
+    }
+
+    &.spotify-accent-#{"" + $accent-name} .cc-audio-scale highlight,
+    &.spotify-accent-#{"" + $accent-name} .vol-scale highlight,
+    &.spotify-accent-#{"" + $accent-name} .health-meter-ok progress {
+      @include ag-progress-fill(
+        map.get($accent-token, fill-start),
+        map.get($accent-token, fill-end)
+      );
+    }
   }
 }
 

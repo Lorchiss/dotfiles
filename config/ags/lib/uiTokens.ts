@@ -1,5 +1,5 @@
 export const OVERLAY_LAYOUT = {
-  topOffset: 84,
+  topOffset: 68,
   edgeOffset: 28,
   gap: 16,
 } as const
@@ -13,8 +13,8 @@ export const BAR_UI = {
     popover: 8,
   },
   text: {
-    activeWindowMaxChars: 64,
-    activeWindowMinChars: 24,
+    activeWindowMaxChars: 42,
+    activeWindowMinChars: 18,
     networkLabelChars: 14,
     volumeLabelChars: 4,
   },

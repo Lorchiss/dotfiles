@@ -325,10 +325,10 @@ export async function readHyprWorkspaceState(): Promise<HyprWorkspaceState> {
   try {
     const [monitorsRaw, workspacesRaw, clientsRaw, activeRaw] =
       await Promise.all([
-        execAsync(`bash -lc "hyprctl -j monitors"`),
-        execAsync(`bash -lc "hyprctl -j workspaces"`),
-        execAsync(`bash -lc "hyprctl -j clients"`),
-        execAsync(`bash -lc "hyprctl -j activewindow"`),
+        execAsync(`bash -c "hyprctl -j monitors"`),
+        execAsync(`bash -c "hyprctl -j workspaces"`),
+        execAsync(`bash -c "hyprctl -j clients"`),
+        execAsync(`bash -c "hyprctl -j activewindow"`),
       ])
 
     const monitors = safeJsonParse<HyprMonitorRaw[]>(monitorsRaw) ?? []
@@ -421,6 +421,6 @@ export async function switchWorkspaceOnMonitor(
 
   const batch = `dispatch focusmonitor ${monitorName}; dispatch workspace ${safeWorkspaceId}`
   await execAsync(
-    `bash -lc "hyprctl --batch ${shellQuote(batch)} >/dev/null 2>&1"`,
+    `bash -c "hyprctl --batch ${shellQuote(batch)} >/dev/null 2>&1"`,
   )
 }

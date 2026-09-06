@@ -8,7 +8,6 @@ import {
   switchWorkspaceOnMonitor,
   workspaceChipState,
 } from "../../lib/hypr"
-import { resolveAppIcon } from "../../lib/appIcon"
 import { safeText } from "../../lib/text"
 import { BAR_UI } from "../../lib/uiTokens"
 import { barLog } from "../../lib/barObservability"
@@ -70,36 +69,26 @@ function chipTooltip(workspaceId: number, meta: WorkspaceMeta): string {
   return `Workspace ${workspaceText} · ${title}`
 }
 
-function workspaceContent(
-  workspaceId: number,
-  meta: WorkspaceMeta,
-  iconTheme: any,
-): any {
-  const appName = safeText(
-    meta.appName,
-    "Desktop",
-    "WS",
-    `workspace-app-label-${workspaceId}`,
-  )
-  const iconName = resolveAppIcon(iconTheme, appName)
-
+function workspaceContent(workspaceId: number, meta: WorkspaceMeta): any {
   const overlay = new Gtk.Overlay()
-  const icon = new Gtk.Image({ icon_name: iconName, pixel_size: 14 })
-  setClasses(icon, "workspace-chip-icon")
-  overlay.set_child(icon)
-
-  const badge = new Gtk.Label({
+  const number = new Gtk.Label({
     label: safeText(workspaceId, "--", "WS", `workspace-badge-${workspaceId}`),
   })
-  setClasses(badge, "workspace-chip-badge")
-  badge.set_halign(Gtk.Align.END)
-  badge.set_valign(Gtk.Align.START)
-  overlay.add_overlay(badge)
+  setClasses(number, "workspace-chip-number")
+  overlay.set_child(number)
+
+  if (!meta.empty) {
+    const occupied = new Gtk.Box()
+    setClasses(occupied, "workspace-chip-dot")
+    occupied.set_halign(Gtk.Align.CENTER)
+    occupied.set_valign(Gtk.Align.END)
+    overlay.add_overlay(occupied)
+  }
 
   return overlay
 }
 
-function laneWidget(lane: MonitorLaneState, iconTheme: any) {
+function laneWidget(lane: MonitorLaneState) {
   const laneBox = new Gtk.Box({
     spacing: BAR_UI.spacing.tight,
     valign: Gtk.Align.CENTER,
@@ -126,7 +115,7 @@ function laneWidget(lane: MonitorLaneState, iconTheme: any) {
         () => {},
       )
     })
-    button.set_child(workspaceContent(workspaceId, meta, iconTheme))
+    button.set_child(workspaceContent(workspaceId, meta))
     chipsBox.append(button)
   }
 
@@ -134,9 +123,12 @@ function laneWidget(lane: MonitorLaneState, iconTheme: any) {
   return laneBox
 }
 
-export default function WorkspaceLanes() {
+export default function WorkspaceLanes({
+  monitorName = "",
+}: {
+  monitorName?: string
+}) {
   barLog("WS", "mounting WorkspaceLanes")
-  let iconTheme: any = null
   const lanes = createPoll<HyprWorkspaceState>(
     { lanes: [], hasError: false },
     HYPR_POLL_MS,
@@ -149,15 +141,6 @@ export default function WorkspaceLanes() {
       spacing={BAR_UI.spacing.inline}
       valign={Gtk.Align.CENTER}
       $={(self: any) => {
-        try {
-          const display = self.get_display?.()
-          if (display && typeof Gtk.IconTheme.get_for_display === "function") {
-            iconTheme = Gtk.IconTheme.get_for_display(display)
-          }
-        } catch {
-          iconTheme = null
-        }
-
         const source = lanes as any
         let lastRenderKey = ""
 
@@ -182,8 +165,17 @@ export default function WorkspaceLanes() {
             return
           }
 
-          for (const lane of snapshot.lanes) {
-            self.append(laneWidget(lane, iconTheme))
+          const visibleLanes = monitorName
+            ? snapshot.lanes.filter((lane) => lane.monitorName === monitorName)
+            : snapshot.lanes
+
+          if (!visibleLanes.length) {
+            self.append(fallbackWidget(snapshot.hasError))
+            return
+          }
+
+          for (const lane of visibleLanes) {
+            self.append(laneWidget(lane))
           }
         }
 
