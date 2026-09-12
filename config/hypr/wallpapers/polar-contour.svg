@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="3840" height="2160" viewBox="0 0 3840 2160">
+  <title>Polar Contour</title>
+  <desc>Static Arctic Instrument wallpaper. A dark horizon with layered ice-blue contours; no text or animation.</desc>
+  <defs>
+    <linearGradient id="night" x2="0.8" y2="1">
+      <stop stop-color="#080d14"/>
+      <stop offset="0.55" stop-color="#0d1823"/>
+      <stop offset="1" stop-color="#172e40"/>
+    </linearGradient>
+    <radialGradient id="atmosphere" cx="0.73" cy="0.56" r="0.65">
+      <stop stop-color="#3d7390" stop-opacity="0.28"/>
+      <stop offset="1" stop-color="#080d14" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="farIce" x1="0.2" y1="0" x2="0.8" y2="1">
+      <stop stop-color="#33546a"/>
+      <stop offset="0.28" stop-color="#213e52"/>
+      <stop offset="1" stop-color="#101f2d"/>
+    </linearGradient>
+    <linearGradient id="nearIce" x1="0.3" y1="0" x2="0.65" y2="1">
+      <stop stop-color="#355c73"/>
+      <stop offset="0.2" stop-color="#1c3547"/>
+      <stop offset="1" stop-color="#080d14"/>
+    </linearGradient>
+    <linearGradient id="edge" x1="0" y1="0" x2="1" y2="0">
+      <stop stop-color="#79c7ff" stop-opacity="0"/>
+      <stop offset="0.52" stop-color="#79c7ff" stop-opacity="0.15"/>
+      <stop offset="0.75" stop-color="#a3d9ec" stop-opacity="0.7"/>
+      <stop offset="1" stop-color="#70e1bd" stop-opacity="0.12"/>
+    </linearGradient>
+    <path id="contour" d="M-240 1510 C420 1280 720 1740 1320 1370 S2100 1490 2570 1070 S3310 700 4080 930"/>
+  </defs>
+  <path fill="url(#night)" d="M0 0H3840V2160H0Z"/>
+  <path fill="url(#atmosphere)" d="M0 0H3840V2160H0Z"/>
+  <g fill="none" stroke="#79c7ff" stroke-width="1" opacity="0.045">
+    <path d="M0 540H3840M0 1080H3840M0 1620H3840M960 0V2160M1920 0V2160M2880 0V2160"/>
+    <circle cx="2850" cy="970" r="670"/>
+    <circle cx="2850" cy="970" r="690"/>
+  </g>
+  <path fill="url(#farIce)" d="M-240 1510 C420 1280 720 1740 1320 1370 S2100 1490 2570 1070 S3310 700 4080 930 V2160 H-240Z"/>
+  <g fill="none" stroke="url(#edge)" stroke-width="1.5">
+    <use href="#contour"/>
+    <use href="#contour" transform="translate(0 22)" opacity="0.65"/>
+    <use href="#contour" transform="translate(0 48)" opacity="0.48"/>
+    <use href="#contour" transform="translate(0 80)" opacity="0.36"/>
+    <use href="#contour" transform="translate(0 120)" opacity="0.28"/>
+    <use href="#contour" transform="translate(0 168)" opacity="0.22"/>
+    <use href="#contour" transform="translate(0 224)" opacity="0.16"/>
+    <use href="#contour" transform="translate(0 288)" opacity="0.12"/>
+  </g>
+  <path fill="url(#nearIce)" d="M-100 1970 C510 1620 1050 1930 1620 1580 S2380 1210 2820 1510 S3500 1800 3940 1450 V2160 H-100Z"/>
+  <path fill="none" stroke="url(#edge)" stroke-width="2" d="M-100 1970 C510 1620 1050 1930 1620 1580 S2380 1210 2820 1510 S3500 1800 3940 1450"/>
+  <g fill="none" stroke="#91a5b7" stroke-width="1" opacity="0.12">
+    <path d="M112 1936v48m-24-24h48M3704 256v48m-24-24h48"/>
+    <path d="M120 2032h96m12 0h24m12 0h12M3564 160h96m12 0h24m12 0h12"/>
+  </g>
+</svg>

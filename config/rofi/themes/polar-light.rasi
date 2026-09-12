@@ -1,0 +1,12 @@
+/* Compatible light palette with the same layout and selection hierarchy. */
+* {
+    bg0: #f6f8fc;
+    bg1: #edf2fb;
+    bg2: #dde6f5;
+    fg0: #1d2433;
+    fg1: #4a5870;
+    line: #bdcddd;
+    accent-color: #226592;
+    warning-color: #9a6700;
+    accent: rgba(34, 101, 146, 0.14);
+}

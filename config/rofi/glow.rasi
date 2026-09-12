@@ -42,7 +42,7 @@ element {
 
 element selected {
   background-color: @accent;
-  text-color: @selection_fg;
+  text-color: @selection-fg;
 }
 
 element-text { text-color: inherit; }

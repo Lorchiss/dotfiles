@@ -1,0 +1,142 @@
+/* Polar layout; colors follow the persisted theme-sync.sh selection. */
+@import "theme-auto.rasi"
+configuration {
+    modi: "drun,window";
+    show-icons: true;
+    font: "IBM Plex Sans 11";
+    display-drun: "APPS";
+    display-window: "VENTANAS";
+    drun-display-format: "{name}";
+}
+
+* {
+    void: @bg0;
+    panel: @bg1;
+    elevated: @bg2;
+    hairline: @line;
+    frost: @accent-color;
+    primary: @fg0;
+    muted: @fg1;
+    warning: @warning-color;
+    background-color: transparent;
+    text-color: @primary;
+}
+
+window {
+    location: center;
+    anchor: center;
+    width: 560px;
+    border: 1px;
+    border-color: @hairline;
+    border-radius: 18px;
+    background-color: @panel;
+    children: [mainbox];
+}
+
+mainbox {
+    padding: 16px;
+    spacing: 12px;
+    children: [inputbar, listview, message];
+}
+
+inputbar {
+    children: [prompt, entry, case-indicator];
+    background-color: @elevated;
+    border: 0px 0px 1px;
+    border-color: @hairline;
+    border-radius: 10px;
+    padding: 12px;
+    spacing: 12px;
+}
+
+prompt {
+    font: "IBM Plex Sans SemiBold 10";
+    text-color: @frost;
+    vertical-align: 0.5;
+}
+
+entry {
+    placeholder: "Buscar aplicaciones";
+    placeholder-color: @muted;
+    cursor: text;
+    vertical-align: 0.5;
+}
+
+case-indicator {
+    text-color: @muted;
+}
+
+listview {
+    lines: 6;
+    columns: 1;
+    fixed-height: false;
+    dynamic: true;
+    spacing: 4px;
+    scrollbar: false;
+}
+
+element {
+    padding: 10px 12px;
+    spacing: 12px;
+    border-radius: 10px;
+    border: 0px 0px 0px 2px;
+    border-color: transparent;
+}
+
+element normal.normal, element alternate.normal {
+    background-color: transparent;
+    text-color: @primary;
+}
+
+element selected.normal {
+    background-color: @elevated;
+    border-color: @frost;
+    text-color: @primary;
+}
+
+element normal.active, element alternate.active {
+    text-color: @frost;
+}
+
+element selected.active {
+    background-color: @elevated;
+    border-color: @frost;
+    text-color: @frost;
+}
+
+element normal.urgent, element alternate.urgent {
+    text-color: @warning;
+}
+
+element selected.urgent {
+    background-color: @elevated;
+    border-color: @warning;
+    text-color: @warning;
+}
+
+element-icon {
+    size: 24px;
+    vertical-align: 0.5;
+}
+
+element-text {
+    text-color: inherit;
+    vertical-align: 0.5;
+    highlight: bold;
+}
+
+message {
+    border: 1px 0px 0px;
+    border-color: @hairline;
+    padding: 12px 0px 0px;
+}
+
+textbox {
+    text-color: @muted;
+}
+
+@media (max-width: 640px) {
+    window {
+        width: 90%;
+    }
+}

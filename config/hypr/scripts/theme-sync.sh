@@ -1,228 +1,143 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
+CONFIG_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
+CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}"
 STATE_DIR="${XDG_STATE_HOME:-$HOME/.local/state}/hypr"
 STATE_FILE="$STATE_DIR/theme-mode"
-
-KITTY_THEME_FILE="${XDG_CONFIG_HOME:-$HOME/.config}/kitty/theme-auto.conf"
-ROFI_THEME_FILE="${XDG_CONFIG_HOME:-$HOME/.config}/rofi/theme-auto.rasi"
-ROFI_GLOW_THEME_FILE="${XDG_CONFIG_HOME:-$HOME/.config}/rofi/theme-auto-glow.rasi"
+DRY_RUN=0
+FILES_ONLY=0
 
 usage() {
-  cat <<'EOF'
-Usage: theme-sync.sh [dark|light|toggle|apply|status]
-
-Commands:
-  dark    Persist and apply dark mode
-  light   Persist and apply light mode
-  toggle  Toggle mode, persist and apply
-  apply   Re-apply persisted mode (default: dark if none)
-  status  Print current persisted mode
-EOF
-}
-
-normalize_mode() {
-  local mode="${1:-}"
-  case "$mode" in
-    dark|light) printf '%s\n' "$mode" ;;
-    *) printf 'dark\n' ;;
-  esac
+  printf '%s\n' \
+    'Usage: theme-sync.sh [--dry-run] [--files-only] [dark|light|toggle|apply|status]' \
+    'Persist/apply Kitty, Rofi and GTK preferences. Default: apply.' \
+    '--dry-run     No writes or desktop changes.' \
+    '--files-only  Write palettes and state, but skip GTK and GSettings.' \
+    'Quickshell and the wallpaper keep their dark Polar appearance.'
 }
 
 read_mode() {
-  if [[ -f "$STATE_FILE" ]]; then
-    local stored
-    stored="$(tr -d '[:space:]' <"$STATE_FILE" || true)"
-    normalize_mode "$stored"
-    return
-  fi
-  printf 'dark\n'
+  local mode=dark
+  if [[ -f "$STATE_FILE" ]]; then mode="$(tr -d '[:space:]' < "$STATE_FILE")"; fi
+  case "$mode" in dark|light) printf '%s\n' "$mode" ;; *) echo dark ;; esac
 }
 
-write_mode() {
-  local mode="$1"
-  mkdir -p "$STATE_DIR"
-  printf '%s' "$mode" >"$STATE_FILE"
+# Avoid rewriting unchanged files: consumers may hot reload when files change.
+publish() {
+  local temporary="$1" target="$2"
+  if cmp -s "$temporary" "$target"; then
+    rm -- "$temporary"
+  else
+    if [[ -f "$target" ]]; then chmod --reference="$target" "$temporary"; else chmod 644 "$temporary"; fi
+    mv -f -- "$temporary" "$target"
+  fi
+}
+
+copy_theme() {
+  local source="$1" target="$2" temporary
+  if [[ -L "$target" ]]; then target="$(readlink -f "$target")"; fi
+  mkdir -p "$(dirname "$target")"
+  temporary="$(mktemp "${target}.XXXXXX")"
+  cp -- "$source" "$temporary"
+  publish "$temporary" "$target"
+}
+
+gtk_settings() {
+  local target="$1" dark="$2" temporary input=/dev/null
+  if [[ -L "$target" ]]; then target="$(readlink -f "$target")"; fi
+  mkdir -p "$(dirname "$target")"
+  [[ ! -f "$target" ]] || input="$target"
+  temporary="$(mktemp "${target}.XXXXXX")"
+  # Update only our two keys inside [Settings]; preserve comments and other groups.
+  awk -v dark="$dark" '
+    function finish() {
+      if (settings && !font_seen) print "gtk-font-name=IBM Plex Sans 11"
+      if (settings && !dark_seen) print "gtk-application-prefer-dark-theme=" dark
+    }
+    /^\[[^]]+\][[:space:]]*$/ {
+      finish()
+      settings = ($0 ~ /^\[Settings\]/)
+      if (settings) found = 1
+      font_seen = dark_seen = 0
+    }
+    settings && /^[[:space:]]*gtk-font-name[[:space:]]*=/ {
+      if (!font_seen++) print "gtk-font-name=IBM Plex Sans 11"
+      next
+    }
+    settings && /^[[:space:]]*gtk-application-prefer-dark-theme[[:space:]]*=/ {
+      if (!dark_seen++) print "gtk-application-prefer-dark-theme=" dark
+      next
+    }
+    { print }
+    END {
+      finish()
+      if (!found) {
+        print "[Settings]"
+        print "gtk-font-name=IBM Plex Sans 11"
+        print "gtk-application-prefer-dark-theme=" dark
+      }
+    }
+  ' "$input" > "$temporary"
+  publish "$temporary" "$target"
 }
 
 apply_gtk() {
-  local mode="$1"
-  if ! command -v gsettings >/dev/null 2>&1; then
-    return
+  local mode="$1" dark=0 scheme=default
+  if [[ "$mode" == dark ]]; then dark=1; scheme=prefer-dark; fi
+  gtk_settings "$CONFIG_DIR/gtk-3.0/settings.ini" "$dark"
+  gtk_settings "$CONFIG_DIR/gtk-4.0/settings.ini" "$dark"
+  if command -v gsettings >/dev/null 2>&1; then
+    gsettings set org.gnome.desktop.interface font-name 'IBM Plex Sans 11' \
+      || echo '[theme] GTK font preference could not be published' >&2
+    gsettings set org.gnome.desktop.interface color-scheme "$scheme" \
+      || echo '[theme] GTK color preference could not be published' >&2
   fi
-
-  if [[ "$mode" == "dark" ]]; then
-    gsettings set org.gnome.desktop.interface color-scheme 'prefer-dark' >/dev/null 2>&1 || true
-  else
-    gsettings set org.gnome.desktop.interface color-scheme 'default' >/dev/null 2>&1 || true
-  fi
-}
-
-write_kitty_theme() {
-  local mode="$1"
-  mkdir -p "$(dirname "$KITTY_THEME_FILE")"
-
-  if [[ "$mode" == "dark" ]]; then
-    cat >"$KITTY_THEME_FILE" <<'EOF'
-# Managed by ~/.config/hypr/scripts/theme-sync.sh
-background #0f0f0f
-foreground #e6e6e6
-selection_background #2a2a2a
-selection_foreground #ffffff
-cursor #4c8bf5
-
-color0  #1a1a1a
-color1  #c25f5f
-color2  #7fb069
-color3  #d7ba7d
-color4  #4c8bf5
-color5  #c586c0
-color6  #4ec9b0
-color7  #e6e6e6
-
-color8  #5c5c5c
-color9  #d16969
-color10 #8ec07c
-color11 #e5c07b
-color12 #6ca0f6
-color13 #d19ad9
-color14 #56b6c2
-color15 #ffffff
-EOF
-  else
-    cat >"$KITTY_THEME_FILE" <<'EOF'
-# Managed by ~/.config/hypr/scripts/theme-sync.sh
-background #f6f8fc
-foreground #1e2430
-selection_background #dce6f7
-selection_foreground #152133
-cursor #2f6feb
-
-color0  #e4e7ee
-color1  #b42318
-color2  #1f883d
-color3  #9a6700
-color4  #175cd3
-color5  #8250df
-color6  #0e7490
-color7  #1f2937
-
-color8  #98a2b3
-color9  #d92d20
-color10 #2da44e
-color11 #bf8700
-color12 #1d4ed8
-color13 #7c3aed
-color14 #0369a1
-color15 #0f172a
-EOF
-  fi
-}
-
-write_rofi_theme() {
-  local mode="$1"
-  mkdir -p "$(dirname "$ROFI_THEME_FILE")"
-
-  if [[ "$mode" == "dark" ]]; then
-    cat >"$ROFI_THEME_FILE" <<'EOF'
-* {
-  bg0: #0f0f0f;
-  bg1: #151515;
-  bg2: #1c1c1c;
-  fg0: #e6e6e6;
-  fg1: #9a9a9a;
-  accent: rgba(76, 139, 245, 0.18);
-}
-EOF
-  else
-    cat >"$ROFI_THEME_FILE" <<'EOF'
-* {
-  bg0: #f6f8fc;
-  bg1: #edf2fb;
-  bg2: #dde6f5;
-  fg0: #1d2433;
-  fg1: #4a5870;
-  accent: rgba(37, 99, 235, 0.18);
-}
-EOF
-  fi
-}
-
-write_rofi_glow_theme() {
-  local mode="$1"
-  mkdir -p "$(dirname "$ROFI_GLOW_THEME_FILE")"
-
-  if [[ "$mode" == "dark" ]]; then
-    cat >"$ROFI_GLOW_THEME_FILE" <<'EOF'
-* {
-  bg: #0b0f17ee;
-  bg2: #111827ee;
-  fg: #dbeafe;
-  dim: #94a3b8;
-  accent: #22d3ee;
-  selection_fg: #001018;
-}
-EOF
-  else
-    cat >"$ROFI_GLOW_THEME_FILE" <<'EOF'
-* {
-  bg: #f6f9ffee;
-  bg2: #e7eefbee;
-  fg: #1f2937;
-  dim: #51607a;
-  accent: #2563eb;
-  selection_fg: #ffffff;
-}
-EOF
-  fi
-}
-
-apply_mode() {
-  local mode="$1"
-  apply_gtk "$mode"
-  write_kitty_theme "$mode"
-  write_rofi_theme "$mode"
-  write_rofi_glow_theme "$mode"
-  printf '%s\n' "$mode"
-}
-
-set_mode() {
-  local mode
-  mode="$(normalize_mode "${1:-dark}")"
-  write_mode "$mode"
-  apply_mode "$mode"
 }
 
 main() {
-  local command="${1:-apply}"
-  case "$command" in
-    dark|light)
-      set_mode "$command"
-      ;;
-    toggle)
-      local current next
-      current="$(read_mode)"
-      if [[ "$current" == "dark" ]]; then
-        next="light"
-      else
-        next="dark"
-      fi
-      set_mode "$next"
-      ;;
-    apply)
-      apply_mode "$(read_mode)"
-      ;;
-    status)
-      read_mode
-      ;;
-    -h|--help)
-      usage
-      ;;
-    *)
-      usage >&2
-      exit 2
-      ;;
+  local action=apply mode source action_seen=0
+  while (($#)); do
+    case "$1" in
+      --dry-run) DRY_RUN=1 ;;
+      --files-only) FILES_ONLY=1 ;;
+      dark|light|toggle|apply|status)
+        if ((action_seen)); then usage >&2; return 2; fi
+        action="$1"; action_seen=1 ;;
+      -h|--help) usage; return ;;
+      *) usage >&2; return 2 ;;
+    esac
+    shift
+  done
+  mode="$(read_mode)"
+  case "$action" in
+    status) printf '%s\n' "$mode"; return ;;
+    dark|light) mode="$action" ;;
+    toggle) if [[ "$mode" == dark ]]; then mode=light; else mode=dark; fi ;;
   esac
+  for source in "$CONFIG_ROOT/kitty/themes/polar-$mode.conf" \
+      "$CONFIG_ROOT/rofi/themes/polar-$mode.rasi" \
+      "$CONFIG_ROOT/rofi/themes/polar-glow-compat.rasi"; do
+    [[ -f "$source" ]] || { echo "[theme] Missing template: $source" >&2; return 1; }
+  done
+  if ((DRY_RUN)); then
+    printf '[dry-run] %s -> Kitty/Rofi in %s; GTK=%s; state=%s\n' \
+      "$mode" "$CONFIG_DIR" "$((1 - FILES_ONLY))" "$STATE_FILE"
+    return
+  fi
+  copy_theme "$CONFIG_ROOT/kitty/themes/polar-$mode.conf" "$CONFIG_DIR/kitty/theme-auto.conf"
+  copy_theme "$CONFIG_ROOT/rofi/themes/polar-$mode.rasi" "$CONFIG_DIR/rofi/theme-auto.rasi"
+  copy_theme "$CONFIG_ROOT/rofi/themes/polar-glow-compat.rasi" "$CONFIG_DIR/rofi/theme-auto-glow.rasi"
+  if (( ! FILES_ONLY )); then apply_gtk "$mode"; fi
+  mkdir -p "$STATE_DIR"
+  if [[ ! -f "$STATE_FILE" || "$(read_mode)" != "$mode" ]]; then
+    local temporary
+    temporary="$(mktemp "${STATE_FILE}.XXXXXX")"
+    printf '%s\n' "$mode" > "$temporary"
+    publish "$temporary" "$STATE_FILE"
+  fi
+  printf '%s\n' "$mode"
 }
 
-main "${1:-apply}"
+main "$@"
