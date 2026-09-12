@@ -87,6 +87,14 @@ check_cmd optional pavucontrol "Advanced audio control UI"
 check_cmd optional nmtui "Wi-Fi TUI fallback"
 check_cmd optional blueman-manager "Bluetooth GUI fallback"
 check_cmd optional grim "Screenshot tool"
+if command -v awww >/dev/null 2>&1; then
+  check_cmd optional awww "Wallpaper control"
+  check_cmd optional awww-daemon "Wallpaper daemon"
+else
+  check_cmd optional swww "Legacy wallpaper control"
+  check_cmd optional swww-daemon "Legacy wallpaper daemon"
+fi
+check_cmd optional rsvg-convert "Polar wallpaper rasterizer"
 check_cmd optional slurp "Screenshot region selector"
 check_cmd optional powerprofilesctl "Power profile controller"
 check_cmd optional checkupdates "Arch updates helper"

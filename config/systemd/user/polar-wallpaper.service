@@ -1,0 +1,16 @@
+[Unit]
+Description=Polar desktop wallpaper
+PartOf=graphical-session.target
+After=graphical-session.target
+StartLimitIntervalSec=60
+StartLimitBurst=3
+
+[Service]
+Type=exec
+ExecStart=/usr/bin/bash %h/.config/hypr/scripts/start-wallpaper.sh --daemon
+Restart=on-failure
+RestartSec=2
+TimeoutStopSec=5
+KillMode=control-group
+
+# Started by the existing Hyprland wallpaper entry, never default.target.
