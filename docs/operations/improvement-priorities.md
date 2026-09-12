@@ -3,7 +3,7 @@
 Estado revisado: 2026-08-19.
 
 Esta cola usa el modelo `P0`-`P3` de
-`.github/instructions/repository-governance.instructions.md`. La prioridad se
+`AGENTS.md`. La prioridad se
 basa en impacto y evidencia del repositorio, no en tamaño o atractivo visual.
 
 ## P0: credencial retirada presente en historial

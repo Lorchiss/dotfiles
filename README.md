@@ -37,9 +37,8 @@ el runtime de recuperacion; su Command Palette (`Super+P`) y popup Spotify
 
 ## Gobierno de agentes
 
-- Entrada global: `.github/copilot-instructions.md`.
-- Orquestación y especialistas: `.github/agents/`.
-- Contratos de alcance, prioridad, riesgo y workflows: `.github/instructions/`.
+- Entrada y gobernanza nativas: `AGENTS.md`.
+- Arquitectura del harness y responsabilidades: `docs/architecture/agent-harness.md`.
 - Validación estática: `bash bootstrap/validate-agent-config.sh`.
 - Prioridad operativa: `P0` seguridad/pérdida de datos, `P1` regresiones,
   `P2` deuda relevante y documentación, `P3` mejoras opcionales.
@@ -310,7 +309,6 @@ Secuencia recomendada de aislamiento:
 
 Contrato runtime AGS (bar + popups):
 
-- `.github/instructions/ags-runtime-contract.instructions.md`
 
 ## QA estricto bloqueante (fail-fast)
 

@@ -24,3 +24,12 @@ Cada avance terminado debe seguir este flujo: cambiar, validar, crear un commit 
 - **Validado:** `bash bootstrap/validate-agent-config.sh` y `git diff --check`.
 - **Estado:** contrato nativo activo; `.github` permanece como referencia de
   migración hasta retirar duplicaciones en una pasada posterior.
+
+## 2026-09-12 — Retiro de contratos duplicados
+
+- **Alcance:** eliminación de los perfiles e instrucciones heredados de
+  `.github`; actualización del README y del validador para usar `AGENTS.md`.
+- **Motivo:** evitar dos fuentes de autoridad para la misma gobernanza y hacer
+  que el harness nativo sea verificable por una sola puerta.
+- **Validado:** `bash bootstrap/validate-agent-config.sh` y `git diff --check`.
+- **Estado:** migración de autoridad completada localmente; no se ha hecho push.
