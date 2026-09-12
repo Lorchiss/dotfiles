@@ -14,3 +14,13 @@ Este archivo registra avances terminados del repositorio de dotfiles. Git conser
 ## Regla de registro
 
 Cada avance terminado debe seguir este flujo: cambiar, validar, crear un commit local con un mensaje específico y actualizar esta bitácora. El `push` a un remoto es un respaldo separado y no define si el avance quedó registrado.
+
+## 2026-09-12 — Harness nativo para Codex
+
+- **Alcance:** contrato raíz `AGENTS.md`, mapa arquitectónico del harness y
+  validación de su presencia.
+- **Motivo:** centralizar gobernanza, prioridad/riesgo, ownership, autorización
+  y gates sin traducir mecánicamente los perfiles de Copilot.
+- **Validado:** `bash bootstrap/validate-agent-config.sh` y `git diff --check`.
+- **Estado:** contrato nativo activo; `.github` permanece como referencia de
+  migración hasta retirar duplicaciones en una pasada posterior.

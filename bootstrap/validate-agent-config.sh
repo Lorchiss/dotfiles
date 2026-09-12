@@ -15,6 +15,7 @@ require_file() {
 }
 
 required_files=(
+  "AGENTS.md"
   ".github/copilot-instructions.md"
   ".github/agents/orquestador-dotfiles.agent.md"
   ".github/agents/ags-runtime.agent.md"
