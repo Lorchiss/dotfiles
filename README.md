@@ -18,6 +18,8 @@ prototipo manualmente despues de cada reinicio.
 - `config/systemd/user/ags.service`: recuperacion manual o ante fallo de Polar.
 - `config/quickshell`: Polar Command Deck en QML/QtQuick, incluido en el arranque de Hyprland.
 - `config/hypr/scripts/start-desktop-shell.sh`: entrada unica para importar entorno e iniciar la barra.
+- `config/systemd/user/polar-wallpaper.service`: fondo Polar estatico, iniciado desde la sesion sin competir con la barra.
+- Direccion del escritorio, selector de paletas y QA: [Polar Desktop](docs/design/polar-desktop-phase-1.md).
 
 `Super+C` abre el Control Center Polar. Los apartados AGS siguientes documentan
 el runtime de recuperacion; su Command Palette (`Super+P`) y popup Spotify

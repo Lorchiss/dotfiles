@@ -62,7 +62,7 @@ link_dir "$CFG_DIR/ags" "$HOME/.config/ags"
 link_dir "$CFG_DIR/quickshell" "$HOME/.config/quickshell"
 # Preserve unrelated user units and enablement links.
 run "mkdir -p '$HOME/.config/systemd/user'"
-for unit in ags.service quickshell.service quickshell-prototype.service; do
+for unit in ags.service quickshell.service quickshell-prototype.service polar-wallpaper.service; do
 link_dir "$CFG_DIR/systemd/user/$unit" "$HOME/.config/systemd/user/$unit"
 done
 

@@ -1,6 +1,6 @@
 # Startup map: Hyprland + Polar desktop
 
-Estado observado: 2026-09-06.
+Estado observado: 2026-09-08.
 
 Este mapa separa qué levanta la sesión, qué es esencial, qué es opcional y qué
 queda pendiente de ordenar. La barra oficial es Quickshell Polar Command Deck.
@@ -44,7 +44,8 @@ arranques prematuros y competencia. No usar `systemctl enable` para las barras.
 | mako | `optional` | Notificaciones Wayland | D-Bus/systemd user |
 | nm-applet | `optional` | Tray de NetworkManager | Hyprland `exec-once` |
 | blueman-applet | `optional` | Tray Bluetooth | Hyprland `exec-once` |
-| Wallpaper | `external` | Fondo de pantalla | `config/hypr/scripts/start-wallpaper.sh` delega en `~/.config/scripts/wallpaper.sh` |
+| Wallpaper | `optional` | Polar Contour estatico | `start-wallpaper.sh`, SVG local y `polar-wallpaper.service` (awww/swww) |
+| Theme sync | `optional` | Paletas Kitty/Rofi y preferencia GTK | `config/hypr/scripts/theme-sync.sh apply` |
 | Workspace bootstrap | `essential` | Layout diario de workspaces y fallback de apps | `config/hypr/scripts/bootstrap-workspaces.sh` |
 | Window session daemon | `needs-review` | Autosave de ventanas cada 20s | `config/hypr/scripts/window-session-daemon.sh` |
 | Waybar | `needs-review` | Barra alternativa instalada/deshabilitada | No es parte del flujo oficial |
@@ -57,8 +58,11 @@ arranques prematuros y competencia. No usar `systemctl enable` para las barras.
   coexistan. El prototipo historico queda manual, excluido del arranque.
 - El deploy enlaza Quickshell y unidades individuales, respeta instalaciones
   antiguas con el directorio systemd enlazado y no vuelve a habilitar AGS.
-- `start-wallpaper.sh` es un adaptador a un script externo. Si se quiere
-  reproducibilidad total, versionar una implementación propia.
+- El fondo ya no depende del script externo que invocaba swww ausente.
+  `start-wallpaper.sh` genera/reutiliza el PNG y arranca una unidad static propia
+  despues de importar WAYLAND_DISPLAY. Se conserva su exec-once original.
+- `theme-sync.sh` es el unico escritor de las paletas dinamicas Kitty/Rofi y
+  conserva las claves GTK ajenas. La paridad clara de la barra sigue pendiente.
 - `hypridle` está deshabilitado. Los warnings de portal/screensaver pueden ser
   esperados hasta definir una política de idle/lock.
 
@@ -70,6 +74,9 @@ arranques prematuros y competencia. No usar `systemctl enable` para las barras.
 - Iniciar Polar: `bash ~/.config/hypr/scripts/start-desktop-shell.sh`
 - Validar estructura: `bash bootstrap/quickshell-check.sh`
 - Probar arranque sin tocar la sesion: `bash bootstrap/test-desktop-shell.sh`
+- Revisar fondo: `systemctl --user status polar-wallpaper.service`
+- Reaplicar fondo (R2): `bash ~/.config/hypr/scripts/start-wallpaper.sh`
+- Verificar estilos sin cambiar la sesion: `bash bootstrap/polar-visual-check.sh`
 - Revisar audio actual:
   `pactl get-default-sink && pactl list short sink-inputs`
 
@@ -86,7 +93,7 @@ trabajo explicito sobre el fallback, no para verificar Quickshell.
 
 ## Mejoras futuras
 
-- Migrar applets, wallpaper y daemon de ventanas a servicios systemd user.
+- Migrar applets y daemon de ventanas a servicios systemd user; el fondo ya tiene unidad propia.
 - Crear `dotfiles-session.target` como healthcheck de sesión.
 - Definir política `hypridle` + `hyprlock`, o documentar explícitamente que no
   se usa bloqueo/idle automático.

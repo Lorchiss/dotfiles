@@ -4,6 +4,11 @@ Estado al 2026-09-06: Polar Command Deck es la barra de inicio. Este documento
 conserva la evolucion visual de AGS y Quickshell; los estados de las fases
 anteriores son evidencia historica, no una seleccion de runtime.
 
+Entrega al 2026-09-08: [base visual compartida de Polar](polar-desktop-phase-1.md)
+integrada y validada en la sesion con autorizacion R2. Fondo, Rofi, Kitty,
+decoracion y preferencia GTK comparten la direccion Arctic. El nuevo login
+completo y la paridad clara/Qt permanecen pendientes; la barra no se modifica.
+
 ## Vision
 
 Arctic Instrument convierte el escritorio en una herramienta tecnica, fria y
